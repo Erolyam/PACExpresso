@@ -1,0 +1,5 @@
+.settings
+.project
+.buildpath
+var/db.*
+var/log.*

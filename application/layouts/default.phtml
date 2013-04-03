@@ -1,0 +1,106 @@
+<?php if(0){$content="";} ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type"        content="text/html; charset=UTF-8" />
+    <base href="<?php echo getUrl(); ?>" />
+    <meta http-equiv='Content-Script-Type' content='text/javascript'>
+    <meta http-equiv='Content-Style-Type'  content='text/css'>
+    <meta http-equiv='Content-Language'    content='fr'>
+    <meta http-equiv="X-UA-Compatible"     content="IE=edge" />
+    <link rel="shortcut icon"              href="about:blank" />
+
+    <!--  shims  -->
+    <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/es5-shim/es5-shim.js"></script><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/es5-shim/es5-sham.js"></script><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/es6-shim/es6-shim.js"></script><?php endif; ?>
+    <!-- Shim to make HTML5 elements usable in older Internet Explorer versions html5shim.googlecode.com/svn/trunk/html5.js -->
+    <!--[if lt IE 9]><script src="public/extlib/html5shiv/html5shiv.js"></script><![endif]-->
+    <!--[if lt IE 8]><script src="public/extlib/JSON-js/json2.js"></script><![endif]-->
+
+    <!--  jQuery -->
+    <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/jquery/jquery-1.9.1.js"></script><?php endif; ?>
+
+    <!--  Bootstrap -->
+    <?php if(!$GLOBALS["_min"]):?><link href="public/extlib/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" media="screen"><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/twitter-bootstrap/js/bootstrap.js"></script><?php endif; ?>
+
+    <!--  Backbone -->
+    <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/lodash/lodash.js"></script><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/backbone.js/backbone.js"></script><?php endif; ?>
+
+    <!--  Our js / css -->
+    <?php if(!$GLOBALS["_min"]):?><script src="public/js/mestests/passer.js"></script><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><link type="text/css" href="public/css/default.css" rel="stylesheet" /><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><link type="text/css" href="public/css/custom.css" rel="stylesheet" /><?php endif; ?>
+
+    <?php if( $GLOBALS["_min"]):?><script type="text/javascript" src="public/compiled/layout_all.js"></script><?php endif; ?>
+    <?php if( $GLOBALS["_min"]):?><link type="text/css" href="public/compiled/layout_all.css" rel="stylesheet" /><?php endif; ?>
+
+    <meta name="robots" content="noindex, nofollow">
+    <title>Evaluations Pharma</title>
+</head>
+<body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">Project name</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#contact">Contact</a></li>
+              <!--
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Action</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li class="divider"></li>
+                  <li class="nav-header">Nav header</li>
+                  <li><a href="#">Separated link</a></li>
+                  <li><a href="#">One more separated link</a></li>
+                </ul>
+              </li>
+              -->
+            </ul>
+            <form class="navbar-form pull-right">
+              <input class="span2" type="text" placeholder="Email">
+              <input class="span2" type="password" placeholder="Password">
+              <button type="submit" class="btn">Sign in</button>
+            </form>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
+<?php echo $this->yield(); ?>
+
+<footer class="container">
+    <div class="row">
+        <div class="span4">
+            En cas de problème, envoyez un mail à <span class='tt'>gilles.bouthenot@univ-fcomte.fr</span>
+        </div>
+        <div class="span1 offset7 text-right">
+            <a href="public/credits.txt">Credits</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.jsp = <?= json_encode($this->jsp); ?>;
+jQuery(document).ready(function() {
+<?= $this->onready ?>
+});
+</script>
+
+</body>
+</html>

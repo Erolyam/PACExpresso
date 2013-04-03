@@ -1,0 +1,19 @@
+AddDefaultCharset UTF-8
+Options -Indexes
+allow from all
+RedirectMatch 404 /\\.(svn|git|hg|bzr|cvs)(/|$)
+RewriteEngine on
+
+###### A CONFIGURER ######
+# no trailing slash
+SetEnv BASE_URL         /gbo/panouces
+RewriteBase             /gbo/panouces
+php_value include_path  ".:/home/gilles/web/gbphpdb:/usr/share/php:/usr/share/pear"
+##########################
+
+# Passthrough for url beggining with "/public/"
+# $0 is the RewriteRule left part !
+RewriteCond $0                  public/.*$
+RewriteRule ^(.*)$              -                    [L]
+RewriteRule ^(.*)$              public/index.php     [L]
+

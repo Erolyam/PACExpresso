@@ -1,0 +1,29 @@
+Conception et programmation : Gilles Bouthenot, université de Franche-Comté
+
+Partie client:
+bacbbone.js 1.0.0 : http://backbonejs.org/
+jQuery 1.9.1 : http://jquery.org/
+Lo-Dash 1.1.1 : http://lodash.com/
+twitter-bootstrap 2.3.1 : http://twitter.github.com/bootstrap/
+
+Compatibility for bogus browsers:
+es5-shim : https://github.com/kriskowal/es5-shim (version 2.0.5, 27/11/2012, 12adafe355)
+ (actually from https://github.com/rma4ok/es5-shim/, version 2.0.6, 13/12/2012, f5b6181e43)
+es6-shim : https://raw.github.com/paulmillr/es6-shim/master/es6-shim.js (30/01/2013, 4f0f614b62)
+html5shiv : https://github.com/aFarkas/html5shiv (version 3.6.2pre, 22/02/2013, b1545f164f)
+JSON-js : https://github.com/douglascrockford/JSON-js/ (20/02/2013, ff55d8d451)
+
+Partie serveur:
+Php 5.3 : http://www.php.net/
+Sqlite 3 : http://www.sqlite.org/
+gbphpdb : https://bitbucket.org/gbouthenot/gbphpdb
+Zend Framework 1 : http://framework.zend.com/
+Klein.php
+
+Builder:
+NodeJS : http://nodejs.org/
+npm uglify-js : https://github.com/mishoo/UglifyJS
+npm css-condense : https://github.com/rstacruz/css-condense
+npm stylus
+
+

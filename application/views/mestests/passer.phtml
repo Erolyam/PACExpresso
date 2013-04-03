@@ -1,0 +1,48 @@
+<script type="x/custom" id="tplqContext">
+  <div class='context'>
+    <div class='title'><h2><%= title %></h2></div>
+    <div class='body'><%= body %></div>
+  </div>
+</script>
+<script type="x/custom" id="tplqAlinea">
+  <div class='alineabody'><%= body %></div>
+  <div class='alineaanswers'></div>
+</script>
+<script type="x/custom" id="tplqAlineaAnswer">
+  <div class='oneanswer'>
+    <div class='letter'><label><%= letter %>: <input type='checkbox' <%= checked %> /></label></div>
+    <div class='body'><%= body %></div>
+  </div>
+</script>
+
+<div class='container passer'>
+  <div class="row">
+    <div class="span12">
+      <header class="text-center well">
+        Questionnaire
+      </header>
+    </div>
+  </div>
+  <div class="row qrow">
+    <div class="span1 qtabctn">
+      <ul></ul>
+    </div>
+    <div class="span11 qbodyctn"></div>
+  </div>
+  <div class="row">
+    <div class="span12">
+      <footer class='text-center well'>
+        <button class="btn btn-primary actionprev" href="#"><i class="icon-backward icon-white"></i></button>
+        <button class="btn btn-primary actionnext" href="#"><i class="icon-forward icon-white"></i></button>
+      </footer>
+    </div>
+  </div>
+
+</div><!-- .container -->
+
+
+<? $this->onready.= <<<HEREDOC
+mestestsPasser = new MestestsPasser();
+mestestsPasser.go();
+HEREDOC;
+?>
