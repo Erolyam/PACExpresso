@@ -40,7 +40,8 @@ class Questionnaire extends Model {
                 throw new Exception("Cannot create Questionnaire");
             }
             $rand = rand(0, $nbQuestions-1);
-            $qNum    = array_keys($aNbAlineasPerQuestion)[$rand];
+            $qNum    = array_keys($aNbAlineasPerQuestion);
+            $qNum    = $qNum[$rand];
             $qWeight = $aNbAlineasPerQuestion[$qNum];
             if ($total + $qWeight <= $nombreDemandeMax) {
                 // la question tirée n'excède pas le total demandé

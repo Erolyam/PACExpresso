@@ -80,7 +80,8 @@ class Model {
         if (!(is_array($rows) && count($rows)) ) {
             return;
         }
-        $firstrow = array_keys($rows[array_keys($rows)[0]]);
+        $firstrow = array_keys($rows);
+        $firstrow = array_keys($rows[$firstrow[0]]);
         foreach ($firstrow as $col) {
             if ('_json' === substr($col, -5)) {
                 foreach ($rows as $rowid=>$row) {
