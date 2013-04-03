@@ -11,14 +11,20 @@
   cursor: pointer;
   background: #ffc473;
 }
+.passer .qtabctn ul li:first-child {
+  border-top: 1px solid #000;
+}
+.passer .qtabctn ul li.result-right {
+  background: #bf3;
+}
+.passer .qtabctn ul li.result-wrong {
+  background: #ff4d50;
+}
 .passer .qtabctn ul li.selected {
   background: #ff9400;
 }
 .passer .qtabctn ul li:hover {
   background: #ff9400;
-}
-.passer .qtabctn ul li:first-child {
-  border-top: 1px solid #000;
 }
 .passer .qbodyctn {
   background: #fff;
@@ -54,6 +60,20 @@
 }
 .passer .oneanswer label input[type=checkbox] {
   margin: auto;
+}
+.passer .oneanswer label .result {
+  width: 40px;
+  background: #0f0;
+}
+.passer .oneanswer label.result-wrong {
+  background: #f00;
+  padding-right: 0;
+}
+.passer .oneanswer label.result-right {
+  background: #0f0;
+}
+.passer .oneanswer .letter.result {
+  min-width: 110px;
 }
 .passer .oneanswer .body {
   display: block;

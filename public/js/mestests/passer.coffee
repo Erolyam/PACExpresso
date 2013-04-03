@@ -9,7 +9,9 @@ class MestestsPasser
   @Qaire = null
 
   constructor: () ->
-    @Qaire = window.jsp.qaire
+    @Qaire     = window.jsp.qaire
+    @aAlineas  = window.jsp.aAlineas
+    @aContexts = window.jsp.aContexts
 
     # initialise submited_data_json
     if @Qaire.submited_data_json is null
@@ -38,15 +40,23 @@ class MestestsPasser
 
 
   ###
-    Affiche la liste des alinéas, à gauche. Appelé une seule fois
+    Affiche la liste des alinéas, à gauche.
+    Appelé une seule fois et à la réception des solutions
   ###
   renderLis: () ->
     target = $(".passer .qtabctn ul")
     target.empty()
 
     # ajoute un <li> pour chaque alinéa
-    _.forEach JSON.parse(@Qaire.questionAlineas_json), (alineaId, index) ->
-      html = "<li data-alineaid='#{alineaId}'' data-num='#{index}'>#{index+1}</li>"
+    _.forEach JSON.parse(@Qaire.questionAlineas_json), (alineaId, index) =>
+      resultClass = 'result'
+      if (@Qaire.solution_json?)
+        console.log(@Qaire.solution_json)
+        resultClass = 'result-wrong'
+        etu_ans = JSON.parse(@Qaire.submited_data_json)[index]
+        solutio = JSON.parse(@Qaire.solution_json)[index]
+        resultClass = 'result-right' if etu_ans is solutio
+      html = "<li class='#{resultClass}' data-alineaid='#{alineaId}' data-num='#{index}'>#{index+1}</li>"
       target.append $(html)
 
     # un dernier <li> pour récapitulatif
@@ -79,8 +89,8 @@ class MestestsPasser
 
     if (alineaId?)
       # clic sur un alinéa
-      alinea  = @Qaire.aAlineas[alineaId]
-      context = @Qaire.aContexts[alinea.question_id]
+      alinea  = @aAlineas[alineaId]
+      context = @aContexts[alinea.question_id]
       num     = li.data("num") # numéro (de 0 à 6)
       #console.log context, alinea
 
@@ -98,20 +108,28 @@ class MestestsPasser
       targetAnswers = target.find(".alineaanswers")
       tpl = _.template $('#tplqAlineaAnswer').html().trim()
       total = JSON.parse(@Qaire.submited_data_json)[num]
+      solution = @Qaire.solution_json
+      if (solution isnt null)
+        solution = JSON.parse(solution)[num]
       curWeight = 1
       _.forEach JSON.parse(alinea.answers), (answer, index) ->
-        checked = ""
-        checked = "checked" if (total & curWeight)
+        checked    = ""
+        checked    = "checked" if (total & curWeight)
+        checkedSol = ""
+        if solution isnt null
+          checkedSol = "checked" if (solution & curWeight)
         curWeight <<= 1
-        html = tpl({body:answer, letter:String.fromCharCode(65+index), checked:checked})
+        html = tpl({body:answer, letter:String.fromCharCode(65+index), checked:checked, solution:solution, checkedSol:checkedSol})
         targetAnswers.append(html)
     else
       # clic sur récapitulatif
       if @Qaire.score is null
+        # affiche le bouton de validation du formulaire
         tpl = _.template $('#tplqRecapConfirm').html().trim()
         html = tpl(@Qaire)
         target.append(html)
       else
+        # Affiche le score
         tpl = _.template $('#tplqResult').html().trim()
         html = tpl(@Qaire)
         target.append(html)
@@ -184,8 +202,21 @@ class MestestsPasser
           alert "Le serveur n'a pas pu enregistrer le questionnaire"
           return
         @Qaire = JSON.parse(jqXHR.responseText)
-        # simule l'appui sur le li pour réafficher
-        $(".qtabctn li[data-num=#]").trigger('click')
+        @solutionsReceived()
+
+  ###
+    Met en couleur les alinéas (juste ou faux)
+  ###
+  solutionsReceived: () =>
+    # redraw les <li> avec la classe result-right ou result-wrong
+    @renderLis();
+    # simule l'appui sur le li pour afficher le bilan et sélection le li
+    $(".qtabctn li[data-num=#]").trigger('click')
+
+
+
+
+
 
   ###
     Renvoie le résultat coché, en un nombre bitwise
@@ -197,7 +228,7 @@ class MestestsPasser
     return null if (!curIndex?) # le li selected n'a pas de data-alineaid
 
     # curIndex : numéro (entre 0 et 6)
-    aChks = $(".passer .alineaanswers").find(".letter input[type=checkbox]")
+    aChks = $(".passer .alineaanswers").find(".letter input.etu[type=checkbox]")
     curWeight = 1
     total = 0
     _.each aChks, (elem) ->

@@ -85,14 +85,14 @@ class MestestsController extends KleinExtController {
         $QA = new QuestionAlinea($this->_ap->db);
         $Q = new Question($this->_ap->db);
         $aAlineas = $QA->getById($aAlinIds);
-        $this->_qaire["aAlineas"] = $aAlineas;
+        $rs->jsp->aAlineas = $aAlineas;
 
         // récupère les contextes de chaque alinéa
         $aContexts = array();
         foreach ($aAlineas as $alinea) {
             $aContexts[] = (int) $alinea["question_id"];
         }
-        $this->_qaire["aContexts"] = $Q->getById($aContexts);
+        $rs->jsp->aContexts = $Q->getById($aContexts);
 
 
         if (null === $this->_qaire["score"]) {
@@ -108,9 +108,9 @@ class MestestsController extends KleinExtController {
         $qaire = $this->_qaire;
 
         // enlève les solutions et le commentaire
-        foreach ($qaire['aAlineas'] as $i=>$v) {
-            unset($qaire['aAlineas'][$i]['solutions']);
-            unset($qaire['aAlineas'][$i]['comment']);
+        foreach ($rs->jsp->aAlineas as $i=>$v) {
+            unset($rs->jsp->aAlineas[$i]['solutions']);
+            unset($rs->jsp->aAlineas[$i]['comment']);
             //$qaire['aAlineas'][$i]['body'] = 'thebody';
             //$qaire['aAlineas'][$i]['answers'] = 'theanswers';
         }

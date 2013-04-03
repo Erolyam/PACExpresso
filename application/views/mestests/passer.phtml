@@ -10,7 +10,28 @@
 </script>
 <script type="x/custom" id="tplqAlineaAnswer">
   <div class='oneanswer'>
-    <div class='letter'><label><%= letter %>: <input type='checkbox' <%= checked %> /></label></div>
+    <% if (solution===null) { %>
+      <div class='letter'>
+        <label>
+          <%= letter %>: <input type='checkbox' class='etu' <%= checked %> />
+        </label>
+      </div>
+    <% } else { %>
+      <% if (checked === checkedSol) { %>
+        <div class='letter'>
+          <label class='result-right'>
+            <%= letter %>: <input type='checkbox' class='etu' <%= checked %> />
+          </label>
+      </div>
+      <% } else { %>
+        <div class='letter result'>
+          <label class='result-wrong'>
+            <%= letter %>: <input type='checkbox' class='etu' <%= checked %> />
+            <span class='pull-right result'><input disabled type='checkbox' class='sol' <%= checkedSol %> /></span>
+          </label>
+      </div>
+      <% } %>
+    <% } %>
     <div class='body'><%= body %></div>
   </div>
 </script>
@@ -37,9 +58,11 @@
     <div class='title'><h2>Résultats</h2></div>
     <div class='body'>
       <p>
-        score: <%= score %>
+        Votre note: <%= score %>
       </p>
-      <h2>TODO !!! le corrigé !</h2>
+      <p>
+        Vous pouvez revenir sur chaque question et consulter la solution.
+      </p>
     </div>
   </div>
 </script>

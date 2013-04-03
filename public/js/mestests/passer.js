@@ -7,6 +7,7 @@ MestestsPasser = (function() {
 
   function MestestsPasser() {
     this.retrieveUserAnswer = __bind(this.retrieveUserAnswer, this);
+    this.solutionsReceived = __bind(this.solutionsReceived, this);
     this.handlerSubmitQuestionnaire = __bind(this.handlerSubmitQuestionnaire, this);
     this.handleUserAnswer = __bind(this.handleUserAnswer, this);
     this.handlerClickOnFooterButton = __bind(this.handlerClickOnFooterButton, this);
@@ -14,6 +15,8 @@ MestestsPasser = (function() {
     var submited_data;
 
     this.Qaire = window.jsp.qaire;
+    this.aAlineas = window.jsp.aAlineas;
+    this.aContexts = window.jsp.aContexts;
     if (this.Qaire.submited_data_json === null) {
       submited_data = _.times(JSON.parse(this.Qaire.questionAlineas_json).length, function() {
         return 0;
@@ -36,19 +39,31 @@ MestestsPasser = (function() {
   };
 
   /*
-    Affiche la liste des alinéas, à gauche. Appelé une seule fois
+    Affiche la liste des alinéas, à gauche.
+    Appelé une seule fois et à la réception des solutions
   */
 
 
   MestestsPasser.prototype.renderLis = function() {
-    var html, target;
+    var html, target,
+      _this = this;
 
     target = $(".passer .qtabctn ul");
     target.empty();
     _.forEach(JSON.parse(this.Qaire.questionAlineas_json), function(alineaId, index) {
-      var html;
+      var etu_ans, html, resultClass, solutio;
 
-      html = "<li data-alineaid='" + alineaId + "'' data-num='" + index + "'>" + (index + 1) + "</li>";
+      resultClass = 'result';
+      if ((_this.Qaire.solution_json != null)) {
+        console.log(_this.Qaire.solution_json);
+        resultClass = 'result-wrong';
+        etu_ans = JSON.parse(_this.Qaire.submited_data_json)[index];
+        solutio = JSON.parse(_this.Qaire.solution_json)[index];
+        if (etu_ans === solutio) {
+          resultClass = 'result-right';
+        }
+      }
+      html = "<li class='" + resultClass + "' data-alineaid='" + alineaId + "' data-num='" + index + "'>" + (index + 1) + "</li>";
       return target.append($(html));
     });
     html = "<li data-num='#'>#</li>";
@@ -62,7 +77,7 @@ MestestsPasser = (function() {
 
 
   MestestsPasser.prototype.handlerClickOnLi = function(e) {
-    var alinea, alineaId, context, curWeight, html, li, num, target, targetAnswers, total, tpl;
+    var alinea, alineaId, context, curWeight, html, li, num, solution, target, targetAnswers, total, tpl;
 
     this.handleUserAnswer();
     li = $(e.currentTarget);
@@ -79,8 +94,8 @@ MestestsPasser = (function() {
       $("footer button.actionnext").addClass("disabled");
     }
     if ((alineaId != null)) {
-      alinea = this.Qaire.aAlineas[alineaId];
-      context = this.Qaire.aContexts[alinea.question_id];
+      alinea = this.aAlineas[alineaId];
+      context = this.aContexts[alinea.question_id];
       num = li.data("num");
       tpl = _.template($('#tplqContext').html().trim());
       html = tpl({
@@ -96,19 +111,31 @@ MestestsPasser = (function() {
       targetAnswers = target.find(".alineaanswers");
       tpl = _.template($('#tplqAlineaAnswer').html().trim());
       total = JSON.parse(this.Qaire.submited_data_json)[num];
+      solution = this.Qaire.solution_json;
+      if (solution !== null) {
+        solution = JSON.parse(solution)[num];
+      }
       curWeight = 1;
       return _.forEach(JSON.parse(alinea.answers), function(answer, index) {
-        var checked;
+        var checked, checkedSol;
 
         checked = "";
         if (total & curWeight) {
           checked = "checked";
         }
+        checkedSol = "";
+        if (solution !== null) {
+          if (solution & curWeight) {
+            checkedSol = "checked";
+          }
+        }
         curWeight <<= 1;
         html = tpl({
           body: answer,
           letter: String.fromCharCode(65 + index),
-          checked: checked
+          checked: checked,
+          solution: solution,
+          checkedSol: checkedSol
         });
         return targetAnswers.append(html);
       });
@@ -203,8 +230,18 @@ MestestsPasser = (function() {
         return;
       }
       _this.Qaire = JSON.parse(jqXHR.responseText);
-      return $(".qtabctn li[data-num=#]").trigger('click');
+      return _this.solutionsReceived();
     });
+  };
+
+  /*
+    Met en couleur les alinéas (juste ou faux)
+  */
+
+
+  MestestsPasser.prototype.solutionsReceived = function() {
+    this.renderLis();
+    return $(".qtabctn li[data-num=#]").trigger('click');
   };
 
   /*
@@ -221,7 +258,7 @@ MestestsPasser = (function() {
     if (curIndex == null) {
       return null;
     }
-    aChks = $(".passer .alineaanswers").find(".letter input[type=checkbox]");
+    aChks = $(".passer .alineaanswers").find(".letter input.etu[type=checkbox]");
     curWeight = 1;
     total = 0;
     _.each(aChks, function(elem) {
