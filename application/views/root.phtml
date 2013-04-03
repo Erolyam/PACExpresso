@@ -1,8 +1,16 @@
 <div class="container">
-    <!-- Main hero unit for a primary marketing message or call to action -->
-    <div class="hero-unit">
-        <h1>Hello, world!</h1>
-        <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
-        <p><a href="#" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-    </div>
+  <!-- Main hero unit for a primary marketing message or call to action -->
+  <div class="hero-unit">
+    <h1>Bienvenue !</h1>
+    <p>
+      Ce site vous permet de vous entraîner à passer le QCM de la PACES. Vous pouvez demander à passer autant
+      de tests que vous désirez. À la fin de chaque test, vous obtenez immédiatement votre score et vous
+      pouvez comparer vos réponses à la solution.
+    </p>
+    <? if (isset($this->auth['login'])): ?>
+      <p><a href="<?= $this->urlMestests ?>" class="btn btn-primary btn-large">Commencer &raquo;</a></p>
+    <? else: ?>
+      <p>Vous devez vous connecter afin d'accéder à vos tests.</p>
+    <? endif; ?>
+  </div>
 </div>

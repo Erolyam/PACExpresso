@@ -25,7 +25,7 @@ class MestestsController extends KleinExtController {
 
     public function before($action) {
         $this->_Qaire = new Questionnaire($this->_ap->db);
-        if (!isset($this->_ap->auth)) {
+        if (!isset($this->_ap->auth['id'])) {
             // n'est pas authentifié
             $this->_rs->redirect(getUrl("/"));
         }

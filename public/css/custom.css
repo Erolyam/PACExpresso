@@ -61,3 +61,6 @@
   text-align: justify;
   padding: 0 5px;
 }
+.navbar-text .btn {
+  margin-top: auto;
+}
