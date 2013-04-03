@@ -92,15 +92,59 @@ class Questionnaire extends Model {
 
 
     /**
-     * Enregistre les réponses données par l'étudiant
-     * @param integer $id
-     * @param array $values
+     * Enregistre le questionnaire
+     * @param array[modified] questionnaire
      */
-    public function saveAnswers($id, array $values) {
-        $data = array(
-            "submited_data_json"   => JSON_encode($values),
-            "updated_at"           => Gb_String::date_iso(),
-        );
-        $this->adapter()->update($this->_tablename, $data, $this->adapter()->quoteInto("id=?", $id));
+    public function save(array $qaire) {
+        $qaire["updated_at"] = Gb_String::date_iso();
+        $this->adapter()->update($this->_tablename, $qaire, $this->adapter()->quoteInto("id=?", $qaire["id"]));
+    }
+
+    /**
+     * Calcule le score
+     * remplit 'score' et 'submited_at'
+     * @param array[modified] $qaire
+     */
+    public function computeScore(array &$qaire) {
+        /*
+            $qaire : Array(
+              [id] => 2
+              [etudiant_id] => 1
+              [questionAlineas_json] => [36,29,31,15,14,22,21]
+              [submited_at] =>
+              [submited_data_json] => [1,2,4,3,5,7,0]
+              [score] =>
+              [created_at] => 2013-04-01 16:55:10
+              [updated_at] => 2013-04-03 12:06:44
+            )
+        */
+
+        $QA = new QuestionAlinea($this->adapter());
+        $aAlineaIds  = json_decode($qaire['questionAlineas_json']);
+        $aEtuAnswers = json_decode($qaire['submited_data_json']);
+        $aAlineas    = $QA->getById($aAlineaIds); // [alineaid]=>array("solutions"=>"[2]")
+
+        $score      = 0;
+        $scoremax   = 0;
+        $index      = 0;
+        $aSolutions = array();
+        foreach ($aAlineaIds as $alinea_id) {
+            $etuAnswer    = $aEtuAnswers[$index];
+            $alinea       = $aAlineas[$alinea_id];
+            $solutions    = json_decode($alinea["solutions"]);
+            $solution     = $solutions[0];
+            $aSolutions[] = $solution;
+
+            if ($solution == $etuAnswer) {
+              $score++;
+            }
+
+            $index++;
+            $scoremax++;
+        }
+
+        $qaire["score"]         = $score . "/" . $scoremax;
+        $qaire["solution_json"] = json_encode($aSolutions);
+        $qaire["submited_at"]   = Gb_String::date_iso();
     }
 }

@@ -10,13 +10,16 @@ class MestestsPasser
 
   constructor: () ->
     @Qaire = window.jsp.qaire
-    @Qaire.submited_data_json = JSON.parse @Qaire.submited_data_json
 
     # initialise submited_data_json
     if @Qaire.submited_data_json is null
-      @Qaire.submited_data_json = _.times JSON.parse(@Qaire.questionAlineas_json).length, ()->
+      submited_data = _.times JSON.parse(@Qaire.questionAlineas_json).length, ()->
         return 0;
+      @Qaire.submited_data_json = JSON.stringify(submited_data)
 
+  ###
+    Prépare le questionnaire, installe les handlers
+  ###
   go: () ->
     #console.log(@Qaire)
     @renderLis();
@@ -27,10 +30,16 @@ class MestestsPasser
     # handler quand on clique sur un <li>
     $(".passer footer").on "click", "button", @handlerClickOnFooterButton
 
+    # handler bouton valider le questionnaire
+    $(".passer .qbodyctn").on "click", "button.actionsubmit", @handlerSubmitQuestionnaire
+
     # Simule l'appui sur le premier <li>
     $(".passer .qtabctn li").first().trigger('click')
 
-  # affiche la liste des alinéas, à gauche. Appelé une seule fois
+
+  ###
+    Affiche la liste des alinéas, à gauche. Appelé une seule fois
+  ###
   renderLis: () ->
     target = $(".passer .qtabctn ul")
     target.empty()
@@ -41,11 +50,14 @@ class MestestsPasser
       target.append $(html)
 
     # un dernier <li> pour récapitulatif
-    html = "<li>#</li>"
+    html = "<li data-num='#'>#</li>"
     target.append $(html)
 
 
-  # handler quand on click sur un <li>
+  ###
+    Handler quand on click sur un <li>
+    Appelle l'envoi des checkbox au serveur
+  ###
   handlerClickOnLi: (e) =>
     #target/currentTarget: <li>
     #delegateTarget:div.span1 qtabctn
@@ -85,7 +97,7 @@ class MestestsPasser
       # ajoute les différentes réponses
       targetAnswers = target.find(".alineaanswers")
       tpl = _.template $('#tplqAlineaAnswer').html().trim()
-      total = @Qaire.submited_data_json[num]
+      total = JSON.parse(@Qaire.submited_data_json)[num]
       curWeight = 1
       _.forEach JSON.parse(alinea.answers), (answer, index) ->
         checked = ""
@@ -95,9 +107,20 @@ class MestestsPasser
         targetAnswers.append(html)
     else
       # clic sur récapitulatif
+      if @Qaire.score is null
+        tpl = _.template $('#tplqRecapConfirm').html().trim()
+        html = tpl(@Qaire)
+        target.append(html)
+      else
+        tpl = _.template $('#tplqResult').html().trim()
+        html = tpl(@Qaire)
+        target.append(html)
 
 
-  # handler quand on click sur un bouton du footer
+  ###
+    Handler quand on click sur les boutons previous/next
+    Simule l'appui sur le <li> correspondant
+  ###
   handlerClickOnFooterButton: (e) =>
     #target:<i> ou <button>
     #currentTarget: <button>
@@ -109,6 +132,7 @@ class MestestsPasser
     else if button.hasClass('actionprev')
       li.prev().trigger('click')
 
+
   ###
     Récupère les croix de l'étudiant et met à jour @Qaire
     A appeler à chaque fois qu'on change de page
@@ -118,8 +142,10 @@ class MestestsPasser
     res = @retrieveUserAnswer();
     return if (res is null)
 
-    newsub = _.clone @Qaire.submited_data_json
+    newsub = JSON.parse(@Qaire.submited_data_json)
     newsub[res.num] = res.val
+    newsub = JSON.stringify(newsub)
+
     if _.isEqual(newsub, @Qaire.submited_data_json)
       # pas de différence: retour
       return
@@ -132,9 +158,34 @@ class MestestsPasser
     $.ajax({
       url:url
       method:'POST'
-      data:{_method:'PUT', values:JSON.stringify(newsub)}
-    }).fail (jqXHR, textStatus, errorThrown) ->
+      data:{_method:'PUT', values:newsub}
+    }).fail (jqXHR, textStatus, errorThrown) =>
       alert "Erreur lors de l'enregistrement"
+
+
+
+  ###
+  ###
+  handlerSubmitQuestionnaire: () =>
+    # récupère les réponses de l'atudiant
+    newsub = @Qaire.submited_data_json
+
+    # envoi au serveur
+    url = window.jsp.aUrls.thistst
+    $.ajax({
+      url:url
+      method:'POST'
+      data:{_method:'POST', values:newsub}
+    })
+      .fail (jqXHR, textStatus, errorThrown) =>
+        alert "Erreur lors de l'enregistrement"
+      .done (data, textStatus, jqXHR) =>
+        if jqXHR.status isnt 200 or !jqXHR.getResponseHeader('content-type').startsWith("application/json")
+          alert "Le serveur n'a pas pu enregistrer le questionnaire"
+          return
+        @Qaire = JSON.parse(jqXHR.responseText)
+        # simule l'appui sur le li pour réafficher
+        $(".qtabctn li[data-num=#]").trigger('click')
 
   ###
     Renvoie le résultat coché, en un nombre bitwise

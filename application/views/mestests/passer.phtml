@@ -14,6 +14,35 @@
     <div class='body'><%= body %></div>
   </div>
 </script>
+<script type="x/custom" id="tplqRecapConfirm">
+  <div class='context'>
+    <div class='title'><h2>Fin du questionnaire</h2></div>
+    <div class='body'>
+      <p>
+        Vous êtes arrivé à la fin du questionnaire. Vous pouvez encore vérifier et modifier vos réponses.
+        Quand vous serez satisfait, appuyez sur le bouton de validation pour envoyer vos réponses.
+        Vous aurez alors votre note, et vous pourrez consulter le corrigé.
+      </p>
+      <p>
+        Attention, une fois le questionnaire validé, vous ne pourrez plus modifier vos réponses.
+      </p>
+      <p class='pull-right'>
+        <button class='btn btn-danger actionsubmit'>Valider le questionnaire</button>
+      </p>
+    </div>
+  </div>
+</script>
+<script type="x/custom" id="tplqResult">
+  <div class='context'>
+    <div class='title'><h2>Résultats</h2></div>
+    <div class='body'>
+      <p>
+        score: <%= score %>
+      </p>
+      <h2>TODO !!! le corrigé !</h2>
+    </div>
+  </div>
+</script>
 
 <div class='container passer'>
   <div class="row">

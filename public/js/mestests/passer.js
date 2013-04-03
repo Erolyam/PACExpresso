@@ -7,23 +7,38 @@ MestestsPasser = (function() {
 
   function MestestsPasser() {
     this.retrieveUserAnswer = __bind(this.retrieveUserAnswer, this);
+    this.handlerSubmitQuestionnaire = __bind(this.handlerSubmitQuestionnaire, this);
     this.handleUserAnswer = __bind(this.handleUserAnswer, this);
     this.handlerClickOnFooterButton = __bind(this.handlerClickOnFooterButton, this);
-    this.handlerClickOnLi = __bind(this.handlerClickOnLi, this);    this.Qaire = window.jsp.qaire;
-    this.Qaire.submited_data_json = JSON.parse(this.Qaire.submited_data_json);
+    this.handlerClickOnLi = __bind(this.handlerClickOnLi, this);
+    var submited_data;
+
+    this.Qaire = window.jsp.qaire;
     if (this.Qaire.submited_data_json === null) {
-      this.Qaire.submited_data_json = _.times(JSON.parse(this.Qaire.questionAlineas_json).length, function() {
+      submited_data = _.times(JSON.parse(this.Qaire.questionAlineas_json).length, function() {
         return 0;
       });
+      this.Qaire.submited_data_json = JSON.stringify(submited_data);
     }
   }
+
+  /*
+    Prépare le questionnaire, installe les handlers
+  */
+
 
   MestestsPasser.prototype.go = function() {
     this.renderLis();
     $(".passer .qtabctn").on("click", "li", this.handlerClickOnLi);
     $(".passer footer").on("click", "button", this.handlerClickOnFooterButton);
+    $(".passer .qbodyctn").on("click", "button.actionsubmit", this.handlerSubmitQuestionnaire);
     return $(".passer .qtabctn li").first().trigger('click');
   };
+
+  /*
+    Affiche la liste des alinéas, à gauche. Appelé une seule fois
+  */
+
 
   MestestsPasser.prototype.renderLis = function() {
     var html, target;
@@ -36,9 +51,15 @@ MestestsPasser = (function() {
       html = "<li data-alineaid='" + alineaId + "'' data-num='" + index + "'>" + (index + 1) + "</li>";
       return target.append($(html));
     });
-    html = "<li>#</li>";
+    html = "<li data-num='#'>#</li>";
     return target.append($(html));
   };
+
+  /*
+    Handler quand on click sur un <li>
+    Appelle l'envoi des checkbox au serveur
+  */
+
 
   MestestsPasser.prototype.handlerClickOnLi = function(e) {
     var alinea, alineaId, context, curWeight, html, li, num, target, targetAnswers, total, tpl;
@@ -74,7 +95,7 @@ MestestsPasser = (function() {
       target.append(html);
       targetAnswers = target.find(".alineaanswers");
       tpl = _.template($('#tplqAlineaAnswer').html().trim());
-      total = this.Qaire.submited_data_json[num];
+      total = JSON.parse(this.Qaire.submited_data_json)[num];
       curWeight = 1;
       return _.forEach(JSON.parse(alinea.answers), function(answer, index) {
         var checked;
@@ -92,9 +113,23 @@ MestestsPasser = (function() {
         return targetAnswers.append(html);
       });
     } else {
-
+      if (this.Qaire.score === null) {
+        tpl = _.template($('#tplqRecapConfirm').html().trim());
+        html = tpl(this.Qaire);
+        return target.append(html);
+      } else {
+        tpl = _.template($('#tplqResult').html().trim());
+        html = tpl(this.Qaire);
+        return target.append(html);
+      }
     }
   };
+
+  /*
+    Handler quand on click sur les boutons previous/next
+    Simule l'appui sur le <li> correspondant
+  */
+
 
   MestestsPasser.prototype.handlerClickOnFooterButton = function(e) {
     var button, li;
@@ -116,14 +151,16 @@ MestestsPasser = (function() {
 
 
   MestestsPasser.prototype.handleUserAnswer = function() {
-    var newsub, res, url;
+    var newsub, res, url,
+      _this = this;
 
     res = this.retrieveUserAnswer();
     if (res === null) {
       return;
     }
-    newsub = _.clone(this.Qaire.submited_data_json);
+    newsub = JSON.parse(this.Qaire.submited_data_json);
     newsub[res.num] = res.val;
+    newsub = JSON.stringify(newsub);
     if (_.isEqual(newsub, this.Qaire.submited_data_json)) {
       return;
     }
@@ -134,10 +171,39 @@ MestestsPasser = (function() {
       method: 'POST',
       data: {
         _method: 'PUT',
-        values: JSON.stringify(newsub)
+        values: newsub
       }
     }).fail(function(jqXHR, textStatus, errorThrown) {
       return alert("Erreur lors de l'enregistrement");
+    });
+  };
+
+  /*
+  */
+
+
+  MestestsPasser.prototype.handlerSubmitQuestionnaire = function() {
+    var newsub, url,
+      _this = this;
+
+    newsub = this.Qaire.submited_data_json;
+    url = window.jsp.aUrls.thistst;
+    return $.ajax({
+      url: url,
+      method: 'POST',
+      data: {
+        _method: 'POST',
+        values: newsub
+      }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      return alert("Erreur lors de l'enregistrement");
+    }).done(function(data, textStatus, jqXHR) {
+      if (jqXHR.status !== 200 || !jqXHR.getResponseHeader('content-type').startsWith("application/json")) {
+        alert("Le serveur n'a pas pu enregistrer le questionnaire");
+        return;
+      }
+      _this.Qaire = JSON.parse(jqXHR.responseText);
+      return $(".qtabctn li[data-num=#]").trigger('click');
     });
   };
 

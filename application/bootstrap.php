@@ -46,8 +46,9 @@ respond(function($rq, $rs, $ap) {
 respond(                "/",                            "default#root");
 respond("mestst",       "/mestests",                    "mestests#index");
 respond("newtst",       "/mestests/new",                "mestests#new");
-respond("onetst",       "GET /mestests/[i:id]",         "mestests#one");
-respond(                "PUT /mestests/[i:id]",         "mestests#saveone");
+respond("onetst",       "GET  /mestests/[i:id]",        "mestests#one");
+respond(                "PUT  /mestests/[i:id]",        "mestests#saveone");
+respond(                "POST /mestests/[i:id]",        "mestests#submit");
 
 respond(404, function(){echo "Page inexistante";});
 

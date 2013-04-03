@@ -1,6 +1,5 @@
 <?php
 
-use Klein\getUrl;
 require "models/Questionnaire.php";
 
 class MestestsController extends KleinExtController {
@@ -31,7 +30,8 @@ class MestestsController extends KleinExtController {
         }
         $this->_aQaires = $this->_Qaire->search(array("etudiant_id"=>$this->_ap->auth["id"]));
 
-        if (in_array($action, array("actionOne", "actionSaveone"))) {
+        // vérifie que le questionnaire demandé existe et appartient à l'utilisateur courant
+        if (in_array($action, array("actionOne", "actionSaveone", "actionSubmit"))) {
           $qaire_id     = $this->_rq->param("id");
           $this->_qaire = $this->_Qaire->searchFirst(array("id"=>$qaire_id, "etudiant_id"=>$this->_ap->auth["id"]));
           if (!is_array($this->_qaire)) {
@@ -103,22 +103,6 @@ class MestestsController extends KleinExtController {
         }
     }
 
-    public function actionSaveone() {
-        $rs    = $this->_rs;
-
-        $values = $this->_rq->param("values", "");
-        if (0 === strlen($values)) {
-            $this->_rs->renderJSON("values est vide");
-        }
-        $values = json_decode($values);
-        if (!is_array($values) || count($values)<2) {
-            $this->_rs->renderJSON("values est vide");
-        }
-
-        $this->_Qaire->saveAnswers($this->_qaire['id'], $values);
-        $this->_rs->renderJSON("", 204);
-    }
-
     public function subactionPass() {
         $rs    = $this->_rs;
         $qaire = $this->_qaire;
@@ -136,6 +120,51 @@ class MestestsController extends KleinExtController {
 
     }
 
+
+
+    /**
+     * Enregistre les réponses de l'étudiant.
+     * (ajax), ne renvoit rien
+     */
+    public function actionSaveone() {
+        $rs    = $this->_rs;
+        $this->_getEtuAnswers();
+        $this->_Qaire->save($this->_qaire);
+
+        $rs->renderJSON("", 204);
+    }
+
+    /**
+     * Enregistre les réponses de l'étudiant.
+     * Calcule le score et le stocke dans la bdd
+     * (ajax), renvoie score et les réponses
+     */
+    public function actionSubmit() {
+        $rs    = $this->_rs;
+        $this->_getEtuAnswers();
+        $this->_Qaire->computeScore($this->_qaire);
+
+        //$this->_Qaire->save($this->_qaire);
+
+        $rs->renderJSON($this->_qaire);
+    }
+
+
+    /**
+     * Enregistre les réponses de l'étudiant.
+     * enregistre dans $this->qaire
+     */
+    protected function _getEtuAnswers() {
+        $values = $this->_rq->param("values", "");
+        if (0 === strlen($values)) {
+            $this->_rs->renderJSON("values est vide");
+        }
+        $values = json_decode($values);
+        if (!is_array($values) || count($values)<2) {
+            $this->_rs->renderJSON("values est vide");
+        }
+        $this->_qaire['submited_data_json'] = json_encode($values);
+    }
 
     // *********************************
     // *********************************
