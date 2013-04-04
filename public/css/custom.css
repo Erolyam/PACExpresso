@@ -9,6 +9,15 @@ img {
 .tt {
   font-family: monospace;
 }
+/******************/
+/* liste de tests */
+/******************/
+table.mestests td:nth-child(1) {
+  text-align: center;
+}
+table.mestests td:nth-child(3) {
+  padding: 0 2em;
+}
 /**********/
 /* footer */
 /**********/
