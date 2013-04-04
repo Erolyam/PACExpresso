@@ -1,3 +1,4 @@
+#!/usr/bin/env coffee
 ###
 Modified from https://github.com/jashkenas/coffee-script/blob/master/Cakefile
  
@@ -12,5 +13,5 @@ runCommand = (name, args) ->
   proc.stdout.on 'data', (buffer) -> console.log buffer.toString()
   proc.on 'exit', (status) -> process.exit(1) if status != 0
  
-runCommand 'stylus', ['--watch', 'css']
-runCommand 'coffee', ['-bcw', 'js']
+runCommand 'stylus', ['--watch', 'public/css']
+runCommand 'coffee', ['-bcw', 'public/js']

@@ -72,7 +72,7 @@
 .passer .oneanswer label.result-right {
   background: #0f0;
 }
-.passer .oneanswer .letter.result {
+.passer .oneanswer .letter.larger {
   min-width: 110px;
 }
 .passer .oneanswer .body {

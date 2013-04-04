@@ -9,23 +9,24 @@
       <th>Numéro</th>
       <th>Date de début</th>
       <th>Score</th>
+      <th></th>
     </tr>
+    <? $num = 1; ?>
     <? foreach ($this->jsp->aQaires as $qaire): ?>
-      <?
-      $num = 1;
-      $url = str_replace("[:id]", $qaire["id"], $this->jsp->aUrls['onetst']);
-      ?>
+      <? $url = str_replace("[:id]", $qaire["id"], $this->jsp->aUrls['onetst']); ?>
       <tr>
         <td><?= $num ?></td>
         <td><?= $qaire['created_at'] ?></td>
+        <td><?= $qaire['score'] ?></td>
         <td>
           <? if (null === $qaire['score']): ?>
             <a href="<?= $url ?>">Continuer le test</a>
           <? else: ?>
-            <?= $qaire['score'] ?>
+            <a href="<?= $url ?>">Voir votre résultat</a>
           <? endif; ?>
         </td>
       </tr>
+      <? $num++; ?>
     <? endforeach; ?>
   </table>
 

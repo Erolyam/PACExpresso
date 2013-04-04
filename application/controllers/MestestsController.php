@@ -94,13 +94,7 @@ class MestestsController extends KleinExtController {
         }
         $rs->jsp->aContexts = $Q->getById($aContexts);
 
-
-        if (null === $this->_qaire["score"]) {
-            $this->subactionPass();
-        } else {
-            // TODO
-            echo "Questionnaire terminé";
-        }
+        $this->subactionPass();
     }
 
     public function subactionPass() {
@@ -144,7 +138,7 @@ class MestestsController extends KleinExtController {
         $this->_getEtuAnswers();
         $this->_Qaire->computeScore($this->_qaire);
 
-        //$this->_Qaire->save($this->_qaire);
+        $this->_Qaire->save($this->_qaire);
 
         $rs->renderJSON($this->_qaire);
     }
