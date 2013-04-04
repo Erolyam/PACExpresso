@@ -2,6 +2,19 @@
 
 chdir(dirname(__FILE__));
 
+require_once "Gb/Log.php";
+Gb_Log::setLogFilename("../var/logfile.log");
+
+//valeurs par défaut
+Gb_Log::$loglevel_file = Gb_Log::LOG_INFO;
+// TODO : Environnement; Ici "debug"
+Gb_Log::$loglevel_file = Gb_Log::LOG_DEBUG;
+Gb_Log::$loglevel_showuser = Gb_Log::LOG_CRIT;
+Gb_Log::installErrorHandlers();
+// pour ajouter un texte avant chaque ligne de log: faire
+// Gb_Log::$file_prepend .= "user:$user ";
+//Gb_Glue::registerPlugin("Gb_Log", array("auth", 'logPlugin'));
+
 //set_include_path(dirname(__FILE__) . PATH_SEPARATOR . get_include_path());
 require_once "lib/kleinExt.php";
 
@@ -42,6 +55,8 @@ respond(function($rq, $rs, $ap) {
         }
 
         $ap->auth = array("id"=>$id, "login"=>$login, "logoutUrl"=>$sessionCas->getLogoutUrl());
+        Gb_Log::$file_prepend .= "user:$login ";
+
     } else {
         $ap->auth = array("loginUrl"=>$sessionCas->getLoginUrl());
     }

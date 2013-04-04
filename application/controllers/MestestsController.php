@@ -49,6 +49,8 @@ class MestestsController extends KleinExtController {
      * Liste les tests ouverts, offre la possiblité d'en créer un nouveau
      */
     public function actionIndex() {
+        Gb_Log::logInfo("mestests:index");
+
         $rs = $this->_rs;
         $canCreate = $this->canCreateNew();
 
@@ -67,7 +69,9 @@ class MestestsController extends KleinExtController {
      * Redirige vers la liste de tests
      */
     public function actionNew() {
+        Gb_Log::logInfo("mestests:new");
         if (!$this->canCreateNew()) {
+            Gb_Log::logNotice("creation rejetée");
             $this->_rs->renderJSON("Vous ne pouvez pas créer de questionnaire, parce que un questionnaire est déjà commencé");
         }
 
@@ -78,7 +82,8 @@ class MestestsController extends KleinExtController {
 
 
     public function actionOne() {
-        $rs    = $this->_rs;
+      Gb_Log::logInfo("mestests:one");
+      $rs    = $this->_rs;
 
         $aAlinIds = json_decode($this->_qaire["questionAlineas_json"]);
         $QA = new QuestionAlinea($this->_ap->db);
@@ -120,6 +125,8 @@ class MestestsController extends KleinExtController {
      * (ajax), ne renvoit rien
      */
     public function actionSaveone() {
+        Gb_Log::logInfo("mestests:saveone/".$this->_rq->param("id").": ".$this->_rq->param("values", ""));
+
         $rs    = $this->_rs;
         $this->_getEtuAnswers();
         $this->_Qaire->save($this->_qaire);
@@ -133,6 +140,7 @@ class MestestsController extends KleinExtController {
      * (ajax), renvoie score et les réponses
      */
     public function actionSubmit() {
+        Gb_Log::logInfo("mestests:submit/".$this->_rq->param("id").": ".$this->_rq->param("values", ""));
         $rs    = $this->_rs;
         $this->_getEtuAnswers();
         $this->_Qaire->computeScore($this->_qaire);
