@@ -223,4 +223,15 @@ respond(function( Klein\_Request $rq, Klein\_Response $rs, Klein\_App $ap){
         exit(0);
     };
 
+    $rs->urlPrefix = function() {
+        if (isset($_SERVER['HTTP_X_SSL']) && 'true' === $_SERVER['HTTP_X_SSL']) {
+            $urlPrefix = "https://";
+        } else {
+            $urlPrefix  = ( ("443" === $_SERVER["SERVER_PORT"] || (isset($_SERVER["HTTPS"]) && "on" === $_SERVER["HTTPS"])) ? ("https") : ("http") ) . "://";
+        }
+        $urlPrefix .= isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? ($_SERVER["HTTP_X_FORWARDED_HOST"]) : ($_SERVER["HTTP_HOST"]);
+
+        return $urlPrefix;
+    };
+
 });

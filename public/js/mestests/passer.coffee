@@ -51,7 +51,7 @@ class MestestsPasser
     _.forEach JSON.parse(@Qaire.questionAlineas_json), (alineaId, index) =>
       resultClass = 'result'
       if (@Qaire.solution_json?)
-        console.log(@Qaire.solution_json)
+        #console.log(@Qaire.solution_json)
         resultClass = 'result-wrong'
         etu_ans = JSON.parse(@Qaire.submited_data_json)[index]
         solutio = JSON.parse(@Qaire.solution_json)[index]

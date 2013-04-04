@@ -55,7 +55,6 @@ MestestsPasser = (function() {
 
       resultClass = 'result';
       if ((_this.Qaire.solution_json != null)) {
-        console.log(_this.Qaire.solution_json);
         resultClass = 'result-wrong';
         etu_ans = JSON.parse(_this.Qaire.submited_data_json)[index];
         solutio = JSON.parse(_this.Qaire.solution_json)[index];
