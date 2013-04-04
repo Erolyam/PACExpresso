@@ -224,7 +224,7 @@ MestestsPasser = (function() {
     }).fail(function(jqXHR, textStatus, errorThrown) {
       return alert("Erreur lors de l'enregistrement");
     }).done(function(data, textStatus, jqXHR) {
-      if (jqXHR.status !== 200 || !jqXHR.getResponseHeader('content-type').startsWith("application/json")) {
+      if (jqXHR.status !== 200 || !(jqXHR.getResponseHeader('content-type').substr(0, 16) === "application/json")) {
         alert("Le serveur n'a pas pu enregistrer le questionnaire");
         return;
       }
