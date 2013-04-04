@@ -26,7 +26,7 @@ class MestestsController extends KleinExtController {
         $this->_Qaire = new Questionnaire($this->_ap->db);
         if (!isset($this->_ap->auth['id'])) {
             // n'est pas authentifié
-            $this->_rs->redirect(getUrl("/"));
+            $this->_rs->redirect(getUrl("home"));
         }
         $this->_aQaires = $this->_Qaire->search(array("etudiant_id"=>$this->_ap->auth["id"]));
 
