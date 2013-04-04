@@ -33,8 +33,13 @@ class MestestsController extends KleinExtController {
         // vérifie que le questionnaire demandé existe et appartient à l'utilisateur courant
         if (in_array($action, array("actionOne", "actionSaveone", "actionSubmit"))) {
           $qaire_id     = $this->_rq->param("id");
-          $this->_qaire = $this->_Qaire->searchFirst(array("id"=>$qaire_id, "etudiant_id"=>$this->_ap->auth["id"]));
+          $this->_qaire = $this->_Qaire->searchFirst(array("id"=>$qaire_id));
           if (!is_array($this->_qaire)) {
+              Gb_Log::logWarning($action . " questionnaire " . $qaire_id . " introuvable");
+              $this->_rs->renderJSON("Questionnaire introuvable");
+          }
+          if ($this->_qaire['etudiant_id'] !== $this->_ap->auth["id"]) {
+              Gb_Log::logWarning($action . " questionnaire appartient à l'user " . $qaire_id);
               $this->_rs->renderJSON("Questionnaire introuvable");
           }
 
@@ -71,7 +76,7 @@ class MestestsController extends KleinExtController {
     public function actionNew() {
         Gb_Log::logInfo("mestests:new");
         if (!$this->canCreateNew()) {
-            Gb_Log::logNotice("creation rejetée");
+            Gb_Log::logWarning("creation rejetée");
             $this->_rs->renderJSON("Vous ne pouvez pas créer de questionnaire, parce que un questionnaire est déjà commencé");
         }
 
@@ -82,7 +87,7 @@ class MestestsController extends KleinExtController {
 
 
     public function actionOne() {
-      Gb_Log::logInfo("mestests:one");
+      Gb_Log::logInfo("mestests:one/".$this->_rq->param("id"));
       $rs    = $this->_rs;
 
         $aAlinIds = json_decode($this->_qaire["questionAlineas_json"]);
