@@ -42,7 +42,6 @@ class MestestsController extends KleinExtController {
           $this->_rs->jsp->aUrls['thistst'] = getUrl('onetst', array("id"=>$qaire_id));
         }
 
-
         return true;
     }
 
@@ -57,24 +56,24 @@ class MestestsController extends KleinExtController {
         $rs->jsp->canCreate = $canCreate;
         $rs->jsp->aUrls['onetst'] = getUrl('onetst', true);
         $rs->jsp->aUrls['newtst'] = getUrl('newtst', true);
+        $this->_rs->layout->current = "mestst";
+
         $rs->render("views/mestests/liste.phtml");
-
-
     }
 
 
     /**
      * Crée un nouveau test, si autorisé
+     * Redirige vers la liste de tests
      */
     public function actionNew() {
         if (!$this->canCreateNew()) {
             $this->_rs->renderJSON("Vous ne pouvez pas créer de questionnaire, parce que un questionnaire est déjà commencé");
         }
 
-        echo "<pre>";
         $aAlineas = $this->_Qaire->createNew(7);
         $newid = $this->_Qaire->saveNew($this->_ap->auth["id"], $aAlineas);
-        echo "newid=$newid";
+        $this->_rs->redirect(getUrl("mestst"));
     }
 
 

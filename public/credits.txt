@@ -25,5 +25,7 @@ NodeJS : http://nodejs.org/
 npm uglify-js : https://github.com/mishoo/UglifyJS
 npm css-condense : https://github.com/rstacruz/css-condense
 npm stylus
+npm coffee
+
 
 

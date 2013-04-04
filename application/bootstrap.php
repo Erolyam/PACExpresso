@@ -13,6 +13,10 @@ respond(function($rq, $rs, $ap) {
     $rs->layout("layouts/default.phtml");
     $rs->jsp = new stdClass();
     $rs->onready = "";
+    $rs->layout = new stdClass();
+    $rs->layout->urlHome   = getUrl("home");
+    $rs->layout->urlQuests = getUrl("mestst");
+    $rs->layout->current   = "";
     $GLOBALS["_min"] = false;
 });
 
@@ -43,7 +47,7 @@ respond(function($rq, $rs, $ap) {
     $rs->auth = $ap->auth;
 });
 
-respond(                "/",                            "default#root");
+respond("home",         "/",                            "default#root");
 respond("mestst",       "/mestests",                    "mestests#index");
 respond("newtst",       "/mestests/new",                "mestests#new");
 respond("onetst",       "GET  /mestests/[i:id]",        "mestests#one");
