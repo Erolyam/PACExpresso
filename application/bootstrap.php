@@ -48,11 +48,11 @@ respond(function($rq, $rs, $ap) {
 });
 
 respond("home",         "/",                            "default#root");
-respond("mestst",       "/mestests",                    "mestests#index");
-respond("newtst",       "/mestests/new",                "mestests#new");
-respond("onetst",       "GET  /mestests/[i:id]",        "mestests#one");
-respond(                "PUT  /mestests/[i:id]",        "mestests#saveone");
-respond(                "POST /mestests/[i:id]",        "mestests#submit");
+respond("mestst",       "/vostests",                    "mestests#index");
+respond("newtst",       "/vostests/new",                "mestests#new");
+respond("onetst",       "GET  /vostests/[i:id]",        "mestests#one");
+respond(                "PUT  /vostests/[i:id]",        "mestests#saveone");
+respond(                "POST /vostests/[i:id]",        "mestests#submit");
 
 respond(404, function(){echo "Page inexistante";});
 
