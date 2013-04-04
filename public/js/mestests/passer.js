@@ -10,7 +10,7 @@ MestestsPasser = (function() {
     this.solutionsReceived = __bind(this.solutionsReceived, this);
     this.handlerSubmitQuestionnaire = __bind(this.handlerSubmitQuestionnaire, this);
     this.handleUserAnswer = __bind(this.handleUserAnswer, this);
-    this.handlerClickOnFooterButton = __bind(this.handlerClickOnFooterButton, this);
+    this.handlerClickOnNavButton = __bind(this.handlerClickOnNavButton, this);
     this.handlerClickOnLi = __bind(this.handlerClickOnLi, this);
     var submited_data;
 
@@ -33,7 +33,7 @@ MestestsPasser = (function() {
   MestestsPasser.prototype.go = function() {
     this.renderLis();
     $(".passer .qtabctn").on("click", "li", this.handlerClickOnLi);
-    $(".passer footer").on("click", "button", this.handlerClickOnFooterButton);
+    $(".passer .navbuttons").on("click", "button", this.handlerClickOnNavButton);
     $(".passer .qbodyctn").on("click", "button.actionsubmit", this.handlerSubmitQuestionnaire);
     return $(".passer .qtabctn li").first().trigger('click');
   };
@@ -86,12 +86,12 @@ MestestsPasser = (function() {
     target.empty();
     li.siblings().removeClass("selected");
     li.addClass("selected");
-    $("footer button").removeClass("disabled");
+    $(".passer .navbuttons button").removeClass("disabled");
     if (li.prev().length === 0) {
-      $("footer button.actionprev").addClass("disabled");
+      $(".passer .navbuttons button.actionprev").addClass("disabled");
     }
     if (li.next().length === 0) {
-      $("footer button.actionnext").addClass("disabled");
+      $(".passer .navbuttons button.actionnext").addClass("disabled");
     }
     if ((alineaId != null)) {
       alinea = this.aAlineas[alineaId];
@@ -158,7 +158,7 @@ MestestsPasser = (function() {
   */
 
 
-  MestestsPasser.prototype.handlerClickOnFooterButton = function(e) {
+  MestestsPasser.prototype.handlerClickOnNavButton = function(e) {
     var button, li;
 
     button = $(e.currentTarget);

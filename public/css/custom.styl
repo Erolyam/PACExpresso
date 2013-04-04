@@ -16,15 +16,18 @@
         &:first-child {
           border-top:1px solid #000
         }
+        &.selected {
+          // en premier pour ne pas prendre priorité
+          background:#FF9400
+          border-left:4px solid #000
+          width:(@width - 4 - 4)
+          padding-right:4px
+        }
         &.result-right {
           background:#bbff33
         }
         &.result-wrong {
           background:#ff4d50
-        }
-        &.selected {
-          // en dernier pour qu'il ait priorité
-          background:#FF9400
         }
         &:hover {
           background:#FF9400
@@ -43,9 +46,21 @@
     }
     background:#fff
   }
-  header.well{
-    margin-bottom:0;
-    border-radius: 10px 10px 0 0
+  header {
+    position:relative
+    &.well {
+      margin-bottom:0
+      border-radius: 10px 10px 0 0
+    }
+    .title {
+      font-size:150%
+      display:inline-block
+    }
+    .navbuttons {
+      position:absolute
+      bottom:25%
+      right:2em
+    }
   }
   footer {
     margin-top:0;
@@ -53,6 +68,7 @@
     text-align:right
   }
 }
+
 
 .passer .oneanswer
   border:1px solid #000

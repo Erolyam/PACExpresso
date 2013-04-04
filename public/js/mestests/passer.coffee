@@ -29,8 +29,8 @@ class MestestsPasser
     # handler quand on clique sur un <li>
     $(".passer .qtabctn").on "click", "li", @handlerClickOnLi
 
-    # handler quand on clique sur un <li>
-    $(".passer footer").on "click", "button", @handlerClickOnFooterButton
+    # handler quand on clique sur les bouttons << et >>
+    $(".passer .navbuttons").on "click", "button", @handlerClickOnNavButton
 
     # handler bouton valider le questionnaire
     $(".passer .qbodyctn").on "click", "button.actionsubmit", @handlerSubmitQuestionnaire
@@ -83,9 +83,9 @@ class MestestsPasser
     li.addClass "selected"
 
     # sélectionne les boutons
-    $("footer button").removeClass("disabled")
-    $("footer button.actionprev").addClass("disabled") if (li.prev().length is 0)
-    $("footer button.actionnext").addClass("disabled") if (li.next().length is 0)
+    $(".passer .navbuttons button").removeClass("disabled")
+    $(".passer .navbuttons button.actionprev").addClass("disabled") if (li.prev().length is 0)
+    $(".passer .navbuttons button.actionnext").addClass("disabled") if (li.next().length is 0)
 
     if (alineaId?)
       # clic sur un alinéa
@@ -139,10 +139,10 @@ class MestestsPasser
     Handler quand on click sur les boutons previous/next
     Simule l'appui sur le <li> correspondant
   ###
-  handlerClickOnFooterButton: (e) =>
+  handlerClickOnNavButton: (e) =>
     #target:<i> ou <button>
     #currentTarget: <button>
-    #delegateTarget: <footer>
+    #delegateTarget: .navbuttons
     button = $(e.currentTarget)
     li     = $(".passer .qtabctn li.selected") # le <li> sélectionné
     if button.hasClass('actionnext')
