@@ -20,13 +20,15 @@ class Questionnaire extends Model {
      * @return array: array de questionAlineas
      */
     public function createNew($nombreDemandeMin, $nombreDemandeMax=null) {
+        // todo : rajouter validated/active aux alineas
+        // order les alineas par chemNum
         if (null == $nombreDemandeMax) {
             $nombreDemandeMax = $nombreDemandeMin;
         }
         $Questions = new Question($this->adapter());
         $QA        = new QuestionAlinea($this->adapter());
 
-        // récupère le nomde d'alinéas par question
+        // récupère le nombre d'alinéas par question
         $aNbAlineasPerQuestion = $Questions->getNbAlineasPerQuestion();
         $nbQuestions           = count($aNbAlineasPerQuestion);
         //print_r($aNbAlineasPerQuestion);
