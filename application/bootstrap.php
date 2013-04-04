@@ -17,7 +17,8 @@ respond(function($rq, $rs, $ap) {
     $rs->layout->urlHome   = getUrl("home");
     $rs->layout->urlQuests = getUrl("mestst");
     $rs->layout->current   = "";
-    $GLOBALS["_min"] = false;
+//    $GLOBALS["_min"] = false;
+    $GLOBALS["_min"] = true;
 });
 
 respond(function($rq, $rs, $ap) {

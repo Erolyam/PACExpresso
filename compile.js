@@ -13,20 +13,21 @@ var cssc = require('css-condense');    /* total size : 142110  consolidateViaSel
 
 var js = {
     "public/compiled/layout_all.js": [
-        "public/extlib/es5-shim/es5-shim.js",
-        "public/extlib/es5-shim/es5-sham.js",
-        "public/extlib/es6-shim/es6-shim.js",
+        //"public/extlib/es5-shim/es5-shim.js",
+        //"public/extlib/es5-shim/es5-sham.js",
+        //"public/extlib/es6-shim/es6-shim.js",
         "public/extlib/jquery/jquery-1.9.1.js",
         "public/extlib/twitter-bootstrap/js/bootstrap.js",
         "public/extlib/lodash/lodash.js",
-        "public/extlib/backbone.js/backbone.js",
+        //"public/extlib/backbone.js/backbone.js",
+        "public/js/mestests/passer.js",
     ],
 };
 
 var css = {
     "public/compiled/layout_all.css": [
         "public/extlib/twitter-bootstrap/css/bootstrap.css",
-        "public/css/default.css",
+        "public/css/custom.css",
     ]
 };
 
@@ -68,8 +69,8 @@ Object.keys(css).forEach(function(fname){
     str = stripComments(str);
     var aRpl = [
         ["url(Neuton-Italic-webfont.woff)" , "url(../css/Neuton-Italic-webfont.woff)"],
-        ["url(../img/glyphicons-halflings.png)", "url(../twitter-bootstrap/img/glyphicons-halflings.png)"],
-        ["url(../img/glyphicons-halflings-white.png)", "url(../twitter-bootstrap/img/glyphicons-halflings-white.png)"],
+        ["url(../img/glyphicons-halflings.png)", "url(../extlib/twitter-bootstrap/img/glyphicons-halflings.png)"],
+        ["url(../img/glyphicons-halflings-white.png)", "url(../extlib/twitter-bootstrap/img/glyphicons-halflings-white.png)"],
     ];
     aRpl.forEach(function(aRpls){
         str = str.replace(aRpls[0], aRpls[1]);

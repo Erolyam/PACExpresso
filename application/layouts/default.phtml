@@ -11,12 +11,14 @@
     <link rel="shortcut icon"              href="about:blank" />
 
     <!--  shims  -->
+<?php if (FALSE): ?>
     <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/es5-shim/es5-shim.js"></script><?php endif; ?>
     <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/es5-shim/es5-sham.js"></script><?php endif; ?>
     <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/es6-shim/es6-shim.js"></script><?php endif; ?>
     <!-- Shim to make HTML5 elements usable in older Internet Explorer versions html5shim.googlecode.com/svn/trunk/html5.js -->
     <!--[if lt IE 9]><script src="public/extlib/html5shiv/html5shiv.js"></script><![endif]-->
     <!--[if lt IE 8]><script src="public/extlib/JSON-js/json2.js"></script><![endif]-->
+<?php endif; ?>
 
     <!--  jQuery -->
     <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/jquery/jquery-1.9.1.js"></script><?php endif; ?>
@@ -27,11 +29,15 @@
 
     <!--  Backbone -->
     <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/lodash/lodash.js"></script><?php endif; ?>
+<?php if (FALSE): ?>
     <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/backbone.js/backbone.js"></script><?php endif; ?>
+<?php endif; ?>
 
     <!--  Our js / css -->
     <?php if(!$GLOBALS["_min"]):?><script src="public/js/mestests/passer.js"></script><?php endif; ?>
+<?php if (FALSE): ?>
     <?php if(!$GLOBALS["_min"]):?><link type="text/css" href="public/css/default.css" rel="stylesheet" /><?php endif; ?>
+<?php endif; ?>
     <?php if(!$GLOBALS["_min"]):?><link type="text/css" href="public/css/custom.css" rel="stylesheet" /><?php endif; ?>
 
     <?php if( $GLOBALS["_min"]):?><script type="text/javascript" src="public/compiled/layout_all.js"></script><?php endif; ?>
