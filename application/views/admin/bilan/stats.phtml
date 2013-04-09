@@ -1,3 +1,6 @@
+<?php if(!$GLOBALS["_min"]):?><script src="public/extlib/DataTables/media/js/jquery.dataTables.js"></script><?php endif; ?>
+<?php if( $GLOBALS["_min"]):?><script src="public/extlib/DataTables/media/js/jquery.dataTables.min.js"></script><?php endif; ?>
+
 
 <style>
 div.bilan table tr td:nth-child(2):hover {
@@ -11,6 +14,7 @@ div.bilan table tr td:nth-child(2):hover {
 </div>
 
 <? $this->onready.= <<<HEREDOC
+$("div.bilan table").dataTable({bPaginate:false, bFilter:false, bInfo:false});
 $("div.bilan table").on("click", "tr td:nth-child(2)", function(e){
     var id = $(e.target).prev().text();
     var url = window.jsp.urlAlinea;
