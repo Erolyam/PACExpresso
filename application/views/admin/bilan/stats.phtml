@@ -1,0 +1,26 @@
+
+<style>
+div.bilan table tr td:nth-child(2):hover {
+    cursor:pointer;
+    text-decoration:underline;
+}
+</style>
+
+<div class="bilan">
+<?= $this->out ?>
+</div>
+
+<? $this->onready.= <<<HEREDOC
+$("div.bilan table").on("click", "tr td:nth-child(2)", function(e){
+    var id = $(e.target).prev().text();
+    var url = window.jsp.urlAlinea;
+    url = url.replace("[:id]", id);
+
+    var win1 = window.open("", "_blank");
+    e.preventDefault();
+    if (null === win1) { alert("Autorisez cette page à ouvrir des popups."); }
+
+    win1.location.href = url;
+});
+HEREDOC;
+?>

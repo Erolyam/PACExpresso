@@ -23,7 +23,9 @@ respond(function($rq, $rs, $ap) {
 //    $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"/home/gilles/data/src/rails/mine2/db/development.sqlite3"));
     $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"../var/db.sqlite"));
 
-    $rs->layout("layouts/default.phtml");
+    if (!$rs->isAjax()) {
+        $rs->layout("layouts/default.phtml");
+    }
     $rs->jsp = new stdClass();
     $rs->onready = "";
     $rs->layout = new stdClass();
@@ -69,9 +71,12 @@ respond("newtst",       "/vostests/new",                "mestests#new");
 respond("onetst",       "GET  /vostests/[i:id]",        "mestests#one");
 respond(                "PUT  /vostests/[i:id]",        "mestests#saveone");
 respond(                "POST /vostests/[i:id]",        "mestests#submit");
+
 respond("adbilh",       "GET  /admin/bilan",            "admin#bilanhome");
 respond("adbilg",       "GET  /admin/bilan/[details|stats:type].[csv|txt|html:format]?",
                                                         "admin#bilango");
+respond("adshal",       "GET  /admin/alinea[i:id]/show",
+                                                        "admin#alineashow");
 
 respond(404, function(){echo "Page inexistante";});
 

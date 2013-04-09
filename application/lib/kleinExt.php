@@ -234,4 +234,12 @@ respond(function( Klein\_Request $rq, Klein\_Response $rs, Klein\_App $ap){
         return $urlPrefix;
     };
 
+    $rs->isAjax = function() {
+        // regarde si c'est un appel ajax
+        if (isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && "XMLHttpRequest"===$_SERVER["HTTP_X_REQUESTED_WITH"]) {
+            return true;
+        }
+        return false;
+    };
+
 });

@@ -56,7 +56,6 @@ class AdminController extends KleinExtController {
         $rs = $this->_rs;
 
         $aQaires = $this->_Qaire->search();
-        echo "<pre>";
 
         $aLignes = array();
         $aStats  = array();
@@ -127,9 +126,36 @@ class AdminController extends KleinExtController {
         if ("csv" === $format) {
             Gb_Util::sendString(Gb_String::arrayToCsv($aOut), $type . ".csv");
         } else {
-          echo Gb_String::formatTable($aOut, $format);
+          $rs->out = Gb_String::formatTable($aOut, $format);
+        }
+
+        if ("html" === $format) {
+            $rs->jsp->urlAlinea = getUrl("adshal", true);
+            $rs->render("views/admin/bilan/${type}.phtml");
+        } else {
+            echo "<pre>";
+            echo $rs->out;
         }
 
     }
 
+    public function actionAlineashow() {
+        $id = $this->_rq->param("id");
+        Gb_Log::logInfo("admin#alineashow id=$id");
+        $rs = $this->_rs;
+
+        $Alinea      = $this->_QAlinea->getById($id);
+        $question_id = $Alinea["question_id"];
+        $Question    = $this->_Q->getById($question_id);
+
+        $rs->title    = $Question["title"];
+        $rs->context  = $Question["context"];
+        $rs->body     = $Alinea["body"];
+        $rs->answers  = JSON_decode($Alinea["answers"]);
+        $rs->solution = JSON_decode($Alinea["solutions"]);
+        $rs->solution = $rs->solution[0];
+        $rs->chemNum  = $Alinea["chemNum"];
+
+        $rs->render("views/admin/alinea/show.phtml");
+    }
 }

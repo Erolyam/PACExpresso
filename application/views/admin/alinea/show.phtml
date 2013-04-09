@@ -1,0 +1,25 @@
+
+<h1><?= $this->title ?> - <?= $this->chemNum ?></h1>
+
+<?= $this->context ?>
+
+<hr />
+
+<?= $this->body ?>
+
+<ol type="A">
+  <? $weight = 1; ?>
+  <? foreach($this->answers as $answer): ?>
+    <?
+      $checked = "";
+      if ($this->solution & $weight) {
+        $checked = "checked";
+      }
+      $weight <<= 1;
+    ?>
+    <li>
+      <input type='checkbox' disabled <?= $checked ?>/>
+      <?= $answer ?>
+    </li>
+  <? endforeach; ?>
+</ol>
