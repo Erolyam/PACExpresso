@@ -7,8 +7,4 @@ class QuestionAlinea extends Model {
         parent::__construct("question_alineas", $db);
     }
 
-    //public function getAlineasForQuestion($question_id) {
-    //    $res = $this->adapter()->retrieve_all("SELECT * from {$this->_tablename} WHERE question_id=?", $question_id);
-    //    return $res;
-    //}
 }

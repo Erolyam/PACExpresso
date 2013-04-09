@@ -69,6 +69,9 @@ respond("newtst",       "/vostests/new",                "mestests#new");
 respond("onetst",       "GET  /vostests/[i:id]",        "mestests#one");
 respond(                "PUT  /vostests/[i:id]",        "mestests#saveone");
 respond(                "POST /vostests/[i:id]",        "mestests#submit");
+respond("adbilh",       "GET  /admin/bilan",            "admin#bilanhome");
+respond("adbilg",       "GET  /admin/bilan/[details|stats:type].[csv|txt|html:format]?",
+                                                        "admin#bilango");
 
 respond(404, function(){echo "Page inexistante";});
 

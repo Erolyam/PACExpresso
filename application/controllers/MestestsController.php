@@ -87,8 +87,8 @@ class MestestsController extends KleinExtController {
 
 
     public function actionOne() {
-      Gb_Log::logInfo("mestests:one/".$this->_rq->param("id"));
-      $rs    = $this->_rs;
+        Gb_Log::logInfo("mestests:one/".$this->_rq->param("id"));
+        $rs    = $this->_rs;
 
         $aAlinIds = json_decode($this->_qaire["questionAlineas_json"]);
         $QA = new QuestionAlinea($this->_ap->db);
