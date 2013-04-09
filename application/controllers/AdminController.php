@@ -48,7 +48,7 @@ class AdminController extends KleinExtController {
 
     public function actionBilango() {
         $type   = $this->_rq->param("type");
-        $format = $this->_rq->param("format", html);
+        $format = $this->_rq->param("format", "html");
         if ("txt" === $format) {
           $format = "text";
         }
