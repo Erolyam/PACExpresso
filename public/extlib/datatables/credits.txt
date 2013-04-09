@@ -1,0 +1,14 @@
+http://www.datatables.net/
+DataTables-1.9.4.zip
+
+Previous notes:
+twitter bootstrap 1 integration: http://www.datatables.net/blog/Twitter_Bootstrap
+twitter bootstrap 2 integration: http://www.datatables.net/blog/Twitter_Bootstrap_2
+twitter bootstrap pagination : http://www.datatables.net/media/blog/bootstrap/paging.js
+
+Latest version, all in one:
+http://www.datatables.net/blog/Twitter_Bootstrap_2
+
+
+
+

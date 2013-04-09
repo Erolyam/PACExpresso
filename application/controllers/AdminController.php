@@ -61,8 +61,8 @@ class AdminController extends KleinExtController {
         $aStats  = array();
         foreach ($aQaires as $Qaire) {
             $etudiant_id    = $Qaire["etudiant_id"];
-            $score          = $Qaire["score"];
-            if ($score === NULL) {
+            $pourcent          = $Qaire["score"];
+            if ($pourcent === NULL) {
               // non terminé
               continue;
             }
@@ -115,10 +115,10 @@ class AdminController extends KleinExtController {
             $aOut = $aLignes;
         } elseif ("stats" === $type) {
             foreach ($aStats as $index=>$stat) {
-                $juste = $stat["nbJuste"];
-                $faux  = $stat["nbFaux"];
-                $score = round($juste * 100 / ($juste + $faux));
-                $aStats[$index]["score"] = $score;
+                $juste    = $stat["nbJuste"];
+                $faux     = $stat["nbFaux"];
+                $pourcent = round($juste * 100 / ($juste + $faux));
+                $aStats[$index]["pourcent"] = $pourcent;
             }
             $aOut = $aStats;
         }

@@ -22,12 +22,17 @@ var js = {
         //"public/extlib/backbone.js/backbone.js",
         "public/js/mestests/passer.js",
     ],
+    "public/compiled/layout_admin.js": [
+        "public/extlib/datatables/jquery.dataTables.js",
+        "public/extlib/datatables/DT_bootstrap.js",
+    ],
 };
 
 var css = {
     "public/compiled/layout_all.css": [
         "public/extlib/twitter-bootstrap/css/bootstrap.css",
         "public/css/custom.css",
+        "public/extlib/datatables/DT_bootstrap.css",
     ]
 };
 

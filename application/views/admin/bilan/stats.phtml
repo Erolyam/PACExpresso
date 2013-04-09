@@ -1,6 +1,6 @@
-<?php if(!$GLOBALS["_min"]):?><script src="public/extlib/DataTables/media/js/jquery.dataTables.js"></script><?php endif; ?>
-<?php if( $GLOBALS["_min"]):?><script src="public/extlib/DataTables/media/js/jquery.dataTables.min.js"></script><?php endif; ?>
-
+<?php if(!$GLOBALS["_min"]):?><script src="public/extlib/datatables/jquery.dataTables.js"></script><?php endif; ?>
+<?php if(!$GLOBALS["_min"]):?><script src="public/extlib/datatables/DT_bootstrap.js"></script><?php endif; ?>
+<?php if( $GLOBALS["_min"]):?><script src="public/compiled/layout_admin.js"></script><?php endif; ?>
 
 <style>
 div.bilan table tr td:nth-child(2):hover {
@@ -9,12 +9,19 @@ div.bilan table tr td:nth-child(2):hover {
 }
 </style>
 
+<div class='container'>
 <div class="bilan">
 <?= $this->out ?>
 </div>
 
 <? $this->onready.= <<<HEREDOC
-$("div.bilan table").dataTable({bPaginate:false, bFilter:false, bInfo:false});
+$("div.bilan table").dataTable({
+    bPaginate:false, bFilter:false, bInfo:false, iDisplayLength:5,
+});
+
+$("div.bilan table").addClass("table table-striped table-bordered");
+
+
 $("div.bilan table").on("click", "tr td:nth-child(2)", function(e){
     var id = $(e.target).prev().text();
     var url = window.jsp.urlAlinea;
@@ -28,3 +35,5 @@ $("div.bilan table").on("click", "tr td:nth-child(2)", function(e){
 });
 HEREDOC;
 ?>
+
+</div>
