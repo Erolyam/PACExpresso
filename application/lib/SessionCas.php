@@ -49,6 +49,7 @@ class SessionCas {
             if (isset($_SERVER['HTTP_X_SSL']) && 'true' === $_SERVER['HTTP_X_SSL']) {
                 // make Client->isHttps handle proxyfied ssl
                 $_SERVER["HTTPS"] = "on";
+                $_SERVER['SERVER_PORT'] = 443;
             }
             if (empty($_SESSION["casUser"])) {
                 if (null !== $this->_bypassLogin) {
