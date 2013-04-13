@@ -31,16 +31,6 @@ function respond($name, $method = null, $route = '*', $callback = null) {
     if (null === $route) {
         $route = '*';
     }
-    if (null === $name) {
-        $name = $route;
-        if (isset(Router::$routes[$name])) {
-            $num=1;
-            while (isset(Router::$routes[$name.$num])) {
-                $num++;
-            }
-            $name = $name.$num;
-        }
-    }
 
     // only consider a request to be matched when not using matchall
     $count_match = ($route !== '*');
@@ -80,7 +70,11 @@ function respond($name, $method = null, $route = '*', $callback = null) {
         $method = explode("|", $method);
     }
 
-    Router::$routes[$name] = array($method, $route, $callback, $count_match);
+    if (null !== $name) {
+        Router::$routes[$name] = array($method, $route, $callback, $count_match);
+    } else {
+        Router::$routes[] = array($method, $route, $callback, $count_match);
+    }
 
     return $callback;
 }
@@ -145,7 +139,7 @@ function with($namespace, $routes) {
     if (is_callable($routes)) {
         $routes();
     } else {
-        require_once $routes;
+        require $routes;
     }
     Router::$namespace = $previous;
 }
@@ -627,9 +621,6 @@ class _Response extends StdClass {
 
     // Redirects the request to another URL
     public function redirect($url, $code = 302, $exit_after_redirect = true) {
-        if ((substr($url, 0,7) !== 'http://') && (substr($url, 0,8) !== 'https://') && (substr($url, 0, strlen(getenv("BASE_URL"))) !== getenv("BASE_URL"))) {
-            $url = getenv("BASE_URL") . $url;
-        }
         $this->code($code);
         $this->header("Location: $url");
         if ($exit_after_redirect) {
