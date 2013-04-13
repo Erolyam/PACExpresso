@@ -223,23 +223,46 @@ respond(function( Klein\_Request $rq, Klein\_Response $rs, Klein\_App $ap){
         exit(0);
     };
 
-    $rs->urlPrefix = function() {
-        if (isset($_SERVER['HTTP_X_SSL']) && 'true' === $_SERVER['HTTP_X_SSL']) {
-            $urlPrefix = "https://";
-        } else {
-            $urlPrefix  = ( ("443" === $_SERVER["SERVER_PORT"] || (isset($_SERVER["HTTPS"]) && "on" === $_SERVER["HTTPS"])) ? ("https") : ("http") ) . "://";
-        }
-        $urlPrefix .= isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? ($_SERVER["HTTP_X_FORWARDED_HOST"]) : ($_SERVER["HTTP_HOST"]);
+    $rs->urlPrefix = function($url = '') use ($rs) {
+        $urlPrefix  = $rs->urlScheme();
+        $urlPrefix .= "://";
+        $urlPrefix .= $rs->urlBase();
 
-        return $urlPrefix;
+        return $urlPrefix . $url;
+    };
+
+    $rs->urlBase = function() {
+        return isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? ($_SERVER["HTTP_X_FORWARDED_HOST"]) : ($_SERVER["HTTP_HOST"]);
+    };
+
+    $rs->urlScheme = function() {
+        if (    (isset($_SERVER['HTTP_X_SSL']) && 'true' === $_SERVER['HTTP_X_SSL'])
+             || ("443" === $_SERVER["SERVER_PORT"])
+             || ((isset($_SERVER["HTTPS"]) && "on" === $_SERVER["HTTPS"]))
+           ) {
+            return "https";
+        }
+        return "http";
     };
 
     $rs->isAjax = function() {
-        // regarde si c'est un appel ajax
+        // check if the request is an ajax call
         if (isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && "XMLHttpRequest"===$_SERVER["HTTP_X_REQUESTED_WITH"]) {
             return true;
         }
         return false;
+    };
+
+    $rs->redirect = function($url, $code = 302, $exit_after_redirect = true) {
+        // Redirects the request to another URL
+        if ((substr($url, 0,7) !== 'http://') && (substr($url, 0,8) !== 'https://') && (substr($url, 0, strlen(getenv("BASE_URL"))) !== getenv("BASE_URL"))) {
+            $url = getenv("BASE_URL") . $url;
+        }
+        $this->code($code);
+        $this->header("Location: $url");
+        if ($exit_after_redirect) {
+            exit;
+        }
     };
 
 });
