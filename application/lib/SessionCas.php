@@ -1,7 +1,9 @@
 <?php
 
 /* EXEMPLE D'UTILISATION
-session_start();
+session_name("s" . md5(__DIR__)); // Or custom session php id. Must be application unique
+                                  // warning for load balancer : the session storage must be shared between hosts,
+                                  // and the phpsessid must be the same
 $sessionCas = SessionCas::getSingleton();
 if (isset($_GET["caslogout"])) {
 $sessionCas->logout();
@@ -26,6 +28,9 @@ echo "<a href='$url'>s'authentifier</a>";
 /**
  * @author gbouthenot
  * @version 1.2+ (dév)
+ * changes:
+ *   * handle $_SERVER["X_SSL"]: make Client->isHttps handle proxyfied ssl
+ *   * example update
  */
 class SessionCas {
     protected static $_instance = null;     // singleton
@@ -41,6 +46,10 @@ class SessionCas {
 
     protected function _init() {
         if (null === $this->_init) {
+            if (isset($_SERVER['HTTP_X_SSL']) && 'true' === $_SERVER['HTTP_X_SSL']) {
+                // make Client->isHttps handle proxyfied ssl
+                $_SERVER["HTTPS"] = "on";
+            }
             if (empty($_SESSION["casUser"])) {
                 if (null !== $this->_bypassLogin) {
                     $_SESSION["casUser"] = $this->_bypassLogin;

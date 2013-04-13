@@ -39,6 +39,7 @@ respond(function($rq, $rs, $ap) {
 respond(function($rq, $rs, $ap) {
     // l'authentification. Fournit $ap->auth et $rs->auth
     require_once "lib/SessionCas.php";
+    session_name("s" . md5(__DIR__));
     session_start();
     $sessionCas = SessionCas::getSingleton();
     if (isset($_GET["caslogout"])) {
