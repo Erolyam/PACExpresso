@@ -6,7 +6,7 @@
 
 <? foreach (array("details", "stats") as $type):?>
   <? foreach (array("txt", "html", "csv") as $format):?>
-    <? $url = getUrl($name, array("type"=>$type, "format"=>$format))?>
+    <? $url = getUrlExt($name, array("type"=>$type, "format"=>$format))?>
     <a href="<?= $url ?>">Bilan <?= $type ?>, format <?= $format ?></a><br />
   <? endforeach; ?>
 <? endforeach; ?>

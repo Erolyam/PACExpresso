@@ -33,7 +33,7 @@ class AdminController extends KleinExtController {
         $login = (isset($this->_ap->auth['login'])) ? ($this->_ap->auth['login']) : ("");
         if ($login !== "ecavalli" && $login !== "gbouthen") {
             // n'a pas accès
-            $this->_rs->redirect(getUrl("home"));
+            $this->_rs->redirect(getUrlExt("home"));
         }
 
         return true;
@@ -130,7 +130,7 @@ class AdminController extends KleinExtController {
         }
 
         if ("html" === $format) {
-            $rs->jsp->urlAlinea = getUrl("adshal", true);
+            $rs->jsp->urlAlinea = getUrlExt("adshal", true);
             $rs->render("views/admin/bilan/${type}.phtml");
         } else {
             echo "<pre>";

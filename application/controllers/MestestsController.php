@@ -26,7 +26,7 @@ class MestestsController extends KleinExtController {
         $this->_Qaire = new Questionnaire($this->_ap->db);
         if (!isset($this->_ap->auth['id'])) {
             // n'est pas authentifié
-            $this->_rs->redirect(getUrl("home"));
+            $this->_rs->redirect(getUrlExt("home"));
         }
         $this->_aQaires = $this->_Qaire->search(array("etudiant_id"=>$this->_ap->auth["id"]));
 
@@ -44,7 +44,7 @@ class MestestsController extends KleinExtController {
           }
 
           // fournit l'url du test
-          $this->_rs->jsp->aUrls['thistst'] = getUrl('onetst', array("id"=>$qaire_id));
+          $this->_rs->jsp->aUrls['thistst'] = getUrlExt('onetst', array("id"=>$qaire_id));
         }
 
         return true;
@@ -61,8 +61,8 @@ class MestestsController extends KleinExtController {
 
         $rs->jsp->aQaires = $this->_aQaires;
         $rs->jsp->canCreate = $canCreate;
-        $rs->jsp->aUrls['onetst'] = getUrl('onetst', true);
-        $rs->jsp->aUrls['newtst'] = getUrl('newtst', true);
+        $rs->jsp->aUrls['onetst'] = getUrlExt('onetst', true);
+        $rs->jsp->aUrls['newtst'] = getUrlExt('newtst', true);
         $this->_rs->layout->current = "mestst";
 
         $rs->render("views/mestests/liste.phtml");
@@ -82,7 +82,7 @@ class MestestsController extends KleinExtController {
 
         $aAlineas = $this->_Qaire->createNew(7);
         $newid = $this->_Qaire->saveNew($this->_ap->auth["id"], $aAlineas);
-        $this->_rs->redirect(getUrl("mestst"));
+        $this->_rs->redirect(getUrlExt("mestst"));
     }
 
 

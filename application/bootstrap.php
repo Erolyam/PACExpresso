@@ -18,7 +18,7 @@ Gb_Log::installErrorHandlers();
 //set_include_path(dirname(__FILE__) . PATH_SEPARATOR . get_include_path());
 require_once "lib/kleinExt.php";
 
-respond(function($rq, $rs, $ap) {
+respondExt(function($rq, $rs, $ap) {
     require_once "Gb/Db.php";
 //    $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"/home/gilles/data/src/rails/mine2/db/development.sqlite3"));
     $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"../var/db.sqlite"));
@@ -29,14 +29,14 @@ respond(function($rq, $rs, $ap) {
     $rs->jsp = new stdClass();
     $rs->onready = "";
     $rs->layout = new stdClass();
-    $rs->layout->urlHome   = getUrl("home");
-    $rs->layout->urlQuests = getUrl("mestst");
+    $rs->layout->urlHome   = getUrlExt("home");
+    $rs->layout->urlQuests = getUrlExt("mestst");
     $rs->layout->current   = "";
 //    $GLOBALS["_min"] = false;
     $GLOBALS["_min"] = true;
 });
 
-respond(function($rq, $rs, $ap) {
+respondExt(function($rq, $rs, $ap) {
     // l'authentification. Fournit $ap->auth et $rs->auth
     require_once "lib/SessionCas.php";
     session_name("s" . md5(__DIR__));
@@ -66,19 +66,19 @@ respond(function($rq, $rs, $ap) {
     $rs->auth = $ap->auth;
 });
 
-respond("home",         "/",                            "default#root");
-respond("mestst",       "/vostests",                    "mestests#index");
-respond("newtst",       "/vostests/new",                "mestests#new");
-respond("onetst",       "GET  /vostests/[i:id]",        "mestests#one");
-respond(                "PUT  /vostests/[i:id]",        "mestests#saveone");
-respond(                "POST /vostests/[i:id]",        "mestests#submit");
+respondExt("home",         "/",                            "default#root");
+respondExt("mestst",       "/vostests",                    "mestests#index");
+respondExt("newtst",       "/vostests/new",                "mestests#new");
+respondExt("onetst",       "GET  /vostests/[i:id]",        "mestests#one");
+respondExt(                "PUT  /vostests/[i:id]",        "mestests#saveone");
+respondExt(                "POST /vostests/[i:id]",        "mestests#submit");
 
-respond("adbilh",       "GET  /admin/bilan",            "admin#bilanhome");
-respond("adbilg",       "GET  /admin/bilan/[details|stats:type].[csv|txt|html:format]?",
+respondExt("adbilh",       "GET  /admin/bilan",            "admin#bilanhome");
+respondExt("adbilg",       "GET  /admin/bilan/[details|stats:type].[csv|txt|html:format]?",
                                                         "admin#bilango");
-respond("adshal",       "GET  /admin/alinea[i:id]/show",
+respondExt("adshal",       "GET  /admin/alinea[i:id]/show",
                                                         "admin#alineashow");
 
-respond(404, function(){echo "Page inexistante";});
+respondExt(404, function(){echo "Page inexistante";});
 
-dispatch();
+dispatchExt();
