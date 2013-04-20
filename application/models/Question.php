@@ -1,11 +1,8 @@
 <?php
-require_once "lib/Model.php";
+class Question extends \Gb\Model\Model {
 
-class Question extends Model {
-
-    public function __construct($db) {
-        parent::__construct("questions", $db);
-    }
+    static $_tablename = "questions";
+    static $_pk        = "id";
 
     public function getNbAlineasPerQuestion() {
         // construit un array(question_id=>question_alineas.length)

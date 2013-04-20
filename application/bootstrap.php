@@ -3,6 +3,7 @@
 chdir(dirname(__FILE__));
 
 require_once "Gb/Log.php";
+require_once "Gb/Model.php";
 Gb_Log::setLogFilename("../var/logfile.log");
 
 //valeurs par défaut

@@ -1,10 +1,7 @@
 <?php
-require_once "lib/Model.php";
+class QuestionAlinea extends \Gb\Model\Model {
 
-class QuestionAlinea extends Model {
-
-    public function __construct($db) {
-        parent::__construct("question_alineas", $db);
-    }
+    static $_tablename = "question_alineas";
+    static $_pk        = "id";
 
 }

@@ -1,6 +1,8 @@
 <?php
 
+require "models/Question.php";
 require "models/Questionnaire.php";
+require "models/QuestionAlinea.php";
 require "models/Author.php";
 
 class AdminController extends KleinExtController {
@@ -23,10 +25,63 @@ class AdminController extends KleinExtController {
     protected $_Author;
 
     public function initialize() {
-        $this->_Qaire   = new Questionnaire($this->_ap->db);
-        $this->_QAlinea = new QuestionAlinea($this->_ap->db);
-        $this->_Q       = new Question($this->_ap->db);
-        $this->_Author  = new Author($this->_ap->db);
+
+        \Gb\Model\Model::setAdapter($this->_ap->db);
+
+        /*
+        echo "<pre>";
+
+        echo "<i>Author::getOne(2)</i><br />";
+        $q = Author::getOne(2);
+        echo "\$q->login=" . serialize($q->login) . "<br />";
+        echo "\$q->notexistent=" . serialize($q->notexistent) . "<br />";
+        echo "<b>foreach:</b> ";
+        foreach ($q as $k=>$v) {
+            echo "$k:$v ";
+        }echo "<br />";
+        echo "<b>__tostring:</b> " . $q . "<br />";
+        echo "<br />";
+
+        echo "<i>Author::getSome(array(1,2,3))</i><br />";
+        $q = Author::getSome(array(1,2,3));
+        echo "<b>foreach:</b><br />";
+        foreach ($q as $k=>$v) {
+            echo "  $k:$v<br />";
+        }echo "<br />";
+        echo "<b>__tostring:</b> " . $q . "<br />";
+        echo "<br />";
+
+        echo "<i>Author::getAll()</i><br />";
+        $q = Author::getAll();
+        echo "<b>foreach:</b><br />";
+        foreach ($q as $k=>$v) {
+            echo "  $k:$v<br />";
+        }echo "<br />";
+        echo "<b>__tostring:</b> " . $q . "<br />";
+        echo "<br />";
+
+        echo '<i>Questionnaire::getSome(array(1,2,8,9,10,11))</i><br />';
+        $q = Questionnaire::getSome(array(1,2,8,9,10,11));
+        echo "<b>__tostring:</b> " . $q . "<br />";
+        echo "<br />";
+
+        $r=$q->rel("etudiant")->{2};
+        echo $r."\n";
+        echo "\n";
+
+        $r=$q->{9};
+        echo $r."\n";
+        echo $r->rel("etudiant")."\n";    // doit renvoyer {"id":"2","login":"ecavalli","created_at":"2013-04-04 10:55:56","updated_at":"2013-04-04 10:55:56"}
+        echo "\n";
+
+        $q = Questionnaire::getOne(8);
+        echo $q."\n";
+        echo $q->rel("etudiant");
+        echo "\n";
+
+        exit();
+        */
+
     }
 
     public function before($action) {
@@ -55,29 +110,29 @@ class AdminController extends KleinExtController {
         Gb_Log::logInfo("admin#bilango type=$type format=$format");
         $rs = $this->_rs;
 
-        $aQaires = $this->_Qaire->search();
+        $aQaires = Questionnaire::getAll($this->_ap->db);
 
         $aLignes = array();
         $aStats  = array();
         foreach ($aQaires as $Qaire) {
-            $etudiant_id    = $Qaire["etudiant_id"];
-            $pourcent          = $Qaire["score"];
+            $etudiant_id    = $Qaire->etudiant_id;
+            $pourcent          = $Qaire->score;
             if ($pourcent === NULL) {
               // non terminé
               continue;
             }
-            $Author         = $this->_Author->getById($etudiant_id);
-            $login          = $Author["login"];
-            $Aalineas       = JSON_decode($Qaire["questionAlineas_json"]);
-            $aSubmited_data = JSON_decode($Qaire["submited_data_json"]);
-            $aSolutions     = JSON_decode($Qaire["solution_json"]);
-            $submited_at    = $Qaire["submited_at"];
+            $Author         = Author::getOne($etudiant_id);
+            $login          = $Author->login;
+            $Aalineas       = JSON_decode($Qaire->questionAlineas_json);
+            $aSubmited_data = JSON_decode($Qaire->submited_data_json);
+            $aSolutions     = JSON_decode($Qaire->solution_json);
+            $submited_at    = $Qaire->submited_at;
             foreach ($Aalineas as $index=>$alinea_id) {
-                $Alinea      = $this->_QAlinea->getById($alinea_id);
-                $question_id = $Alinea["question_id"];
-                $chemNum     = $Alinea["chemNum"];
-                $Question    = $this->_Q->getById($question_id);
-                $title       = $Question["title"];
+                $Alinea      = QuestionAlinea::getOne($alinea_id);
+                $question_id = $Alinea->question_id;
+                $chemNum     = $Alinea->chemNum;
+                $Question    = Question::getOne($question_id);
+                $title       = $Question->title;
                 $submited    = $aSubmited_data[$index];
                 $solution    = $aSolutions[$index];
 

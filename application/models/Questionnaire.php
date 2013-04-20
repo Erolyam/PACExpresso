@@ -1,16 +1,14 @@
 <?php
 require_once "Gb/String.php";
-require_once "lib/Model.php";
-require_once "models/Question.php";
-require_once "models/QuestionAlinea.php";
 
+class Questionnaire extends \Gb\Model\Model {
 
-class Questionnaire extends Model {
+    static $_tablename = "questionnaires";
+    static $_pk        = "id";
 
-    public function __construct($db) {
-        parent::__construct("questionnaires", $db);
-    }
-
+    static $rels = array(
+        'etudiant'=>array("reltype"=>"belongs_to", "class_name"=>"Author", "foreign_key"=>"etudiant_id"),
+    );
 
     /**
      * Tire des questions
