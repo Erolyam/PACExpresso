@@ -23,6 +23,8 @@ respondExt(function($rq, $rs, $ap) {
     require_once "Gb/Db.php";
 //    $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"/home/gilles/data/src/rails/mine2/db/development.sqlite3"));
     $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"../var/db.sqlite"));
+    \Gb\Model\Model::setAdapter($ap->db);
+
 
     if (!$rs->isAjax()) {
         $rs->layout("layouts/default.phtml");

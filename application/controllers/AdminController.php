@@ -26,8 +26,6 @@ class AdminController extends KleinExtController {
 
     public function initialize() {
 
-        \Gb\Model\Model::setAdapter($this->_ap->db);
-
         /*
         echo "<pre>";
 

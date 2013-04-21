@@ -1,13 +1,11 @@
 <?php
 
+require "models/Question.php";
 require "models/Questionnaire.php";
+require "models/QuestionAlinea.php";
+require "models/Author.php";
 
 class MestestsController extends KleinExtController {
-
-    /**
-     * @var Questionnaire
-     */
-    protected $_Qaire;
 
     /**
      * @var array questionnaires de l'étudiant
@@ -23,28 +21,23 @@ class MestestsController extends KleinExtController {
     }
 
     public function before($action) {
-        $this->_Qaire = new Questionnaire($this->_ap->db);
         if (!isset($this->_ap->auth['id'])) {
             // n'est pas authentifié
             $this->_rs->redirect(getUrlExt("home"));
         }
-        $this->_aQaires = $this->_Qaire->search(array("etudiant_id"=>$this->_ap->auth["id"]));
+        $this->_aQaires = Questionnaire::findAll(array("etudiant_id"=>$this->_ap->auth["id"]));
 
         // vérifie que le questionnaire demandé existe et appartient à l'utilisateur courant
         if (in_array($action, array("actionOne", "actionSaveone", "actionSubmit"))) {
-          $qaire_id     = $this->_rq->param("id");
-          $this->_qaire = $this->_Qaire->searchFirst(array("id"=>$qaire_id));
-          if (!is_array($this->_qaire)) {
-              Gb_Log::logWarning($action . " questionnaire " . $qaire_id . " introuvable");
-              $this->_rs->renderJSON("Questionnaire introuvable");
-          }
-          if ($this->_qaire['etudiant_id'] !== $this->_ap->auth["id"]) {
-              Gb_Log::logWarning($action . " questionnaire appartient à l'user " . $qaire_id);
-              $this->_rs->renderJSON("Questionnaire introuvable");
-          }
-
-          // fournit l'url du test
-          $this->_rs->jsp->aUrls['thistst'] = getUrlExt('onetst', array("id"=>$qaire_id));
+            $qaire_id     = $this->_rq->param("id");
+            try {
+                $this->_qaire = $this->_aQaires->$qaire_id;
+            } catch (Gb_Exception $e) {
+                  Gb_Log::logWarning($action . " questionnaire " . $qaire_id . " introuvable");
+                $this->_rs->renderJSON("Questionnaire introuvable");
+            }
+            // fournit l'url du test
+            $this->_rs->jsp->aUrls['thistst'] = getUrlExt('onetst', array("id"=>$qaire_id));
         }
 
         return true;
@@ -90,25 +83,18 @@ class MestestsController extends KleinExtController {
         Gb_Log::logInfo("mestests:one/".$this->_rq->param("id"));
         $rs    = $this->_rs;
 
-        $aAlinIds = json_decode($this->_qaire["questionAlineas_json"]);
-        $QA = new QuestionAlinea($this->_ap->db);
-        $Q = new Question($this->_ap->db);
-        $aAlineas = $QA->getById($aAlinIds);
-        $rs->jsp->aAlineas = $aAlineas;
+        $aAlineas = $this->_qaire->rel("alineas");
+        $rs->jsp->aAlineas = $aAlineas->data();
 
         // récupère les contextes de chaque alinéa
-        $aContexts = array();
-        foreach ($aAlineas as $alinea) {
-            $aContexts[] = (int) $alinea["question_id"];
-        }
-        $rs->jsp->aContexts = $Q->getById($aContexts);
+        $aContexts = $aAlineas->rel('question');
+        $rs->jsp->aContexts = $aContexts->data();
 
         $this->subactionPass();
     }
 
     public function subactionPass() {
         $rs    = $this->_rs;
-        $qaire = $this->_qaire;
 
         // enlève les solutions et le commentaire
         foreach ($rs->jsp->aAlineas as $i=>$v) {
@@ -118,7 +104,7 @@ class MestestsController extends KleinExtController {
             //$qaire['aAlineas'][$i]['answers'] = 'theanswers';
         }
 
-        $rs->jsp->qaire = $qaire;
+        $rs->jsp->qaire = $this->_qaire->data();
         $rs->render("views/mestests/passer.phtml");
 
     }
@@ -134,7 +120,7 @@ class MestestsController extends KleinExtController {
 
         $rs    = $this->_rs;
         $this->_getEtuAnswers();
-        $this->_Qaire->save($this->_qaire);
+        $this->_qaire->save();
 
         $rs->renderJSON("", 204);
     }
@@ -150,7 +136,7 @@ class MestestsController extends KleinExtController {
         $this->_getEtuAnswers();
         $this->_Qaire->computeScore($this->_qaire);
 
-        $this->_Qaire->save($this->_qaire);
+        $this->_qaire->save();
 
         $rs->renderJSON($this->_qaire);
     }
@@ -158,7 +144,7 @@ class MestestsController extends KleinExtController {
 
     /**
      * Enregistre les réponses de l'étudiant.
-     * enregistre dans $this->qaire
+     * enregistre dans $this->_qaire
      */
     protected function _getEtuAnswers() {
         $values = $this->_rq->param("values", "");

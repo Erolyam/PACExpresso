@@ -7,7 +7,8 @@ class Questionnaire extends \Gb\Model\Model {
     static $_pk        = "id";
 
     static $rels = array(
-        'etudiant'=>array("reltype"=>"belongs_to", "class_name"=>"Author", "foreign_key"=>"etudiant_id"),
+        'etudiant'      =>array('reltype'=>'belongs_to',      'class_name'=>'Author',         'foreign_key'=>'etudiant_id'),
+        'alineas'       =>array('reltype'=>'belongs_to_json', 'class_name'=>'QuestionAlinea', 'foreign_key'=>'questionAlineas_json')
     );
 
     /**

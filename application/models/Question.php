@@ -4,6 +4,10 @@ class Question extends \Gb\Model\Model {
     static $_tablename = "questions";
     static $_pk        = "id";
 
+    static $rels = array(
+        'author'        =>array('reltype'=>'belongs_to',      'class_name'=>'Author',         'foreign_key'=>'author_id'),
+    );
+
     public function getNbAlineasPerQuestion() {
         // construit un array(question_id=>question_alineas.length)
         $aNbAlineasPerQuestion = array();
