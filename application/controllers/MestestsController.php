@@ -73,8 +73,14 @@ class MestestsController extends KleinExtController {
             $this->_rs->renderJSON("Vous ne pouvez pas créer de questionnaire, parce que un questionnaire est déjà commencé");
         }
 
-        $aAlineas = $this->_Qaire->createNew(7);
-        $newid = $this->_Qaire->saveNew($this->_ap->auth["id"], $aAlineas);
+        $qaire = Questionnaire::create();
+
+        $aAlineas = $qaire->createNew(7);
+
+        $qaire->etudiant_id = $this->_ap->auth["id"];
+        $qaire->questionAlineas_json = JSON_encode($aAlineas);
+
+        $qaire->save();
         $this->_rs->redirect(getUrlExt("mestst"));
     }
 
@@ -134,11 +140,11 @@ class MestestsController extends KleinExtController {
         Gb_Log::logInfo("mestests:submit/".$this->_rq->param("id").": ".$this->_rq->param("values", ""));
         $rs    = $this->_rs;
         $this->_getEtuAnswers();
-        $this->_Qaire->computeScore($this->_qaire);
+        $this->_qaire->computeScore();
 
         $this->_qaire->save();
 
-        $rs->renderJSON($this->_qaire);
+        $rs->renderJSON($this->_qaire->data());
     }
 
 
@@ -168,9 +174,9 @@ class MestestsController extends KleinExtController {
      * @return boolean
      */
     protected function canCreateNew()
-    {
+    {return true;
         $rs = $this->_rs;
-      $fCanCreate = true;
+        $fCanCreate = true;
         foreach ($this->_aQaires as $aQaire) {
             if (null === $aQaire["score"]) {
                 $fCanCreate = false; break;

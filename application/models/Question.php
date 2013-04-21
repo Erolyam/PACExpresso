@@ -8,15 +8,14 @@ class Question extends \Gb\Model\Model {
         'author'        =>array('reltype'=>'belongs_to',      'class_name'=>'Author',         'foreign_key'=>'author_id'),
     );
 
-    public function getNbAlineasPerQuestion() {
+    public static function getNbAlineasPerQuestion() {
         // construit un array(question_id=>question_alineas.length)
         $aNbAlineasPerQuestion = array();
-        $questions = $this->search(array("isValidated"=>1, "isActive"=>1));
-        $QA = new QuestionAlinea($this->adapter());
+        $questions = self::findAll(array("isValidated"=>1, "isActive"=>1));
         foreach ($questions as $question) {
-            $id    = $question["id"];
-    //        $title = $question["title"];
-            $question_alineas = $QA->search(array("question_id"=>$id));
+            $id    = $question->id;
+    //        $title = $question->title;
+            $question_alineas = QuestionAlinea::findAll(array("question_id"=>$id));
             $count = count($question_alineas);
     //        echo "$id $title: $count<br />";
             if ($count) {

@@ -24,11 +24,9 @@ class Questionnaire extends \Gb\Model\Model {
         if (null == $nombreDemandeMax) {
             $nombreDemandeMax = $nombreDemandeMin;
         }
-        $Questions = new Question($this->adapter());
-        $QA        = new QuestionAlinea($this->adapter());
 
         // récupère le nombre d'alinéas par question
-        $aNbAlineasPerQuestion = $Questions->getNbAlineasPerQuestion();
+        $aNbAlineasPerQuestion = Question::getNbAlineasPerQuestion();
         $nbQuestions           = count($aNbAlineasPerQuestion);
         //print_r($aNbAlineasPerQuestion);
 
@@ -58,11 +56,12 @@ class Questionnaire extends \Gb\Model\Model {
         //print_r($aQuestions);
 
         // convertit la liste de question en liste de questionAlineas
+        // TODO : order by chemNum
         $aAlineas = array();
         foreach ($aQuestions as $question_id) {
-            $alineas = $QA->search(array("question_id"=>$question_id));
+            $alineas = QuestionAlinea::findAll(array("question_id"=>$question_id));
             foreach ($alineas as $alinea) {
-                $aAlineas[] = (int)$alinea["id"];
+                $aAlineas[] = (int)$alinea->id;
             }
 
         }
@@ -71,45 +70,15 @@ class Questionnaire extends \Gb\Model\Model {
         return $aAlineas;
     }
 
-    /**
-     * Insère un nouveau questionnaire
-     * @param integer $etudiant_id
-     * @param array $aAlineasId
-     * @return number
-     */
-    public function saveNew($etudiant_id, $aAlineasId) {
-        $data = array(
-            "etudiant_id"          => $etudiant_id,
-            "questionAlineas_json" => JSON_encode($aAlineasId),
-            "created_at"           => Gb_String::date_iso(),
-            "updated_at"           => Gb_String::date_iso(),
-        );
-        //$res=$this->adapter()->retrieve_all("select * from authors");
-        //print_r($res);
-        //exit(0);
-        $this->adapter()->insert($this->_tablename, $data);
-        $id = $this->adapter()->lastInsertId();
-        return $id;
-    }
-
-
-    /**
-     * Enregistre le questionnaire
-     * @param array[modified] questionnaire
-     */
-    public function save(array $qaire) {
-        $qaire["updated_at"] = Gb_String::date_iso();
-        $this->adapter()->update($this->_tablename, $qaire, $this->adapter()->quoteInto("id=?", $qaire["id"]));
-    }
 
     /**
      * Calcule le score
      * remplit 'score' et 'submited_at'
      * @param array[modified] $qaire
      */
-    public function computeScore(array &$qaire) {
+    public function computeScore() {
         /*
-            $qaire : Array(
+            $this->o : Array(
               [id] => 2
               [etudiant_id] => 1
               [questionAlineas_json] => [36,29,31,15,14,22,21]
@@ -121,10 +90,9 @@ class Questionnaire extends \Gb\Model\Model {
             )
         */
 
-        $QA = new QuestionAlinea($this->adapter());
-        $aAlineaIds  = json_decode($qaire['questionAlineas_json']);
-        $aEtuAnswers = json_decode($qaire['submited_data_json']);
-        $aAlineas    = $QA->getById($aAlineaIds); // [alineaid]=>array("solutions"=>"[2]")
+        $aAlineaIds  = json_decode($this->questionAlineas_json);
+        $aEtuAnswers = json_decode($this->submited_data_json);
+        $aAlineas    = $this->rel("alineas");
 
         $score      = 0;
         $scoremax   = 0;
@@ -145,8 +113,8 @@ class Questionnaire extends \Gb\Model\Model {
             $scoremax++;
         }
 
-        $qaire["score"]         = $score . "/" . $scoremax;
-        $qaire["solution_json"] = json_encode($aSolutions);
-        $qaire["submited_at"]   = Gb_String::date_iso();
+        $this->score         = $score . "/" . $scoremax;
+        $this->solution_json = json_encode($aSolutions);
+        $this->submited_at   = Gb_String::date_iso();
     }
 }
