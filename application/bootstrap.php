@@ -35,6 +35,7 @@ respondExt(function($rq, $rs, $ap) {
     $rs->layout->urlHome   = getUrlExt("home");
     $rs->layout->urlQuests = getUrlExt("mestst");
     $rs->layout->current   = "";
+    $rs->layout->bodyclass = "";
 //    $GLOBALS["_min"] = false;
     $GLOBALS["_min"] = true;
 });

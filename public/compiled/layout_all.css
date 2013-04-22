@@ -974,6 +974,8 @@ table.mestests td:nth-child(1){text-align:center}
 table.mestests td:nth-child(3){padding:0 2em}
 footer{border-top:1px solid #ddd;color:#ccc;font-size:90%;line-height:110%;margin-top:3em;padding-top:1em}
 footer a,footer a:hover{color:#ccc}
+body.bodypasser{background:#f6f6f6}
+.passer{background:#fff;border-radius:10px;box-shadow:2px 2px 4px rgba(0,0,0,0.5)}
 .passer .qtabctn ul{list-style:none;margin:0}
 .passer .qtabctn ul li{background:#ffc473;border-bottom:1px solid #000;cursor:pointer;height:40px;line-height:40px;text-align:center;width:60px}
 .passer .qtabctn ul li:first-child{border-top:1px solid #000}
@@ -981,14 +983,13 @@ footer a,footer a:hover{color:#ccc}
 .passer .qtabctn ul li.result-right{background:#bf3}
 .passer .qtabctn ul li.result-wrong{background:#ff4d50}
 .passer .qtabctn ul li:hover{background:#ff9400}
-.passer .qbodyctn{background:#fff}
 .passer .qbodyctn .context .body{text-align:justify}
 .passer .qbodyctn .alineabody{text-align:justify}
 .passer header{position:relative}
 .passer header.well{border-radius:10px 10px 0 0;margin-bottom:0}
 .passer header .title{display:inline-block;font-size:150%}
 .passer header .navbuttons{bottom:25%;position:absolute;right:2em}
-.passer footer{border-radius:0 0 10px 10px;margin-top:0;text-align:right}
+.passer footer{border-radius:0 0 10px 10px;margin-bottom:0;margin-top:0;text-align:right}
 .passer .oneanswer{border:1px solid #000;display:inline-block;margin:0 5px 5px 0}
 .passer .oneanswer label{background:#ffc;border-bottom:1px solid #000;display:block;height:2em;line-height:2em;padding:0 5px;text-align:center}
 .passer .oneanswer label input[type=checkbox]{margin:auto}

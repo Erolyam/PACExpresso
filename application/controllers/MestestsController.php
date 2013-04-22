@@ -110,6 +110,8 @@ class MestestsController extends KleinExtController {
             //$qaire['aAlineas'][$i]['answers'] = 'theanswers';
         }
 
+        $rs->layout->bodyclass = "bodypasser";
+
         $rs->jsp->qaire = $this->_qaire->asArray();
         $rs->render("views/mestests/passer.phtml");
 

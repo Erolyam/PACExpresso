@@ -33,6 +33,14 @@ footer a,
 footer a:hover {
   color: #ccc;
 }
+body.bodypasser {
+  background: #f6f6f6;
+}
+.passer {
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  border-radius: 10px;
+  background: #fff;
+}
 .passer .qtabctn ul {
   list-style: none;
   margin: 0;
@@ -64,9 +72,6 @@ footer a:hover {
 .passer .qtabctn ul li:hover {
   background: #ff9400;
 }
-.passer .qbodyctn {
-  background: #fff;
-}
 .passer .qbodyctn .context .body {
   text-align: justify;
 }
@@ -93,6 +98,7 @@ footer a:hover {
   margin-top: 0;
   border-radius: 0 0 10px 10px;
   text-align: right;
+  margin-bottom: 0;
 }
 .passer .oneanswer {
   border: 1px solid #000;
