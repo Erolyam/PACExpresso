@@ -90,11 +90,11 @@ class MestestsController extends KleinExtController {
         $rs    = $this->_rs;
 
         $aAlineas = $this->_qaire->rel("alineas");
-        $rs->jsp->aAlineas = $aAlineas->data();
+        $rs->jsp->aAlineas = $aAlineas->asArray();
 
         // récupère les contextes de chaque alinéa
         $aContexts = $aAlineas->rel('question');
-        $rs->jsp->aContexts = $aContexts->data();
+        $rs->jsp->aContexts = $aContexts->asArray();
 
         $this->subactionPass();
     }
@@ -110,7 +110,7 @@ class MestestsController extends KleinExtController {
             //$qaire['aAlineas'][$i]['answers'] = 'theanswers';
         }
 
-        $rs->jsp->qaire = $this->_qaire->data();
+        $rs->jsp->qaire = $this->_qaire->asArray();
         $rs->render("views/mestests/passer.phtml");
 
     }
@@ -144,7 +144,7 @@ class MestestsController extends KleinExtController {
 
         $this->_qaire->save();
 
-        $rs->renderJSON($this->_qaire->data());
+        $rs->renderJSON($this->_qaire->asArray());
     }
 
 
