@@ -11,6 +11,8 @@ class Questionnaire extends \Gb\Model\Model {
         'alineas'       =>array('reltype'=>'belongs_to_json', 'class_name'=>'QuestionAlinea', 'foreign_key'=>'questionAlineas_json')
     );
 
+    static $_buffer = array();
+
     /**
      * Tire des questions
      * @param integer $nombreDemandeMin

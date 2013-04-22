@@ -8,4 +8,5 @@ class Author extends \Gb\Model\Model {
         'questionnaires'=>array('reltype'=>'has_many',        'class_name'=>'Questionnaire',  'foreign_key'=>'etudiant_id'),
     );
 
+    static $_buffer = array();
 }

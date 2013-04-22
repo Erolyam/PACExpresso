@@ -9,4 +9,6 @@ class QuestionAlinea extends \Gb\Model\Model {
         'author'        =>array('reltype'=>'belongs_to',      'class_name'=>'Author',         'foreign_key'=>'author_id'),
     );
 
+    static $_buffer = array();
+
 }
