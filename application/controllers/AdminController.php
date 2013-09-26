@@ -7,23 +7,6 @@ require "models/Author.php";
 
 class AdminController extends KleinExtController {
 
-    /**
-     * @var Questionnaire
-     */
-    protected $_Qaire;
-    /**
-     * @var QuestionAlinea
-     */
-    protected $_QAlinea;
-    /**
-     * @var Question
-     */
-    protected $_Q;
-    /**
-     * @var Author
-     */
-    protected $_Author;
-
     public function initialize() {
 
         /*
@@ -196,10 +179,9 @@ class AdminController extends KleinExtController {
         $id = $this->_rq->param("id");
         Gb_Log::logInfo("admin#alineashow id=$id");
         $rs = $this->_rs;
-
-        $Alinea      = $this->_QAlinea->getById($id);
+        $Alinea      = QuestionAlinea::getOne($id);
         $question_id = $Alinea["question_id"];
-        $Question    = $this->_Q->getById($question_id);
+        $Question    = Question::getOne($question_id);
 
         $rs->title    = $Question["title"];
         $rs->context  = $Question["context"];
