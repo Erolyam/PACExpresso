@@ -47,7 +47,7 @@ blockquote,pre{border:1px solid #999;page-break-inside:avoid}
 thead{display:table-header-group}
 img,tr{page-break-inside:avoid}
 img{max-width:100%!important}
-@page{margin:.5cm}
+{margin:.5cm}
 h2,h3,p{orphans:3;widows:3}
 h2,h3{page-break-after:avoid}
 }
@@ -530,6 +530,7 @@ table{background-color:transparent;border-collapse:collapse;border-spacing:0;max
 .dropdown-menu>.disabled>a:focus,.dropdown-menu>.disabled>a:hover{background-color:transparent;background-image:none;cursor:default;filter:progid:DXImageTransform.Microsoft.gradient(enabled=false);text-decoration:none}
 .open{*z-index:1000}
 .open>.dropdown-menu{display:block}
+.dropdown-backdrop{bottom:0;left:0;position:fixed;right:0;top:0;z-index:990}
 .pull-right>.dropdown-menu{left:auto;right:0}
 .dropup .caret,.navbar-fixed-bottom .dropdown .caret{border-bottom:4px solid #000;border-top:0;content:""}
 .dropup .dropdown-menu,.navbar-fixed-bottom .dropdown .dropdown-menu{bottom:100%;margin-bottom:1px;top:auto}
