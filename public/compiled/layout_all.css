@@ -14,6 +14,7 @@ to{background-position:40px 0}
 @keyframes progress-bar-stripes{from{background-position:40px 0}
 to{background-position:0 0}
 }
+@font-face{font-family:NeutonItalic;font-style:normal;font-weight:normal;src:url(../css/Neuton-Italic-webfont.woff) format('woff')}
 .clearfix{*zoom:1}
 .clearfix:after,.clearfix:before{content:"";display:table;line-height:0}
 .clearfix:after{clear:both}
@@ -1004,6 +1005,8 @@ div.DTFC_LeftBodyWrapper table{border-top:0;margin-bottom:0!important}
 div.DTFC_LeftBodyWrapper tbody tr:first-child td,div.DTFC_LeftBodyWrapper tbody tr:first-child th{border-top:0}
 div.DTFC_LeftFootWrapper table{border-top:0}
 body{margin:0;padding-bottom:40px;padding-top:60px}
+span.nobr{white-space:nowrap}
+.templates{display:none}
 img{border:0}
 .tt{font-family:monospace}
 table.mestests td:nth-child(1){text-align:center}
