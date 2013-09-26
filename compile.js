@@ -31,8 +31,8 @@ var js = {
 var css = {
     "public/compiled/layout_all.css": [
         "public/extlib/twitter-bootstrap/css/bootstrap.css",
-        "public/css/custom.css",
         "public/extlib/datatables/DT_bootstrap.css",
+        "public/css/custom.css", // doit être après DT_bootstrap.css
     ]
 };
 
