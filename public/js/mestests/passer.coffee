@@ -70,7 +70,7 @@ class MestestsPasser
   ###
   handlerClickOnLi: (e) =>
     #target/currentTarget: <li>
-    #delegateTarget:div.span1 qtabctn
+    #delegateTarget:div.col-md-1 qtabctn
     @handleUserAnswer()
 
     li = $(e.currentTarget)

@@ -3,7 +3,7 @@ Conception et programmation : Gilles Bouthenot, université de Franche-Comté
 Partie client:
 jQuery 1.9.1 : http://jquery.org/
 Lo-Dash 1.1.1 : http://lodash.com/
-twitter-bootstrap 2.3.2 : http://getbootstrap.com/2.3.2/
+twitter-bootstrap 3.0.0 : https://github.com/twbs/bootstrap/releases/download/v3.0.0/bootstrap-3.0.0-dist.zip
 
 Partie serveur:
 Php 5.3 : http://www.php.net/
