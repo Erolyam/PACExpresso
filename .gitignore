@@ -2,5 +2,6 @@
 .project
 .buildpath
 .htaccess
+application/ini/globals.php
 var/db.*
 var/logfile.*
