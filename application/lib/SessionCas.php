@@ -31,6 +31,7 @@ echo "<a href='$url'>s'authentifier</a>";
  * changes:
  *   * handle $_SERVER["X_SSL"]: make Client->isHttps handle proxyfied ssl
  *   * example update
+ *   * 2013-09-28: bypassLogin() replaces casUser if already set
  */
 class SessionCas {
     protected static $_instance = null;     // singleton
@@ -93,6 +94,9 @@ class SessionCas {
 
     public function bypassLogin($bypassLogin = null) {
         $this->_bypassLogin = $bypassLogin;
+        if (!empty($_SESSION["casUser"])) {
+            $_SESSION["casUser"] = $bypassLogin;
+        }
     }
 
     protected function _initCas() {

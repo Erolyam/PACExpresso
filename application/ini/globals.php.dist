@@ -1,0 +1,13 @@
+<?php
+$GLOBALS["env_default"]      = "prod";  // "prod", "devel"
+$GLOBALS["allow_bypassAuth"] = true;    // Permet de pouvoir bypasser l'authentification
+
+function apply_env() {
+    // LES PARAMETRES PAR DEFAUT:
+    $GLOBALS["_min"]   = true;
+
+    if ("devel"===$GLOBALS["_ENV"]) {
+	// LES PARAMETRES EN MODE DEVEL:
+        $GLOBALS["_min"]   = false;
+    }
+}
