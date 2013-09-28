@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type"        content="text/html; charset=UTF-8" />
     <base href="<?php echo $this->urlPrefix(getUrlExt()); ?>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport"                  content="width=device-width, initial-scale=1.0" />
     <meta http-equiv='Content-Script-Type' content='text/javascript'>
     <meta http-equiv='Content-Style-Type'  content='text/css'>
     <meta http-equiv='Content-Language'    content='fr'>
@@ -103,20 +103,23 @@
       </div><!--/.container -->
     </div><!--/.navbar -->
 
+    <?php echo $this->yield(); ?>
 
-<?php echo $this->yield(); ?>
-
-<footer class="container">
-    <div class="row">
-      <div class="pull-left">
-        En cas de problème, envoyez un mail à<br />
-        <span class='tt'>gilles.bouthenot@univ-fcomte.fr</span>
-      </div>
-      <div class="pull-right">
-        <a href="public/credits.txt">Credits</a>
-      </div>
-    </div>
-</footer>
+    <?php if ("devel"===$GLOBALS["_ENV"]): ?>
+      <footer style="white-space:pre; font-family:monospace;"><?= Gb_Response::get_footer(); ?></footer>
+    <?php else: ?>
+      <footer class="container">
+        <div class="row">
+          <div class="pull-left">
+            En cas de problème, envoyez un mail à<br />
+            <span class='tt'>gilles.bouthenot@univ-fcomte.fr</span>
+          </div>
+          <div class="pull-right">
+            <a href="public/credits.txt">Credits</a>
+          </div>
+        </div>
+      </footer>
+    <?php endif; ?>
 
 <script>
 window.jsp = <?= json_encode($this->jsp); ?>;
