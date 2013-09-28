@@ -1346,11 +1346,11 @@ table.mestests td:nth-child(3){padding:0 2em}
 footer{border-top:1px solid #ddd;color:#ccc;font-size:90%;line-height:110%;margin-top:3em;padding-top:1em}
 footer a,footer a:hover{color:#ccc}
 body.bodypasser{background:#f6f6f6}
-.passer{background:#fff;border-radius:10px;box-shadow:2px 2px 4px rgba(0,0,0,0.5)}
-.passer .qtabctn ul{list-style:none;margin:0}
+.passer{background:#fff;border-radius:10px;box-shadow:2px 2px 4px rgba(0,0,0,0.5);padding:0}
+.passer .qtabctn ul{list-style:none;margin:0;margin-left:-40px}
 .passer .qtabctn ul li{background:#ffc473;border-bottom:1px solid #000;cursor:pointer;height:40px;line-height:40px;text-align:center;width:60px}
 .passer .qtabctn ul li:first-child{border-top:1px solid #000}
-.passer .qtabctn ul li.selected{background:#ff9400;border-left:4px solid #000;padding-right:4px;width:52px}
+.passer .qtabctn ul li.selected{background:#ff9400;border-left:4px solid #000;padding-right:4px}
 .passer .qtabctn ul li.result-right{background:#bf3}
 .passer .qtabctn ul li.result-wrong{background:#ff4d50}
 .passer .qtabctn ul li:hover{background:#ff9400}

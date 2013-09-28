@@ -59,12 +59,14 @@ body.bodypasser
   box-shadow:2px 2px 4px rgba(0,0,0,.5)
   border-radius:10px
   background:#fff
+  padding:0
   .qtabctn {
     // la barre à gauche avec les alineas
     // http://colorschemedesigner.com/#0J51Tw0w0w0w0
     ul {
       list-style:none
       margin:0
+      margin-left:-40px
       li {
         text-align:center
         width:60px
@@ -80,7 +82,6 @@ body.bodypasser
           // en premier pour ne pas prendre priorité
           background:#FF9400
           border-left:4px solid #000
-          width:(@width - 4 - 4)
           padding-right:4px
         }
         &.result-right {
