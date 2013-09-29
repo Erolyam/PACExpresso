@@ -4,7 +4,58 @@ var AdminStats;
 AdminStats = (function() {
   function AdminStats() {}
 
-  AdminStats.prototype.go = function() {};
+  AdminStats.prototype.go = function() {
+    var _this = this;
+    $("div.bilan table").dataTable({
+      bPaginate: false,
+      bFilter: false,
+      bInfo: false,
+      iDisplayLength: 5
+    });
+    $("div.bilan table").addClass("table table-striped table-bordered");
+    $("div.bilan table").on("click", "tr td:nth-child(1)", function(e) {
+      var id, target, url;
+      id = $(e.target).text();
+      url = window.jsp.urlAlinea;
+      url = url.replace("[:id]", id);
+      url = url.replace("[:format]", "html");
+      target = $(e.target);
+      if (target.data("poloaded") == null) {
+        target.data("poloaded", "waiting");
+        return $.ajax(url, {}).done(function(body) {
+          target.data("poloaded", "1");
+          target.popover({
+            html: true,
+            content: body,
+            trigger: "manual",
+            container: ".bilan"
+          }).popover("show");
+          return target.data("poshown", "1");
+        });
+      } else if (target.data("poloaded") === "1") {
+        if (target.data("poshown") === "1") {
+          target.popover("hide");
+          return target.data("poshown", "0");
+        } else {
+          target.popover("show");
+          return target.data("poshown", "1");
+        }
+      }
+    });
+    return $("div.bilan table").on("click", "tr td:nth-child(2)", function(e) {
+      var id, url, win1;
+      id = $(e.target).prev().text();
+      url = window.jsp.urlAlinea;
+      url = url.replace("[:id]", id);
+      url = url.replace("[:format]", "html");
+      win1 = window.open("", "_blank");
+      e.preventDefault();
+      if (win1 === null) {
+        alert("Autorisez cette page à ouvrir des popups.");
+      }
+      return win1.location.href = url;
+    });
+  };
 
   return AdminStats;
 

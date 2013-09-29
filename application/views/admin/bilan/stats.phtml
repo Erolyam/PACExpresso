@@ -13,59 +13,7 @@ div.bilan table tr td:nth-child(2):hover {
 <div class="bilan">
 <?= $this->out ?>
 </div>
-
-<? $this->onready.= <<<HEREDOC
-$("div.bilan table").dataTable({
-    bPaginate:false, bFilter:false, bInfo:false, iDisplayLength:5,
-});
-
-$("div.bilan table").addClass("table table-striped table-bordered");
-
-
-$("div.bilan table").on("click", "tr td:nth-child(1)", function(e){
-    var id = $(e.target).text();
-    var url = window.jsp.urlAlinea;
-    url = url.replace("[:id]", id);
-    url = url.replace("[:format]", "html");
-
-    var target = $(e.target);
-
-    if (target.data("poloaded") === undefined) {
-        target.data("poloaded", "waiting")
-        // charge le popover et l'affiche
-        $.ajax(url, {}).done(function(body){
-            target.data("poloaded", "1")
-            target.popover({html:true, content:body, trigger:"manual", container:".bilan"}).popover("show");
-            target.data("poshown", "1")
-        });
-    } else if (target.data("poloaded") === "1") {
-        // popover chargé
-        if (target.data("poshown") === "1") {
-            target.popover("hide");
-            target.data("poshown", "0")
-        } else {
-            target.popover("show");
-            target.data("poshown", "1")
-        }
-    }
-});
-
-$("div.bilan table").on("click", "tr td:nth-child(2)", function(e){
-    var id = $(e.target).prev().text();
-    var url = window.jsp.urlAlinea;
-    url = url.replace("[:id]", id);
-    url = url.replace("[:format]", "html");
-
-    var win1 = window.open("", "_blank");
-    e.preventDefault();
-    if (null === win1) { alert("Autorisez cette page à ouvrir des popups."); }
-
-    win1.location.href = url;
-});
-HEREDOC;
-?>
-
-</div>
+</div><!-- /.container -->
 
 <? $this->onready.= <<<HEREDOC
 var adminStats = new AdminStats();
