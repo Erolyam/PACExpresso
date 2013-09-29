@@ -1,25 +1,57 @@
+<div class="alineashow">
+  <? if ($this->o->type !== "popover"): ?>
+    <h1><?= $this->o->title ?> - <?= $this->o->chemNum ?></h1>
+  <? endif; ?>
 
-<h1><?= $this->title ?> - <?= $this->chemNum ?></h1>
+  <? if (strlen($this->o->context)): ?>
+    <? if ($this->o->type === "popover"): ?>
+      <div class="context collapse">
+        <?= $this->o->context ?>
+      </div>
+      <button class="btn btn-xs btn-primary" data-toggle="collapse" data-target=".context">Contexte</button>
+    <? else: ?>
+      <div class="context">
+        <?= $this->o->context ?>
+      </div>
+      <hr class="context_body"/>
+    <? endif; ?>
+  <? endif; ?>
 
-<?= $this->context ?>
 
-<hr />
+  <div class="body">
+    <?= $this->o->body ?>
+  </div>
 
-<?= $this->body ?>
-
-<ol type="A">
-  <? $weight = 1; ?>
-  <? foreach($this->answers as $answer): ?>
-    <?
-      $checked = "";
-      if ($this->solution & $weight) {
-        $checked = "checked";
-      }
-      $weight <<= 1;
-    ?>
-    <li>
-      <input type='checkbox' disabled <?= $checked ?>/>
-      <?= $answer ?>
-    </li>
-  <? endforeach; ?>
-</ol>
+  <div class="answers">
+    <ul>
+      <? $weight = 1; ?>
+      <? $index = 0; ?>
+      <? foreach($this->o->answers as $answer): ?>
+        <?
+          $checked = "";
+          if ($this->o->solution & $weight) {
+            $checked = "checked";
+          }
+          $weight <<= 1;
+        ?>
+        <li>
+          <div class="ansltr">
+            <?= chr(65 + $index) ?>.
+          </div>
+          <div class="anspcent">
+            <? if ($this->o->count > 0): ?>
+              <?= round((isset($this->o->aChecked[$index])?($this->o->aChecked[$index]):(0)) * 100 / $this->o->count); ?> %
+            <? endif; ?>
+          </div>
+          <div class="anschk">
+            <input type='checkbox' disabled <?= $checked ?>/>
+          </div>
+          <div class="ansbody">
+            <?= $answer ?>
+          </div>
+        </li>
+        <? $index++ ?>
+      <? endforeach; ?>
+    </ul>
+  </div>
+</div><!-- /.alineashow -->

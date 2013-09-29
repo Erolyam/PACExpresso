@@ -23,6 +23,8 @@ img {
     font-family: monospace;
 }
 
+.navbar-fixed-top
+  z-index:100 // permet au popover de s'afficher au dessus de la navbar
 
 /******************/
 /* liste de tests */
@@ -193,9 +195,35 @@ body.bodypasser
     text-align:justify
     padding:0 5px
 
-// alignement vertical des boutons dans la navbar
-.navbar-text .btn
-  margin-top:auto
+// affichage d'un alinéa
+.alineashow
+  ul
+    margin:0 0 0 -40px
+    li
+      white-space:nowrap // pour éviter que le texte se mette sous la checkbox
+      list-style:none
+      .anschk, .ansltr, .anspcent, .ansbody
+        display:inline-block
+        vertical-align:top  //super pour aligner verticalement
+      .anspcent
+        font-size:90%
+        width:3em
+        text-align:right
+      .ansbody
+        white-space:normal // pour permettre au texte d'aller à la ligne, tout en le laissant aligné
+        margin-right:30px
+
+// page récapitulative
+.bilan
+  table tr:hover
+    cursor:pointer
+    td:nth-child(1)
+      text-decoration:underline
+  .popover
+    max-width:900px
+
+
+
 
 // images pour datatables
 table.table thead .sorting { background: url('images/sort_both.png') no-repeat center right;

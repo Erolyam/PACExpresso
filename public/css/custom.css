@@ -22,6 +22,9 @@ img {
 .tt {
   font-family: monospace;
 }
+.navbar-fixed-top {
+  z-index: 100;
+}
 /******************/
 /* liste de tests */
 /******************/
@@ -182,8 +185,37 @@ body.bodypasser {
   text-align: justify;
   padding: 0 5px;
 }
-.navbar-text .btn {
-  margin-top: auto;
+.alineashow ul {
+  margin: 0 0 0 -40px;
+}
+.alineashow ul li {
+  white-space: nowrap;
+  list-style: none;
+}
+.alineashow ul li .anschk,
+.alineashow ul li .ansltr,
+.alineashow ul li .anspcent,
+.alineashow ul li .ansbody {
+  display: inline-block;
+  vertical-align: top;
+}
+.alineashow ul li .anspcent {
+  font-size: 90%;
+  width: 3em;
+  text-align: right;
+}
+.alineashow ul li .ansbody {
+  white-space: normal;
+  margin-right: 30px;
+}
+.bilan table tr:hover {
+  cursor: pointer;
+}
+.bilan table tr:hover td:nth-child(1) {
+  text-decoration: underline;
+}
+.bilan .popover {
+  max-width: 900px;
 }
 table.table thead .sorting {
   background: url("images/sort_both.png") no-repeat center right;
