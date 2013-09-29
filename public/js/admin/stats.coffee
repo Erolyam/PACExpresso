@@ -1,0 +1,6 @@
+
+class AdminStats
+  constructor: () ->
+
+  go: () ->
+

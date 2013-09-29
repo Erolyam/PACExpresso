@@ -21,6 +21,7 @@ var js = {
         "public/extlib/lodash/lodash.js",
         //"public/extlib/backbone.js/backbone.js",
         "public/js/mestests/passer.js",
+        "public/js/admin/stats.js",
     ],
     "public/compiled/layout_admin.js": [
         "public/extlib/datatables/jquery.dataTables.js",

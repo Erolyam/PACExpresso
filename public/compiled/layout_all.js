@@ -899,4 +899,5 @@ return n="",f&i&&(n="checked"),r="",null!==l&&l&i&&(r="checked"),i<<=1,o=p({body
 }).done(function(t,e,r){return 200!==r.status||"application/json"!==r.getResponseHeader("content-type").substr(0,16)?(alert("Le serveur n'a pas pu enregistrer le questionnaire"),void 0):(n.Qaire=JSON.parse(r.responseText),n.solutionsReceived())
 })},t.prototype.solutionsReceived=function(){return this.renderLis(),$(".qtabctn li[data-num=#]").trigger("click")
 },t.prototype.retrieveUserAnswer=function(){var t,e,n,r,i;return r=$(".passer .qtabctn li.selected"),e=r.data("num"),null==e?null:(t=$(".passer .alineaanswers").find(".letter input.etu[type=checkbox]"),n=1,i=0,_.each(t,function(t){return $(t).prop("checked")&&(i+=n),n<<=1
-}),{num:e,val:i})},t}();
+}),{num:e,val:i})},t}();var AdminStats;AdminStats=function(){function t(){}return t.prototype.go=function(){},t
+}();

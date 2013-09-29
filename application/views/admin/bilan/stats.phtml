@@ -66,3 +66,9 @@ HEREDOC;
 ?>
 
 </div>
+
+<? $this->onready.= <<<HEREDOC
+var adminStats = new AdminStats();
+adminStats.go();
+HEREDOC;
+?>
