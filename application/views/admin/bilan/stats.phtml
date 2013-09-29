@@ -28,13 +28,26 @@ $("div.bilan table").on("click", "tr td:nth-child(1)", function(e){
     url = url.replace("[:id]", id);
     url = url.replace("[:format]", "html");
 
-    var elem=$(this);
-    elem.unbind("click");
+    var target = $(e.target);
 
-    $.ajax(url, {}).done(function(body){
-      elem.popover({html:true, content:body, trigger:"manual", container:".bilan"}).popover("show");
-    });
-
+    if (target.data("poloaded") === undefined) {
+        target.data("poloaded", "waiting")
+        // charge le popover et l'affiche
+        $.ajax(url, {}).done(function(body){
+            target.data("poloaded", "1")
+            target.popover({html:true, content:body, trigger:"manual", container:".bilan"}).popover("show");
+            target.data("poshown", "1")
+        });
+    } else if (target.data("poloaded") === "1") {
+        // popover chargé
+        if (target.data("poshown") === "1") {
+            target.popover("hide");
+            target.data("poshown", "0")
+        } else {
+            target.popover("show");
+            target.data("poshown", "1")
+        }
+    }
 });
 
 $("div.bilan table").on("click", "tr td:nth-child(2)", function(e){

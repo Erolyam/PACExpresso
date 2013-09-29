@@ -202,7 +202,7 @@ body.bodypasser {
   margin-right: 30px;
 }
 .bilan .popover {
-  max-width: 800px;
+  max-width: none;
 }
 .bilan .popover .alineashow h1,
 .bilan .popover .alineashow .context,
