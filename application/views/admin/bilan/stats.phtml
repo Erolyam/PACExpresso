@@ -2,13 +2,6 @@
 <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/datatables/DT_bootstrap.js"></script><?php endif; ?>
 <?php if( $GLOBALS["_min"]):?><script src="public/compiled/layout_admin.js"></script><?php endif; ?>
 
-<style>
-div.bilan table tr td:nth-child(2):hover {
-    cursor:pointer;
-    text-decoration:underline;
-}
-</style>
-
 <div class='container'>
 <div class="bilan">
 <?= $this->out ?>

@@ -15,13 +15,13 @@ AdminStats = (function() {
       iDisplayLength: 5
     });
     $("div.bilan table").addClass("table table-striped table-bordered");
-    $("div.bilan table").on("click", "tr td:nth-child(1)", function(e) {
+    return $("div.bilan table").on("click", "tr", function(e) {
       var id, same, target, url;
-      id = $(e.target).text();
+      target = $(e.currentTarget).find("td:nth-child(1)");
+      id = target.text();
       url = window.jsp.urlAlinea;
       url = url.replace("[:id]", id);
       url = url.replace("[:type]", "popover");
-      target = $(e.target);
       if (target.data("poloaded") === void 0) {
         if (_this.poActive !== false) {
           _this.poActive.popover("hide");
@@ -49,19 +49,21 @@ AdminStats = (function() {
         }
       }
     });
-    return $("div.bilan table").on("click", "tr td:nth-child(2)", function(e) {
-      var id, url, win1;
-      id = $(e.target).prev().text();
-      url = window.jsp.urlAlinea;
-      url = url.replace("[:id]", id);
-      url = url.replace("[:type]", "show");
-      win1 = window.open("", "_blank");
-      e.preventDefault();
-      if (win1 === null) {
-        alert("Autorisez cette page à ouvrir des popups.");
-      }
-      return win1.location.href = url;
-    });
+    /*
+    $("div.bilan table").on "click", "tr td:nth-child(2)", (e) =>
+      id = $(e.target).prev().text()
+      url = window.jsp.urlAlinea
+      url = url.replace("[:id]", id)
+      url = url.replace("[:type]", "show")
+    
+      win1 = window.open("", "_blank")
+      e.preventDefault()
+      if win1 is null
+        alert "Autorisez cette page à ouvrir des popups."
+    
+      win1.location.href = url;
+    */
+
   };
 
   return AdminStats;

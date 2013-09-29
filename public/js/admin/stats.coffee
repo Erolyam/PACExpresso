@@ -11,13 +11,14 @@ class AdminStats
     $("div.bilan table").addClass("table table-striped table-bordered")
 
 
-    $("div.bilan table").on "click", "tr td:nth-child(1)", (e) =>
-      id = $(e.target).text()
+    $("div.bilan table").on "click", "tr", (e) =>
+      # deltarget:table   target:td   curTar:tr
+      target = $(e.currentTarget).find "td:nth-child(1)"  # la première colonne
+      id = target.text() # récupération de l'id
       url = window.jsp.urlAlinea
       url = url.replace("[:id]", id)
       url = url.replace("[:type]", "popover")
 
-      target = $(e.target)
 
       if target.data("poloaded") is undefined
         # popover pas encore chargé
@@ -40,6 +41,7 @@ class AdminStats
           target.popover("show")
           @poActive = target
 
+    ###
     $("div.bilan table").on "click", "tr td:nth-child(2)", (e) =>
       id = $(e.target).prev().text()
       url = window.jsp.urlAlinea
@@ -52,6 +54,7 @@ class AdminStats
         alert "Autorisez cette page à ouvrir des popups."
 
       win1.location.href = url;
+    ###
 
 
 
