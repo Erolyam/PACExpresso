@@ -14,7 +14,7 @@
   <div class="answers">
     <ul>
       <? $weight = 1; ?>
-      <? $count = 0; ?>
+      <? $index = 0; ?>
       <? foreach($this->o->answers as $answer): ?>
         <?
           $checked = "";
@@ -24,16 +24,23 @@
           $weight <<= 1;
         ?>
         <li>
+          <div class="ansltr">
+            <?= chr(65 + $index) ?>.
+          </div>
+          <div class="anspcent">
+            <? if ($this->o->count > 0): ?>
+              <?= round($this->o->aChecked[$index] * 100 / $this->o->count); ?> %
+            <? endif; ?>
+          </div>
           <div class="anschk">
-            <?= chr(65 + $count) ?>.
             <input type='checkbox' disabled <?= $checked ?>/>
           </div>
           <div class="ansbody">
             <?= $answer ?>
           </div>
         </li>
-        <? $count++ ?>
+        <? $index++ ?>
       <? endforeach; ?>
     </ul>
   </div>
-</div><!-- /.alineashow>
+</div><!-- /.alineashow -->

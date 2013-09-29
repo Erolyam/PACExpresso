@@ -202,11 +202,14 @@ body.bodypasser
     li
       white-space:nowrap // pour éviter que le texte se mette sous la checkbox
       list-style:none
-      .anschk
+      .anschk, .ansltr, .anspcent, .ansbody
         display:inline-block
         vertical-align:top  //super pour aligner verticalement
+      .anspcent
+        font-size:90%
+        width:3em
+        text-align:right
       .ansbody
-        display:inline-block
         white-space:normal // pour permettre au texte d'aller à la ligne, tout en le laissant aligné
         margin-right:30px
 
