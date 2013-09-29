@@ -2,7 +2,9 @@
 var AdminStats;
 
 AdminStats = (function() {
-  function AdminStats() {}
+  function AdminStats() {
+    this.poActive = false;
+  }
 
   AdminStats.prototype.go = function() {
     var _this = this;
@@ -20,8 +22,9 @@ AdminStats = (function() {
       url = url.replace("[:id]", id);
       url = url.replace("[:format]", "html");
       target = $(e.target);
-      if (target.data("poloaded") == null) {
+      if (target.data("poloaded") === void 0 && _this.poActive === false) {
         target.data("poloaded", "waiting");
+        _this.poActive = true;
         return $.ajax(url, {}).done(function(body) {
           target.data("poloaded", "1");
           target.popover({
@@ -35,10 +38,12 @@ AdminStats = (function() {
       } else if (target.data("poloaded") === "1") {
         if (target.data("poshown") === "1") {
           target.popover("hide");
-          return target.data("poshown", "0");
-        } else {
+          target.data("poshown", "0");
+          return _this.poActive = false;
+        } else if (_this.poActive === false) {
           target.popover("show");
-          return target.data("poshown", "1");
+          target.data("poshown", "1");
+          return _this.poActive = true;
         }
       }
     });

@@ -1,6 +1,8 @@
 
 class AdminStats
+  #@static = "static variable"
   constructor: () ->
+    @poActive = false   # limite à un seul popover
 
   go: () ->
     $("div.bilan table").dataTable
@@ -17,8 +19,9 @@ class AdminStats
 
       target = $(e.target)
 
-      unless target.data("poloaded")?
+      if target.data("poloaded") is undefined && @poActive is false
         target.data("poloaded", "waiting")
+        @poActive = true # en cours de chargement. Ne pas autoriser autre popover
         # charge le popover et l'affiche
         $.ajax(url, {}).done (body)->
           target.data("poloaded", "1")
@@ -29,9 +32,12 @@ class AdminStats
         if target.data("poshown") is "1"
           target.popover("hide")
           target.data("poshown", "0")
-        else
+          @poActive = false # permet d'en ouvrir un nouveau
+        else if @poActive is false
+          # déjà chargé
           target.popover("show")
           target.data("poshown", "1")
+          @poActive = true
 
     $("div.bilan table").on "click", "tr td:nth-child(2)", (e) =>
       id = $(e.target).prev().text()
