@@ -1,25 +1,39 @@
+<div class="alineashow">
+  <h1><?= $this->o->title ?> - <?= $this->o->chemNum ?></h1>
 
-<h1><?= $this->title ?> - <?= $this->chemNum ?></h1>
+  <div class="context">
+    <?= $this->o->context ?>
+  </div>
 
-<?= $this->context ?>
+  <hr class="context_body"/>
 
-<hr />
+  <div class="body">
+    <?= $this->o->body ?>
+  </div>
 
-<?= $this->body ?>
-
-<ol type="A">
-  <? $weight = 1; ?>
-  <? foreach($this->answers as $answer): ?>
-    <?
-      $checked = "";
-      if ($this->solution & $weight) {
-        $checked = "checked";
-      }
-      $weight <<= 1;
-    ?>
-    <li>
-      <input type='checkbox' disabled <?= $checked ?>/>
-      <?= $answer ?>
-    </li>
-  <? endforeach; ?>
-</ol>
+  <div class="answers">
+    <ul>
+      <? $weight = 1; ?>
+      <? $count = 0; ?>
+      <? foreach($this->o->answers as $answer): ?>
+        <?
+          $checked = "";
+          if ($this->o->solution & $weight) {
+            $checked = "checked";
+          }
+          $weight <<= 1;
+        ?>
+        <li>
+          <div class="anschk">
+            <?= chr(65 + $count) ?>.
+            <input type='checkbox' disabled <?= $checked ?>/>
+          </div>
+          <div class="ansbody">
+            <?= $answer ?>
+          </div>
+        </li>
+        <? $count++ ?>
+      <? endforeach; ?>
+    </ul>
+  </div>
+</div><!-- /.alineashow>

@@ -22,10 +22,26 @@ $("div.bilan table").dataTable({
 $("div.bilan table").addClass("table table-striped table-bordered");
 
 
+$("div.bilan table").on("click", "tr td:nth-child(1)", function(e){
+    var id = $(e.target).text();
+    var url = window.jsp.urlAlinea;
+    url = url.replace("[:id]", id);
+    url = url.replace("[:format]", "html");
+
+    var elem=$(this);
+    elem.unbind("click");
+
+    $.ajax(url, {}).done(function(body){
+      elem.popover({html:true, content:body, trigger:"manual", container:".bilan"}).popover("show");
+    });
+
+});
+
 $("div.bilan table").on("click", "tr td:nth-child(2)", function(e){
     var id = $(e.target).prev().text();
     var url = window.jsp.urlAlinea;
     url = url.replace("[:id]", id);
+    url = url.replace("[:format]", "html");
 
     var win1 = window.open("", "_blank");
     e.preventDefault();

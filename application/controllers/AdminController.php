@@ -183,14 +183,20 @@ class AdminController extends KleinExtController {
         $question_id = $Alinea["question_id"];
         $Question    = Question::getOne($question_id);
 
-        $rs->title    = $Question["title"];
-        $rs->context  = $Question["context"];
-        $rs->body     = $Alinea["body"];
-        $rs->answers  = JSON_decode($Alinea["answers"]);
-        $rs->solution = JSON_decode($Alinea["solutions"]);
-        $rs->solution = $rs->solution[0];
-        $rs->chemNum  = $Alinea["chemNum"];
+        $obj = new stdClass();
+        $obj->title    = $Question["title"];
+        $obj->context  = $Question["context"];
+        $obj->body     = $Alinea["body"];
+        $obj->answers  = JSON_decode($Alinea["answers"]);
+        $obj->solution = JSON_decode($Alinea["solutions"]);
+        $obj->solution = $obj->solution[0];
+        $obj->chemNum  = $Alinea["chemNum"];
+        $rs->o = $obj;
 
-        $rs->render("views/admin/alinea/show.phtml");
+        if ("json" === $this->_rq->param("format", "html")) {
+          $this->_rs->renderJSON($obj);
+        } else {
+          $rs->render("views/admin/alinea/show.phtml");
+        }
     }
 }
