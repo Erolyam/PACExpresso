@@ -210,6 +210,7 @@ class AdminController extends KleinExtController {
             $index = 0; // commence par réponse A
             while ($answer>0) {
                 if (($answer & 1) === 1) {
+                    if (!isset($aChecked[$index])) {$aChecked[$index] = 0;}
                     $aChecked[$index]++;
                 }
                 $index++;

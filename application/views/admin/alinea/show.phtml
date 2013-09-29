@@ -29,7 +29,7 @@
           </div>
           <div class="anspcent">
             <? if ($this->o->count > 0): ?>
-              <?= round($this->o->aChecked[$index] * 100 / $this->o->count); ?> %
+              <?= round((isset($this->o->aChecked[$index])?($this->o->aChecked[$index]):(0)) * 100 / $this->o->count); ?> %
             <? endif; ?>
           </div>
           <div class="anschk">
