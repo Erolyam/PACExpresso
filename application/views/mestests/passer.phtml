@@ -83,28 +83,28 @@
 
 <div class='container passer'>
   <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
       <header class="text-center well">
         <div class='title'>Votre questionnaire</div>
         <div class="navbuttons pull-right">
-          <button class="btn btn-primary actionprev" href="#"><i class="icon-backward icon-white"></i></button>
-          <button class="btn btn-primary actionnext" href="#"><i class="icon-forward icon-white"></i></button>
+          <button class="btn btn-primary actionprev" href="#"><i class="glyphicon glyphicon-backward glyphicon-white"></i></button>
+          <button class="btn btn-primary actionnext" href="#"><i class="glyphicon glyphicon-forward glyphicon-white"></i></button>
         </div>
       </header>
     </div>
   </div>
   <div class="row qrow">
-    <div class="span1 qtabctn">
+    <div class="col-xs-12 col-sm-1 qtabctn">
       <ul></ul>
     </div>
-    <div class="span11 qbodyctn"></div>
+    <div class="col-xs-12 col-sm-11 qbodyctn"></div>
   </div>
   <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
       <footer class='text-center well'>
         <div class='navbuttons'>
-          <button class="btn btn-primary actionprev" href="#"><i class="icon-backward icon-white"></i></button>
-          <button class="btn btn-primary actionnext" href="#"><i class="icon-forward icon-white"></i></button>
+          <button class="btn btn-primary actionprev" href="#"><i class="glyphicon glyphicon-backward glyphicon-white"></i></button>
+          <button class="btn btn-primary actionnext" href="#"><i class="glyphicon glyphicon-forward glyphicon-white"></i></button>
         </div>
       </footer>
     </div>
@@ -113,7 +113,7 @@
 
 
 <? $this->onready.= <<<HEREDOC
-mestestsPasser = new MestestsPasser();
+var mestestsPasser = new MestestsPasser();
 mestestsPasser.go();
 HEREDOC;
 ?>

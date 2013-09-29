@@ -4,6 +4,7 @@
 <head>
     <meta http-equiv="Content-Type"        content="text/html; charset=UTF-8" />
     <base href="<?php echo $this->urlPrefix(getUrlExt()); ?>" />
+    <meta name="viewport"                  content="width=device-width, initial-scale=1.0" />
     <meta http-equiv='Content-Script-Type' content='text/javascript'>
     <meta http-equiv='Content-Style-Type'  content='text/css'>
     <meta http-equiv='Content-Language'    content='fr'>
@@ -17,6 +18,7 @@
     <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/es6-shim/es6-shim.js"></script><?php endif; ?>
     <!-- Shim to make HTML5 elements usable in older Internet Explorer versions html5shim.googlecode.com/svn/trunk/html5.js -->
     <!--[if lt IE 9]><script src="public/extlib/html5shiv/html5shiv.js"></script><![endif]-->
+    <!--[if lt IE 9]><script src="public/extlib/respond/respond.js"></script><![endif]-->
     <!--[if lt IE 8]><script src="public/extlib/JSON-js/json2.js"></script><![endif]-->
 <?php endif; ?>
 
@@ -25,6 +27,7 @@
 
     <!--  Bootstrap -->
     <?php if(!$GLOBALS["_min"]):?><link href="public/extlib/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" media="screen"><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><link href="public/extlib/twitter-bootstrap/css/bootstrap-theme.css" rel="stylesheet" media="screen"><?php endif; ?>
     <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/twitter-bootstrap/js/bootstrap.js"></script><?php endif; ?>
 
     <!--  Backbone -->
@@ -35,6 +38,7 @@
 
     <!--  Our js / css -->
     <?php if(!$GLOBALS["_min"]):?><script src="public/js/mestests/passer.js"></script><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><script src="public/js/admin/stats.js"></script><?php endif; ?>
 <?php if (FALSE): ?>
     <?php if(!$GLOBALS["_min"]):?><link type="text/css" href="public/css/default.css" rel="stylesheet" /><?php endif; ?>
 <?php endif; ?>
@@ -49,69 +53,74 @@
 <body class="<?php echo $this->layout->bodyclass ?>">
 
     <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="<?= $this->layout->urlHome ?>">Paces-QCM</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <? $active = ""; if ($this->layout->current==="home") {$active = "active"; } ?>
-              <li class="<?= $active ?>"><a href="<?= $this->layout->urlHome ?>">Accueil</a></li>
-              <? if (isset($this->auth['login'])) :?>
-                <? $active = ""; if ($this->layout->current==="mestst") {$active = "active"; } ?>
-                <li class="<?= $active ?>"><a href="<?= $this->layout->urlQuests?>">Vos tests</a></li>
-              <? endif; ?>
-              <!--
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="#">Action</a></li>
-                  <li><a href="#">Another action</a></li>
-                  <li><a href="#">Something else here</a></li>
-                  <li class="divider"></li>
-                  <li class="nav-header">Nav header</li>
-                  <li><a href="#">Separated link</a></li>
-                  <li><a href="#">One more separated link</a></li>
-                </ul>
-              </li>
-              -->
-            </ul>
-            <div class="pull-right">
-              <? if (isset($this->auth['login'])) :?>
-                <span class="navbar-text">
-                  Connecté en tant que : <?= $this->auth['login'] ?>
-                  <a href="<?= $this->auth['logoutUrl'] ?>" class='btn'>Déconnexion</a>
-                </span>
-              <? else: ?>
-                <span class="navbar-text">
-                  Vous n'êtes pas connecté
-                  <a href="<?= $this->auth['loginUrl'] ?>" class='btn'>Connexion</a>
-                </span>
+          <a class="navbar-brand" href="<?= $this->layout->urlHome ?>">Paces-QCM</a>
+        </div><!--/.navbar-header -->
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <? $active = ""; if ($this->layout->current==="home") {$active = "active"; } ?>
+            <li class="<?= $active ?>"><a href="<?= $this->layout->urlHome ?>">Accueil</a></li>
+            <? if (isset($this->auth['login'])) :?>
+              <? $active = ""; if ($this->layout->current==="mestst") {$active = "active"; } ?>
+              <li class="<?= $active ?>"><a href="<?= $this->layout->urlQuests?>">Vos tests</a></li>
+            <? endif; ?>
+            <!--
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="nav-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+            -->
+          </ul>
 
-              <? endif; ?>
-            </div>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
+          <div class="navbar-right">
+            <? if (isset($this->auth['login'])) :?>
+              <span class="navbar-text">
+                Connecté en tant que : <?= $this->auth['login'] ?>
+              </span>
+              <a href="<?= $this->auth['logoutUrl'] ?>" class='btn btn-default navbar-btn'>Déconnexion</a>
+            <? else: ?>
+              <span class="navbar-text">
+                Vous n'êtes pas connecté
+              </span>
+              <a href="<?= $this->auth['loginUrl'] ?>" class='btn btn-default navbar-btn'>Connexion</a>
+            <? endif; ?>
+          </div>
 
+        </div><!--/.navbar-collapse -->
+      </div><!--/.container -->
+    </div><!--/.navbar -->
 
-<?php echo $this->yield(); ?>
+    <?php echo $this->yield(); ?>
 
-<footer class="container">
-    <div class="row">
-        <div class="span4">
-            En cas de problème, envoyez un mail à <span class='tt'>gilles.bouthenot@univ-fcomte.fr</span>
-        </div>
-        <div class="span1 offset7 text-right">
+    <?php if ("devel"===$GLOBALS["_ENV"]): ?>
+      <footer style="white-space:pre; font-family:monospace;"><?= Gb_Response::get_footer(); ?></footer>
+    <?php else: ?>
+      <footer class="container">
+        <div class="row">
+          <div class="pull-left">
+            En cas de problème, envoyez un mail à<br />
+            <span class='tt'>gilles.bouthenot@univ-fcomte.fr</span>
+          </div>
+          <div class="pull-right">
             <a href="public/credits.txt">Credits</a>
+          </div>
         </div>
-    </div>
-</footer>
+      </footer>
+    <?php endif; ?>
 
 <script>
 window.jsp = <?= json_encode($this->jsp); ?>;

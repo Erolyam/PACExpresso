@@ -19,7 +19,11 @@ Gb_Log::installErrorHandlers();
 //set_include_path(dirname(__FILE__) . PATH_SEPARATOR . get_include_path());
 require_once "lib/kleinExt.php";
 
+// démarrage session, mise en place du layout et de la bdd
 respondExt(function($rq, $rs, $ap) {
+    session_name("s" . md5(__DIR__));
+    session_start();
+
     require_once "Gb/Db.php";
 //    $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"/home/gilles/data/src/rails/mine2/db/development.sqlite3"));
     $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"../var/db.sqlite"));
@@ -36,19 +40,42 @@ respondExt(function($rq, $rs, $ap) {
     $rs->layout->urlQuests = getUrlExt("mestst");
     $rs->layout->current   = "";
     $rs->layout->bodyclass = "";
-//    $GLOBALS["_min"] = false;
-    $GLOBALS["_min"] = true;
 });
 
 respondExt(function($rq, $rs, $ap) {
-    // l'authentification. Fournit $ap->auth et $rs->auth
+    // env processing
+    include "ini/globals.php";
+    if (isset($_REQUEST["env"]) && strlen($_REQUEST["env"])) {
+        $_SESSION["ENV"] = $_REQUEST["env"];
+    } elseif (isset($_REQUEST["env"]) && ""===$_REQUEST["env"] && isset($_SESSION["ENV"])) {
+        // reset to default env
+        unset($_SESSION["ENV"]);
+    }
+    if (isset($_SESSION["ENV"])) {
+        $GLOBALS["_ENV"] = $_SESSION["ENV"];
+    } else {
+        $GLOBALS["_ENV"] = $GLOBALS["env_default"];
+    }
+    apply_env();
+
+});
+
+
+
+// Gestion de l'authentification. Fournit $ap->auth et $rs->auth
+respondExt(function($rq, $rs, $ap) {
+    // l'authentification.
     require_once "lib/SessionCas.php";
-    session_name("s" . md5(__DIR__));
-    session_start();
     $sessionCas = SessionCas::getSingleton();
     if (isset($_GET["caslogout"])) {
         $sessionCas->logout();
     }
+    if ($GLOBALS["allow_bypassAuth"]) {
+        if (isset($_REQUEST["bypassAuth"]) && strlen($_REQUEST["bypassAuth"])) {
+            $sessionCas->bypassLogin($_REQUEST["bypassAuth"]);
+        }
+    }
+
     $isAuth = $sessionCas->isAuthenticated();
     if ($isAuth) {
         $login = $sessionCas->getUser();
@@ -80,7 +107,7 @@ respondExt(                "POST /vostests/[i:id]",        "mestests#submit");
 respondExt("adbilh",       "GET  /admin/bilan",            "admin#bilanhome");
 respondExt("adbilg",       "GET  /admin/bilan/[details|stats:type].[csv|txt|html:format]?",
                                                         "admin#bilango");
-respondExt("adshal",       "GET  /admin/alinea[i:id]/show",
+respondExt("adshal",       "GET  /admin/alinea[i:id]/[show|popover:type]",
                                                         "admin#alineashow");
 
 respondExt(404, function(){echo "Page inexistante";});

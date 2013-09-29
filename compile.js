@@ -21,6 +21,7 @@ var js = {
         "public/extlib/lodash/lodash.js",
         //"public/extlib/backbone.js/backbone.js",
         "public/js/mestests/passer.js",
+        "public/js/admin/stats.js",
     ],
     "public/compiled/layout_admin.js": [
         "public/extlib/datatables/jquery.dataTables.js",
@@ -31,6 +32,7 @@ var js = {
 var css = {
     "public/compiled/layout_all.css": [
         "public/extlib/twitter-bootstrap/css/bootstrap.css",
+        "public/extlib/twitter-bootstrap/css/bootstrap-theme.css",
         "public/extlib/datatables/DT_bootstrap.css",
         "public/css/custom.css", // doit être après DT_bootstrap.css
     ]
@@ -73,9 +75,14 @@ Object.keys(css).forEach(function(fname){
 //    str = cleanCSS.process(str, {removeEmpty:true, keepBreaks:false});
     str = stripComments(str);
     var aRpl = [
-        ["url(Neuton-Italic-webfont.woff)" , "url(../css/Neuton-Italic-webfont.woff)"],
-        ["url(../img/glyphicons-halflings.png)", "url(../extlib/twitter-bootstrap/img/glyphicons-halflings.png)"],
-        ["url(../img/glyphicons-halflings-white.png)", "url(../extlib/twitter-bootstrap/img/glyphicons-halflings-white.png)"],
+        ["url(Neuton-Italic-webfont.woff)" ,                                           "url(../css/Neuton-Italic-webfont.woff)"],
+        ["url(../fonts/glyphicons-halflings-regular.eot)",                             "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.eot)"],
+        ["url(../fonts/glyphicons-halflings-regular.eot?#iefix)",                      "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix)"],
+        ["url(../fonts/glyphicons-halflings-regular.woff)",                            "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.woff)"],
+        ["url(../fonts/glyphicons-halflings-regular.ttf)",                             "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.ttf)"],
+        ["url(../fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)", "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)"],
+        ["url(../img/glyphicons-halflings.png)",                                       "url(../extlib/twitter-bootstrap/img/glyphicons-halflings.png)"],
+        ["url(../img/glyphicons-halflings-white.png)",                                 "url(../extlib/twitter-bootstrap/img/glyphicons-halflings-white.png)"],
     ];
     aRpl.forEach(function(aRpls){
         str = str.replace(aRpls[0], aRpls[1]);

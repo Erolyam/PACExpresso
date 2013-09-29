@@ -183,14 +183,59 @@ class AdminController extends KleinExtController {
         $question_id = $Alinea["question_id"];
         $Question    = Question::getOne($question_id);
 
-        $rs->title    = $Question["title"];
-        $rs->context  = $Question["context"];
-        $rs->body     = $Alinea["body"];
-        $rs->answers  = JSON_decode($Alinea["answers"]);
-        $rs->solution = JSON_decode($Alinea["solutions"]);
-        $rs->solution = $rs->solution[0];
-        $rs->chemNum  = $Alinea["chemNum"];
+        // totaux des cases cochées:
 
-        $rs->render("views/admin/alinea/show.phtml");
+        // recherche l'alinéa demandé dans tous les questionnaires validés
+        // remplit $aSubmitted avec les reponses données
+        $qaires = Questionnaire::findAll("score is not null");
+        $aSubmitted = array();
+
+        foreach ($qaires as $qaire) {
+            $alineas = json_decode($qaire->questionAlineas_json);
+            $index = array_search($id, $alineas);
+            if ($index !== false) {
+                //echo $index . " dans " . json_encode($alineas) . " " . $qaire->score . " " . $qaire->submited_data_json . " submitted:" . json_decode($qaire->submited_data_json)[$index] . "\n";
+                // 2 dans [34,30,28,31,22,18,17] 3/7 [7,2,4,4,2,3,4] submitted:4
+                $submitted = json_decode($qaire->submited_data_json);
+                $submitted = $submitted[$index];
+                $aSubmitted[] = $submitted;
+            }
+        }
+        //print_r($aSubmitted);
+
+        // construit un tableau avec le nombre de fois où la réponse a été cochée par l'étudiant:
+        // $aChecked[0] = 4  -> la réponse A a été cochée 4 fois
+        $aChecked = array();
+        foreach ($aSubmitted as $answer) {
+            $index = 0; // commence par réponse A
+            while ($answer>0) {
+                if (($answer & 1) === 1) {
+                    if (!isset($aChecked[$index])) {$aChecked[$index] = 0;}
+                    $aChecked[$index]++;
+                }
+                $index++;
+                $answer >>= 1;
+            }
+        }
+        //print_r($aChecked);
+
+        $obj = new stdClass();
+        $obj->title    = $Question["title"];
+        $obj->context  = $Question["context"];
+        $obj->body     = $Alinea["body"];
+        $obj->answers  = JSON_decode($Alinea["answers"]);
+        $obj->solution = JSON_decode($Alinea["solutions"]);
+        $obj->solution = $obj->solution[0];
+        $obj->chemNum  = $Alinea["chemNum"];
+        $obj->count    = count($aSubmitted);
+        $obj->aChecked = $aChecked;
+        $obj->type     = $this->_rq->param("type");
+        $rs->o = $obj;
+
+        if ("json" === $this->_rq->param("format", "html")) {
+            $this->_rs->renderJSON($obj);
+        } else {
+            $rs->render("views/admin/alinea/show.phtml");
+        }
     }
 }
