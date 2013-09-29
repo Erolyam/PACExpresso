@@ -16,34 +16,36 @@ AdminStats = (function() {
     });
     $("div.bilan table").addClass("table table-striped table-bordered");
     $("div.bilan table").on("click", "tr td:nth-child(1)", function(e) {
-      var id, target, url;
+      var id, same, target, url;
       id = $(e.target).text();
       url = window.jsp.urlAlinea;
       url = url.replace("[:id]", id);
       url = url.replace("[:format]", "html");
       target = $(e.target);
-      if (target.data("poloaded") === void 0 && _this.poActive === false) {
+      if (target.data("poloaded") === void 0) {
+        if (_this.poActive !== false) {
+          _this.poActive.popover("hide");
+        }
         target.data("poloaded", "waiting");
-        _this.poActive = true;
+        _this.poActive = target;
         return $.ajax(url, {}).done(function(body) {
           target.data("poloaded", "1");
-          target.popover({
+          return target.popover({
             html: true,
             content: body,
             trigger: "manual",
             container: ".bilan"
           }).popover("show");
-          return target.data("poshown", "1");
         });
       } else if (target.data("poloaded") === "1") {
-        if (target.data("poshown") === "1") {
-          target.popover("hide");
-          target.data("poshown", "0");
-          return _this.poActive = false;
-        } else if (_this.poActive === false) {
+        same = target.is(_this.poActive);
+        if (_this.poActive !== false) {
+          _this.poActive.popover("hide");
+          _this.poActive = false;
+        }
+        if (!same) {
           target.popover("show");
-          target.data("poshown", "1");
-          return _this.poActive = true;
+          return _this.poActive = target;
         }
       }
     });

@@ -19,25 +19,26 @@ class AdminStats
 
       target = $(e.target)
 
-      if target.data("poloaded") is undefined && @poActive is false
+      if target.data("poloaded") is undefined
+        # popover pas encore chargé
+        if @poActive isnt false
+          @poActive.popover("hide")
         target.data("poloaded", "waiting")
-        @poActive = true # en cours de chargement. Ne pas autoriser autre popover
+        @poActive = target # en cours de chargement. Ne pas autoriser autre popover
         # charge le popover et l'affiche
         $.ajax(url, {}).done (body)->
           target.data("poloaded", "1")
           target.popover({html:true, content:body, trigger:"manual", container:".bilan"}).popover("show");
-          target.data("poshown", "1")
       else if target.data("poloaded") is "1"
         # popover chargé
-        if target.data("poshown") is "1"
-          target.popover("hide")
-          target.data("poshown", "0")
-          @poActive = false # permet d'en ouvrir un nouveau
-        else if @poActive is false
-          # déjà chargé
+        same = target.is(@poActive) # clic sur le même ?
+        if @poActive isnt false
+          @poActive.popover("hide")
+          @poActive = false
+        unless same
+          # si on a pas cliqué sur le même, affiche le popover
           target.popover("show")
-          target.data("poshown", "1")
-          @poActive = true
+          @poActive = target
 
     $("div.bilan table").on "click", "tr td:nth-child(2)", (e) =>
       id = $(e.target).prev().text()
