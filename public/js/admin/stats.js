@@ -20,7 +20,7 @@ AdminStats = (function() {
       id = $(e.target).text();
       url = window.jsp.urlAlinea;
       url = url.replace("[:id]", id);
-      url = url.replace("[:format]", "html");
+      url = url.replace("[:type]", "popover");
       target = $(e.target);
       if (target.data("poloaded") === void 0) {
         if (_this.poActive !== false) {
@@ -54,7 +54,7 @@ AdminStats = (function() {
       id = $(e.target).prev().text();
       url = window.jsp.urlAlinea;
       url = url.replace("[:id]", id);
-      url = url.replace("[:format]", "html");
+      url = url.replace("[:type]", "show");
       win1 = window.open("", "_blank");
       e.preventDefault();
       if (win1 === null) {

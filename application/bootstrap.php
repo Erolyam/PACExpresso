@@ -107,7 +107,7 @@ respondExt(                "POST /vostests/[i:id]",        "mestests#submit");
 respondExt("adbilh",       "GET  /admin/bilan",            "admin#bilanhome");
 respondExt("adbilg",       "GET  /admin/bilan/[details|stats:type].[csv|txt|html:format]?",
                                                         "admin#bilango");
-respondExt("adshal",       "GET  /admin/alinea[i:id]/show.[json|html:format]?",
+respondExt("adshal",       "GET  /admin/alinea[i:id]/[show|popover:type]",
                                                         "admin#alineashow");
 
 respondExt(404, function(){echo "Page inexistante";});

@@ -15,7 +15,7 @@ class AdminStats
       id = $(e.target).text()
       url = window.jsp.urlAlinea
       url = url.replace("[:id]", id)
-      url = url.replace("[:format]", "html")
+      url = url.replace("[:type]", "popover")
 
       target = $(e.target)
 
@@ -44,7 +44,7 @@ class AdminStats
       id = $(e.target).prev().text()
       url = window.jsp.urlAlinea
       url = url.replace("[:id]", id)
-      url = url.replace("[:format]", "html")
+      url = url.replace("[:type]", "show")
 
       win1 = window.open("", "_blank")
       e.preventDefault()

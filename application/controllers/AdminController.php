@@ -229,6 +229,7 @@ class AdminController extends KleinExtController {
         $obj->chemNum  = $Alinea["chemNum"];
         $obj->count    = count($aSubmitted);
         $obj->aChecked = $aChecked;
+        $obj->type     = $this->_rq->param("type");
         $rs->o = $obj;
 
         if ("json" === $this->_rq->param("format", "html")) {

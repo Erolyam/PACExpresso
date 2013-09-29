@@ -1,11 +1,22 @@
 <div class="alineashow">
-  <h1><?= $this->o->title ?> - <?= $this->o->chemNum ?></h1>
+  <? if ($this->o->type !== "popover"): ?>
+    <h1><?= $this->o->title ?> - <?= $this->o->chemNum ?></h1>
+  <? endif; ?>
 
-  <div class="context">
-    <?= $this->o->context ?>
-  </div>
+  <? if (strlen($this->o->context)): ?>
+    <? if ($this->o->type === "popover"): ?>
+      <div class="context collapse">
+        <?= $this->o->context ?>
+      </div>
+      <button class="btn btn-xs btn-primary" data-toggle="collapse" data-target=".context">Contexte</button>
+    <? else: ?>
+      <div class="context">
+        <?= $this->o->context ?>
+      </div>
+      <hr class="context_body"/>
+    <? endif; ?>
+  <? endif; ?>
 
-  <hr class="context_body"/>
 
   <div class="body">
     <?= $this->o->body ?>
