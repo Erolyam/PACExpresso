@@ -1,10 +1,5 @@
 <?php
 
-require "models/Question.php";
-require "models/Questionnaire.php";
-require "models/QuestionAlinea.php";
-require "models/Author.php";
-
 class MestestsController extends KleinExtController {
 
     /**
@@ -13,9 +8,14 @@ class MestestsController extends KleinExtController {
     protected $_aQaires;
 
     /**
-     * @var array le questionnaire demandé
+     * @var Questionnaire le questionnaire demandé
      */
     protected $_qaire;
+
+    /**
+     * @var QuestionnaireAlinea (pour saveOne)
+     */
+    protected $_qaireAlinea;
 
     public function initialize() {
     }
@@ -38,6 +38,16 @@ class MestestsController extends KleinExtController {
             }
             // fournit l'url du test
             $this->_rs->jsp->aUrls['thistst'] = getUrlExt('onetst', array("id"=>$qaire_id));
+        }
+
+        // sauvegarde d'une réponse: s'assure que l'alinéa appartient bien au questionnaire
+        if (in_array($action, array("actionSaveone"))) {
+            $qaire_id      = (int) $this->_rq->param("id");
+            $qaireAlineaId = (int) $this->_rq->param("qaireAlineaId");
+            $this->_qaireAlinea = QuestionnaireAlinea::fetch($qaireAlineaId);
+            if ($qaire_id !== (int) $this->_qaireAlinea->questionnaire_id) {
+                $this->_rs->renderJSON("QuestionnaireAlinea pas dans ce Questionnaire");
+            }
         }
 
         return true;
@@ -78,9 +88,14 @@ class MestestsController extends KleinExtController {
         $aAlineas = $qaire->createNew(7);
 
         $qaire->etudiant_id = $this->_ap->auth["id"];
-        $qaire->questionAlineas_json = JSON_encode($aAlineas);
 
+        $this->_ap->db->beginTransaction();
         $qaire->save();
+        foreach ($aAlineas as $order=>$questionalinea_id) {
+            $a = QuestionnaireAlinea::create(array("questionnaire_id"=>$qaire->id, "questionalinea_id"=>$questionalinea_id, "order"=>$order));
+            $a->save();
+        }
+        $this->_ap->db->commit();
         $this->_rs->redirect(getUrlExt("mestst"));
     }
 
@@ -89,32 +104,41 @@ class MestestsController extends KleinExtController {
         Gb_Log::logInfo("mestests:one/".$this->_rq->param("id"));
         $rs    = $this->_rs;
 
-        $aAlineas = $this->_qaire->rel("alineas");
+        $aQaireAlineas = $this->_qaire->rel("alineas");
+        $rs->jsp->aQaireAlineas = $aQaireAlineas->asArray();
+
+        $aAlineas = $aQaireAlineas->rel("questionalinea");
         $rs->jsp->aAlineas = $aAlineas->asArray();
 
         // récupère les contextes de chaque alinéa
         $aContexts = $aAlineas->rel('question');
         $rs->jsp->aContexts = $aContexts->asArray();
 
-        $this->subactionPass();
+        $keepSolution = false;
+        if ($this->_qaire['score']) {
+            $keepSolution = true;
+        }
+        $this->subactionPass($keepSolution);
     }
 
-    public function subactionPass() {
+    public function subactionPass($keepSolution=false) {
         $rs    = $this->_rs;
 
-        // enlève les solutions et le commentaire
-        foreach ($rs->jsp->aAlineas as $i=>$v) {
-            unset($rs->jsp->aAlineas[$i]['solutions']);
-            unset($rs->jsp->aAlineas[$i]['comment']);
-            //$qaire['aAlineas'][$i]['body'] = 'thebody';
-            //$qaire['aAlineas'][$i]['answers'] = 'theanswers';
+        // enlève la solution et le commentaire de questionAlinea et de questionnaireAlinea
+        foreach ($rs->jsp->aQaireAlineas as $qaireAlineaId=>$qaireAlinea) {
+            $questionAlineaId = $qaireAlinea['questionalinea_id'];
+            $rs->jsp->aAlineas[$questionAlineaId]['comment'] = null;
+
+            if (!$keepSolution) {
+                $rs->jsp->aQaireAlineas[$qaireAlineaId]['solution'] = null;
+                $rs->jsp->aAlineas[$questionAlineaId]['solution'] = null;
+            }
         }
 
         $rs->layout->bodyclass = "bodypasser";
 
         $rs->jsp->qaire = $this->_qaire->asArray();
         $rs->render("views/mestests/passer.phtml");
-
     }
 
 
@@ -124,11 +148,17 @@ class MestestsController extends KleinExtController {
      * (ajax), ne renvoit rien
      */
     public function actionSaveone() {
-        Gb_Log::logInfo("mestests:saveone/".$this->_rq->param("id").": ".$this->_rq->param("values", ""));
-
         $rs    = $this->_rs;
-        $this->_getEtuAnswers();
-        $this->_qaire->save();
+        $id = $this->_rq->param("id");
+        $qaireAlineaId = $this->_rq->param("qaireAlineaId");
+
+        // $this->$_qaireAlinea remplit par before()
+
+        $answer = $this->_rq->param("answer");
+        Gb_Log::logInfo("mestests:saveone/$id: qaireAlineaId=$qaireAlineaId answer=$answer");
+
+        $this->_qaireAlinea->answer = $answer;
+        $this->_qaireAlinea->save();
 
         $rs->renderJSON("", 204);
     }
@@ -139,32 +169,23 @@ class MestestsController extends KleinExtController {
      * (ajax), renvoie score et les réponses
      */
     public function actionSubmit() {
-        Gb_Log::logInfo("mestests:submit/".$this->_rq->param("id").": ".$this->_rq->param("values", ""));
         $rs    = $this->_rs;
-        $this->_getEtuAnswers();
+        Gb_Log::logInfo("mestests:submit/".$this->_rq->param("id"));
+        if ($this->_rq->param("submit") !== "true") {
+            $rs->renderJSON("erreur non submit", 400);
+        }
+
         $this->_qaire->computeScore();
 
         $this->_qaire->save();
 
-        $rs->renderJSON($this->_qaire->asArray());
+        $ret = array();
+        $ret["qaire"]         = $this->_qaire->asArray();
+        $ret["aQaireAlineas"] = $this->_qaire->rel("alineas")->asArray();
+
+        $rs->renderJSON($ret, 200);
     }
 
-
-    /**
-     * Enregistre les réponses de l'étudiant.
-     * enregistre dans $this->_qaire
-     */
-    protected function _getEtuAnswers() {
-        $values = $this->_rq->param("values", "");
-        if (0 === strlen($values)) {
-            $this->_rs->renderJSON("values est vide");
-        }
-        $values = json_decode($values);
-        if (!is_array($values) || count($values)<2) {
-            $this->_rs->renderJSON("values est vide");
-        }
-        $this->_qaire['submited_data_json'] = json_encode($values);
-    }
 
     // *********************************
     // *********************************

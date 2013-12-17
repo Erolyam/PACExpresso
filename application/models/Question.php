@@ -1,7 +1,7 @@
 <?php
 class Question extends \Gb\Model\Model {
 
-    static $_tablename = "questions";
+    static $_tablename = "questioncontexts";
     static $_pk        = "id";
 
     static $rels = array(
@@ -11,13 +11,13 @@ class Question extends \Gb\Model\Model {
     static $_buffer = array();
 
     public static function getNbAlineasPerQuestion() {
-        // construit un array(question_id=>question_alineas.length)
+        // construit un array(questioncontext_id=>question_alineas.length)
         $aNbAlineasPerQuestion = array();
-        $questions = self::findAll(array("isValidated"=>1, "isActive"=>1));
+        $questions = self::findAll(array("is_validated"=>1, "is_active"=>1));
         foreach ($questions as $question) {
             $id    = $question->id;
     //        $title = $question->title;
-            $question_alineas = QuestionAlinea::findAll(array("question_id"=>$id));
+            $question_alineas = QuestionAlinea::findAll(array("questioncontext_id"=>$id));
             $count = count($question_alineas);
     //        echo "$id $title: $count<br />";
             if ($count) {

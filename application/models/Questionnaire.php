@@ -7,14 +7,15 @@ class Questionnaire extends \Gb\Model\Model {
     static $_pk        = "id";
 
     static $rels = array(
-        'etudiant'      =>array('reltype'=>'belongs_to',      'class_name'=>'Author',         'foreign_key'=>'etudiant_id'),
-        'alineas'       =>array('reltype'=>'belongs_to_json', 'class_name'=>'QuestionAlinea', 'foreign_key'=>'questionAlineas_json')
+        'etudiant'      =>array('reltype'=>'belongs_to',    'class_name'=>'User',                 'foreign_key'=>'etudiant_id'),
+        'alineas'       =>array('reltype'=>'has_many',      'class_name'=>'QuestionnaireAlinea',  'foreign_key'=>'questionnaire_id')
     );
 
     static $_buffer = array();
 
     /**
-     * Tire des questions
+     * Tire des questions. N'écrit rien dans la bdd
+     * @todo mettre dans un controlleur, ou lib, pas dans model !
      * @param integer $nombreDemandeMin
      * @param integer[optional] $nombreDemandeMax
      * @throws Exception
@@ -22,7 +23,7 @@ class Questionnaire extends \Gb\Model\Model {
      */
     public function createNew($nombreDemandeMin, $nombreDemandeMax=null) {
         // todo : rajouter validated/active aux alineas
-        // order les alineas par chemNum
+        // order les alineas par chem_num
         if (null == $nombreDemandeMax) {
             $nombreDemandeMax = $nombreDemandeMin;
         }
@@ -58,10 +59,10 @@ class Questionnaire extends \Gb\Model\Model {
         //print_r($aQuestions);
 
         // convertit la liste de question en liste de questionAlineas
-        // TODO : order by chemNum
+        // TODO : order by chem_num
         $aAlineas = array();
         foreach ($aQuestions as $question_id) {
-            $alineas = QuestionAlinea::findAll(array("question_id"=>$question_id));
+            $alineas = QuestionAlinea::findAll(array("questioncontext_id"=>$question_id));
             foreach ($alineas as $alinea) {
                 $aAlineas[] = (int)$alinea->id;
             }
@@ -76,47 +77,50 @@ class Questionnaire extends \Gb\Model\Model {
     /**
      * Calcule le score
      * remplit 'score' et 'submited_at'
+     * sauve les solution pour chaque alinea
      * @param array[modified] $qaire
+     * @return Questionnaire
      */
     public function computeScore() {
         /*
             $this->o : Array(
               [id] => 2
               [etudiant_id] => 1
-              [questionAlineas_json] => [36,29,31,15,14,22,21]
               [submited_at] =>
-              [submited_data_json] => [1,2,4,3,5,7,0]
               [score] =>
               [created_at] => 2013-04-01 16:55:10
               [updated_at] => 2013-04-03 12:06:44
             )
         */
 
-        $aAlineaIds  = json_decode($this->questionAlineas_json);
-        $aEtuAnswers = json_decode($this->submited_data_json);
-        $aAlineas    = $this->rel("alineas");
+        $aQaireAlineas    = $this->rel("alineas");
+        $aQuestionAlineas = $aQaireAlineas->rel("questionalinea");
 
         $score      = 0;
         $scoremax   = 0;
-        $index      = 0;
-        $aSolutions = array();
-        foreach ($aAlineaIds as $alinea_id) {
-            $etuAnswer    = $aEtuAnswers[$index];
-            $alinea       = $aAlineas[$alinea_id];
-            $solutions    = json_decode($alinea["solutions"]);
-            $solution     = $solutions[0];
-            $aSolutions[] = $solution;
+
+        $ids = $aQaireAlineas->pluck("id");
+
+        foreach ($ids as $id) {
+            $qaireAlinea    = $aQaireAlineas[$id];
+            $questionAlinea = $aQuestionAlineas[$qaireAlinea->questionalinea_id];
+            $etuAnswer = (int) $qaireAlinea->answer;
+            $solution = (int) $questionAlinea->solution;
+
+            // save the solution (cache the solution)
+            $qaireAlinea->solution = $solution;
+            $qaireAlinea->save();
 
             if ($solution == $etuAnswer) {
               $score++;
             }
 
-            $index++;
             $scoremax++;
         }
 
         $this->score         = $score . "/" . $scoremax;
-        $this->solution_json = json_encode($aSolutions);
         $this->submited_at   = Gb_String::date_iso();
+
+        return $this;
     }
 }

@@ -12,16 +12,14 @@ MestestsPasser = (function() {
     this.handleUserAnswer = __bind(this.handleUserAnswer, this);
     this.handlerClickOnNavButton = __bind(this.handlerClickOnNavButton, this);
     this.handlerClickOnLi = __bind(this.handlerClickOnLi, this);
-    var submited_data;
+    var _this = this;
     this.Qaire = window.jsp.qaire;
     this.aAlineas = window.jsp.aAlineas;
     this.aContexts = window.jsp.aContexts;
-    if (this.Qaire.submited_data_json === null) {
-      submited_data = _.times(JSON.parse(this.Qaire.questionAlineas_json).length, function() {
-        return 0;
-      });
-      this.Qaire.submited_data_json = JSON.stringify(submited_data);
-    }
+    this.aQaireAlineas = window.jsp.aQaireAlineas;
+    _.forEach(this.aQaireAlineas, function(qaireAlinea, index) {
+      return qaireAlinea.answer != null ? qaireAlinea.answer : qaireAlinea.answer = 0;
+    });
   }
 
   /*
@@ -48,18 +46,20 @@ MestestsPasser = (function() {
       _this = this;
     target = $(".passer .qtabctn ul");
     target.empty();
-    _.forEach(JSON.parse(this.Qaire.questionAlineas_json), function(alineaId, index) {
-      var etu_ans, html, resultClass, solutio;
+    _.forEach(this.aQaireAlineas, function(qaireAlinea) {
+      var etu_ans, html, index, qaireAlineaId, resultClass, solutio;
+      qaireAlineaId = qaireAlinea.id;
+      index = parseInt(qaireAlinea.order, 10);
       resultClass = 'result';
-      if ((_this.Qaire.solution_json != null)) {
+      if (qaireAlinea.solution != null) {
         resultClass = 'result-wrong';
-        etu_ans = JSON.parse(_this.Qaire.submited_data_json)[index];
-        solutio = JSON.parse(_this.Qaire.solution_json)[index];
+        etu_ans = parseInt(qaireAlinea.answer, 10);
+        solutio = parseInt(qaireAlinea.solution, 10);
         if (etu_ans === solutio) {
           resultClass = 'result-right';
         }
       }
-      html = "<li class='" + resultClass + "' data-alineaid='" + alineaId + "' data-num='" + index + "'>" + (index + 1) + "</li>";
+      html = "<li class='" + resultClass + "' data-qairealineaid='" + qaireAlineaId + "' data-num='" + index + "'>" + (index + 1) + "</li>";
       return target.append($(html));
     });
     html = "<li data-num='#'>#</li>";
@@ -73,10 +73,10 @@ MestestsPasser = (function() {
 
 
   MestestsPasser.prototype.handlerClickOnLi = function(e) {
-    var alinea, alineaId, context, curWeight, html, li, num, solution, target, targetAnswers, total, tpl;
+    var alinea, context, curWeight, html, li, num, qaireAlinea, qaireAlineaId, solution, target, targetAnswers, total, tpl;
     this.handleUserAnswer();
     li = $(e.currentTarget);
-    alineaId = li.data('alineaid');
+    qaireAlineaId = li.data('qairealineaid');
     target = $('.passer .qbodyctn');
     target.empty();
     li.siblings().removeClass("selected");
@@ -88,14 +88,15 @@ MestestsPasser = (function() {
     if (li.next().length === 0) {
       $(".passer .navbuttons button.actionnext").addClass("disabled");
     }
-    if ((alineaId != null)) {
-      alinea = this.aAlineas[alineaId];
-      context = this.aContexts[alinea.question_id];
+    if ((qaireAlineaId != null)) {
+      qaireAlinea = this.aQaireAlineas[qaireAlineaId];
+      alinea = this.aAlineas[qaireAlinea.questionalinea_id];
+      context = this.aContexts[alinea.questioncontext_id];
       num = li.data("num");
       tpl = _.template($('#tplqContext').html().trim());
       html = tpl({
         title: context.title,
-        body: context.context
+        body: context.body
       });
       target.append(html);
       tpl = _.template($('#tplqAlinea').html().trim());
@@ -105,20 +106,20 @@ MestestsPasser = (function() {
       target.append(html);
       targetAnswers = target.find(".alineaanswers");
       tpl = _.template($('#tplqAlineaAnswer').html().trim());
-      total = JSON.parse(this.Qaire.submited_data_json)[num];
-      solution = this.Qaire.solution_json;
-      if (solution !== null) {
-        solution = JSON.parse(solution)[num];
+      total = parseInt(qaireAlinea.answer, 10);
+      solution = qaireAlinea.solution;
+      if (solution != null) {
+        solution = parseInt(solution, 10);
       }
       curWeight = 1;
-      return _.forEach(JSON.parse(alinea.answers), function(answer, index) {
+      return _.forEach(JSON.parse(alinea.answers_json), function(answer, index) {
         var checked, checkedSol;
         checked = "";
         if (total & curWeight) {
           checked = "checked";
         }
         checkedSol = "";
-        if (solution !== null) {
+        if (solution != null) {
           if (solution & curWeight) {
             checkedSol = "checked";
           }
@@ -171,29 +172,32 @@ MestestsPasser = (function() {
 
 
   MestestsPasser.prototype.handleUserAnswer = function() {
-    var newsub, res, url,
+    var after, before, qaireAlinea, qaireAlineaId, res, url,
       _this = this;
     res = this.retrieveUserAnswer();
     if (res === null) {
       return;
     }
-    newsub = JSON.parse(this.Qaire.submited_data_json);
-    newsub[res.num] = res.val;
-    newsub = JSON.stringify(newsub);
-    if (_.isEqual(newsub, this.Qaire.submited_data_json)) {
+    qaireAlineaId = res.qaireAlineaId;
+    qaireAlinea = this.aQaireAlineas[qaireAlineaId];
+    before = parseInt(qaireAlinea.answer, 10);
+    after = res.val;
+    if (before === after) {
       return;
     }
-    this.Qaire.submited_data_json = newsub;
     url = window.jsp.aUrls.thistst;
     return $.ajax({
       url: url,
       method: 'POST',
       data: {
         _method: 'PUT',
-        values: newsub
+        qaireAlineaId: qaireAlineaId,
+        answer: after
       }
     }).fail(function(jqXHR, textStatus, errorThrown) {
       return alert("Erreur lors de l'enregistrement");
+    }).done(function(data, textStatus, jqXHR) {
+      return qaireAlinea.answer = after;
     });
   };
 
@@ -202,25 +206,27 @@ MestestsPasser = (function() {
 
 
   MestestsPasser.prototype.handlerSubmitQuestionnaire = function() {
-    var newsub, url,
+    var url,
       _this = this;
-    newsub = this.Qaire.submited_data_json;
     url = window.jsp.aUrls.thistst;
     return $.ajax({
       url: url,
       method: 'POST',
       data: {
         _method: 'POST',
-        values: newsub
+        submit: 'true'
       }
     }).fail(function(jqXHR, textStatus, errorThrown) {
       return alert("Erreur lors de l'enregistrement");
     }).done(function(data, textStatus, jqXHR) {
+      var ret;
       if (jqXHR.status !== 200 || !(jqXHR.getResponseHeader('content-type').substr(0, 16) === "application/json")) {
         alert("Le serveur n'a pas pu enregistrer le questionnaire");
         return;
       }
-      _this.Qaire = JSON.parse(jqXHR.responseText);
+      ret = JSON.parse(jqXHR.responseText);
+      _this.Qaire = ret.qaire;
+      _this.aQaireAlineas = ret.aQaireAlineas;
       return _this.solutionsReceived();
     });
   };
@@ -237,15 +243,16 @@ MestestsPasser = (function() {
 
   /*
     Renvoie le résultat coché, en un nombre bitwise
-    @returns null ou {num:, val:}
+    @returns null ou {num:, val:, qaireAlineasId}
   */
 
 
   MestestsPasser.prototype.retrieveUserAnswer = function() {
-    var aChks, curIndex, curWeight, li, total;
+    var aChks, curIndex, curWeight, li, qaireAlineaId, total;
     li = $(".passer .qtabctn li.selected");
     curIndex = li.data("num");
-    if (curIndex == null) {
+    qaireAlineaId = li.data("qairealineaid");
+    if (qaireAlineaId == null) {
       return null;
     }
     aChks = $(".passer .alineaanswers").find(".letter input.etu[type=checkbox]");
@@ -259,7 +266,8 @@ MestestsPasser = (function() {
     });
     return {
       num: curIndex,
-      val: total
+      val: total,
+      qaireAlineaId: qaireAlineaId
     };
   };
 

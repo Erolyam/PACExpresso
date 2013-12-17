@@ -4,6 +4,14 @@ chdir(dirname(__FILE__));
 
 require_once "Gb/Log.php";
 require_once "Gb/Model.php";
+
+require_once "models/Question.php";
+require_once "models/QuestionAlinea.php";
+require_once "models/Questionnaire.php";
+require_once "models/QuestionnaireAlinea.php";
+require_once "models/User.php";
+require_once "models/Userprofile.php";
+
 Gb_Log::setLogFilename("../var/logfile.log");
 
 //valeurs par défaut
@@ -80,15 +88,14 @@ respondExt(function($rq, $rs, $ap) {
     if ($isAuth) {
         $login = $sessionCas->getUser();
 
-        $res = $ap->db->retrieve_one("SELECT * FROM authors WHERE login=?", $login);
-        if (is_array($res)) {
-          $id = $res["id"];
-        } else {
-          $ap->db->insert("authors", array("login"=>$login, "created_at"=>Gb_String::date_iso(), "updated_at"=>Gb_String::date_iso()));
-          $id = $ap->db->lastInsertId();
+        $user = User::findFirst(array("login"=>$login));
+        if (!$user) {
+            $user = User::create();
+            $user->login = $login;
+            $res = $user->save();
         }
 
-        $ap->auth = array("id"=>$id, "login"=>$login, "logoutUrl"=>$sessionCas->getLogoutUrl());
+        $ap->auth = array("id"=>$user->id, "login"=>$login, "logoutUrl"=>$sessionCas->getLogoutUrl());
         Gb_Log::$file_prepend .= "user:$login ";
 
     } else {
