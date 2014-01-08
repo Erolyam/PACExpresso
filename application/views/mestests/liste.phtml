@@ -4,9 +4,11 @@
 <?= Gb_String::formatTable($this->jsp->aQaires, "html") ?>
 <?php */ ?>
 
+  <h2>Vos tests</h2>
   <table class="mestests">
     <tr>
       <th>Numéro</th>
+      <th>Examen</th>
       <th>Date de début</th>
       <th>Score</th>
       <th></th>
@@ -16,6 +18,7 @@
       <? $url = str_replace("[:id]", $qaire["id"], $this->jsp->aUrls['onetst']); ?>
       <tr>
         <td><?= $num ?></td>
+        <td><?= $qaire->rel("examen")->title ?></td>
         <td><?= $qaire['created_at'] ?></td>
         <td><?= $qaire['score'] ?></td>
         <td>
@@ -33,6 +36,33 @@
   <? if ($this->jsp->canCreate): ?>
     <a href="<?= $this->jsp->aUrls['newtst'] ?>">Nouveau test</a>
   <? endif; ?>
+
+  <h2>Examens disponible</h2>
+  <table class="mesexamens">
+    <tr>
+      <th>Numéro</th>
+      <th>Titre</th>
+      <th>Date de début</th>
+      <th>Date de fin</th>
+      <th></th>
+    </tr>
+    <? $num = 1; ?>
+    <? foreach ($this->jsp->aExamens as $examen): ?>
+      <? $url = str_replace("[:id]", $examen["id"], $this->jsp->aUrls['newtstexam']); ?>
+      <tr>
+        <td><?= $num ?></td>
+        <td><?= $examen['title'] ?></td>
+        <td><?= $examen['date_start'] ?></td>
+        <td><?= $examen['date_end'] ?></td>
+        <td>
+          <? if ($examen['is_active']): ?>
+            <a href="<?= $url ?>">Nouveau test</a>
+          <? endif; ?>
+        </td>
+      </tr>
+      <? $num++; ?>
+    <? endforeach; ?>
+  </table>
 
 </div><!-- .container -->
 

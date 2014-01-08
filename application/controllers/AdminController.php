@@ -93,7 +93,7 @@ class AdminController extends KleinExtController {
         $aQaires->rel("etudiant");
         $aQaireAlineas->rel("questionalinea")->rel("question");
 
-        $log = &Gb_Db::$sqlLog;
+        //$log = &Gb_Db::$sqlLog;
 
         $aLignes = array();
         $aStats  = array();

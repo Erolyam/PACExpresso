@@ -10,10 +10,10 @@ class Question extends \Gb\Model\Model {
 
     static $_buffer = array();
 
-    public static function getNbAlineasPerQuestion() {
+    public static function getNbAlineasPerQuestion($theme_id=0) {
         // construit un array(questioncontext_id=>question_alineas.length)
         $aNbAlineasPerQuestion = array();
-        $questions = self::findAll(array("is_validated"=>1, "is_active"=>1));
+        $questions = self::findAll(array("is_validated"=>1, "is_active"=>1, "theme_id"=>$theme_id));
         foreach ($questions as $question) {
             $id    = $question->id;
     //        $title = $question->title;

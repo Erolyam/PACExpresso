@@ -8,7 +8,8 @@ class Questionnaire extends \Gb\Model\Model {
 
     static $rels = array(
         'etudiant'      =>array('reltype'=>'belongs_to',    'class_name'=>'User',                 'foreign_key'=>'etudiant_id'),
-        'alineas'       =>array('reltype'=>'has_many',      'class_name'=>'QuestionnaireAlinea',  'foreign_key'=>'questionnaire_id')
+        'alineas'       =>array('reltype'=>'has_many',      'class_name'=>'QuestionnaireAlinea',  'foreign_key'=>'questionnaire_id'),
+        'examen'        =>array('reltype'=>'belongs_to',    'class_name'=>'Examen',               'foreign_key'=>'examen_id'),
     );
 
     static $_buffer = array();
@@ -21,7 +22,7 @@ class Questionnaire extends \Gb\Model\Model {
      * @throws Exception
      * @return array: array de questionAlineas
      */
-    public function createNew($nombreDemandeMin, $nombreDemandeMax=null) {
+    public function createNew($nombreDemandeMin, $nombreDemandeMax=null, $theme_id=null) {
         // todo : rajouter validated/active aux alineas
         // order les alineas par chem_num
         if (null == $nombreDemandeMax) {
@@ -29,7 +30,7 @@ class Questionnaire extends \Gb\Model\Model {
         }
 
         // récupère le nombre d'alinéas par question
-        $aNbAlineasPerQuestion = Question::getNbAlineasPerQuestion();
+        $aNbAlineasPerQuestion = Question::getNbAlineasPerQuestion($theme_id);
         $nbQuestions           = count($aNbAlineasPerQuestion);
         //print_r($aNbAlineasPerQuestion);
 

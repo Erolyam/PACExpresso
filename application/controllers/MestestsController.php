@@ -3,9 +3,15 @@
 class MestestsController extends KleinExtController {
 
     /**
-     * @var array questionnaires de l'étudiant
+     * @var \Gb\Model\Rows questionnaires de l'étudiant
      */
     protected $_aQaires;
+
+    /**
+     * @var \Gb\Model\Rows examens
+     */
+    protected $_aExamens;
+
 
     /**
      * @var Questionnaire le questionnaire demandé
@@ -26,6 +32,8 @@ class MestestsController extends KleinExtController {
             $this->_rs->redirect(getUrlExt("home"));
         }
         $this->_aQaires = Questionnaire::findAll(array("etudiant_id"=>$this->_ap->auth["id"]));
+        $this->_aExamens = Examen::findAll(array("is_public"=>1));
+        $this->_aQaires->rel("examen");
 
         // vérifie que le questionnaire demandé existe et appartient à l'utilisateur courant
         if (in_array($action, array("actionOne", "actionSaveone", "actionSubmit"))) {
@@ -62,10 +70,12 @@ class MestestsController extends KleinExtController {
         $rs = $this->_rs;
         $canCreate = $this->canCreateNew();
 
-        $rs->jsp->aQaires = $this->_aQaires;
+        $rs->jsp->aQaires  = $this->_aQaires;
+        $rs->jsp->aExamens = $this->_aExamens;
         $rs->jsp->canCreate = $canCreate;
         $rs->jsp->aUrls['onetst'] = getUrlExt('onetst', true);
         $rs->jsp->aUrls['newtst'] = getUrlExt('newtst', true);
+        $rs->jsp->aUrls['newtstexam'] = getUrlExt('newtstexam', true);
         $this->_rs->layout->current = "mestst";
 
         $rs->render("views/mestests/liste.phtml");
@@ -97,6 +107,56 @@ class MestestsController extends KleinExtController {
         }
         $this->_ap->db->commit();
         $this->_rs->redirect(getUrlExt("mestst"));
+    }
+
+
+
+    /**
+     * Crée un nouveau test dans l'examen précisé, si autorisé
+     * Redirige vers la liste de tests
+     */
+    public function actionNewtstexam() {
+        Gb_Log::logInfo("mestests:newexamtst");
+
+        $examen_id = $this->_rq->param("id");
+        $Examen = Examen::getOne($examen_id);
+
+        if (false) {
+            // TODO: honor is_active, is_public, is_redoable
+            if (!$this->canCreateNew()) {
+                Gb_Log::logWarning("creation rejetée");
+                $this->_rs->renderJSON("Vous ne pouvez pas créer de questionnaire, parce que un questionnaire est déjà commencé");
+            }
+        }
+
+        $qaire = Questionnaire::create(array("examen_id"=>$examen_id));
+
+        if (false) {
+            $aAlineas = $qaire->createNewCustom(
+                array(
+                    "nbalineas"=>$Examen['nbalineas'],
+                    "themes_ids"=>array(568),
+                    "questions_ids"=>array(),
+                )
+            );
+        }
+
+
+        $aAlineas = $qaire->createNew($Examen['nbalineas'], null, 568);
+
+        $qaire->etudiant_id = $this->_ap->auth["id"];
+
+        $this->_ap->db->beginTransaction();
+        $qaire->save();
+        foreach ($aAlineas as $order=>$questionalinea_id) {
+            $a = QuestionnaireAlinea::create(array("questionnaire_id"=>$qaire->id, "questionalinea_id"=>$questionalinea_id, "order"=>$order));
+            $a->save();
+        }
+        $this->_ap->db->commit();
+        $this->_rs->redirect(getUrlExt("mestst"));
+
+
+
     }
 
 
