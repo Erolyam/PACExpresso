@@ -119,6 +119,9 @@ respondExt("adbilg",       "GET  /admin/bilan/[details|stats:type].[csv|txt|html
 respondExt("adshal",       "GET  /admin/alinea[i:id]/[show|popover:type]",
                                                         "admin#alineashow");
 
+respondExt("poolsl",       "GET  /admin/examens",          "admExamens#show");
+
+
 respondExt(404, function(){echo "Page inexistante";});
 
 dispatchExt();
