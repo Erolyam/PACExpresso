@@ -12,4 +12,21 @@ class Theme extends \Gb\Model\Model {
     static $_buffer = array();
     static $_isFullyLoaded = false;
 
+    public function pathmatch() {
+        $ref_id = $this->referentiel_id;
+        $path = $this->path;
+        if ($path === null) {
+            $path = "";
+        }
+        if (strlen($path) > 0) {
+            $path .= " // ";
+        }
+
+        $children = Theme::findAll(array("referentiel_id"=>$ref_id, "path" => new Zend_Db_Expr("LIKE '". $path . "%'")));
+
+        $children->prepend($this);
+
+        return $children;
+    }
+
 }

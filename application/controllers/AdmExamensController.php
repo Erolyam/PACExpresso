@@ -40,12 +40,11 @@ class AdmExamensController extends KleinExtController {
         $Examen = Examen::getOne($id);
         echo $Examen;
 
-        $slashed = $Examen->themes_ids;
-        $aThemesIds = Gb_String::explode("/", substr($slashed, 1, strlen($slashed)-2));
         $slashed = $Examen->questions_ids;
         $aQuestionsIds = Gb_String::explode("/", substr($slashed, 1, strlen($slashed)-2));
 
-        print_r($aThemesIds);
-        print_r($aQuestionsIds);
+        $themes = $Examen->questions_all();
+
+        print_r($themes);
     }
 }
