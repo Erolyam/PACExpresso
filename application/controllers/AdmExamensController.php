@@ -38,13 +38,21 @@ class AdmExamensController extends KleinExtController {
     public function actionRepool() {
         $id = $this->_rq->param("id");
         $Examen = Examen::getOne($id);
-        echo $Examen;
 
-        $slashed = $Examen->questions_ids;
-        $aQuestionsIds = Gb_String::explode("/", substr($slashed, 1, strlen($slashed)-2));
+        $questions = $Examen->questions_all();
+        $questions->rel("alineas");
 
-        $themes = $Examen->questions_all();
+        $qDetails = array();
+        foreach ($questions as $question) {
+            $qDetails[] = array(
+                "id"=>$question->id,
+                "alineas"=>$question->rel("alineas")->count(),
+                "diff"=>$question->difficulty
+            );
+        }
 
-        print_r($themes);
+        echo Gb_String::formatTable($qDetails, "html");
+
+        $this->_rs->render("views/empty.phtml");
     }
 }
