@@ -2,42 +2,50 @@
 var AdminExamens;
 
 AdminExamens = (function() {
-  var examens, poActive;
+  var exPoolCount, examens, poActive;
 
   examens = null;
 
   poActive = null;
 
+  exPoolCount = null;
+
   function AdminExamens() {
     this.poActive = false;
     this.examens = _.map(window.jsp.examens);
+    this.exPoolCount = window.jsp.exPoolCount;
   }
 
   AdminExamens.prototype.go = function() {
-    var dt,
+    var aoColumns, dt,
       _this = this;
     dt = $("div.examens table.dteditor");
+    aoColumns = _.map(_.keys(this.examens[0]), function(key) {
+      return {
+        sTitle: key,
+        mData: key
+      };
+    });
+    aoColumns.push({
+      sTitle: "pool count",
+      mData: function(row, type, data) {
+        return _this.exPoolCount[row.id];
+      }
+    });
     dt.dataTable({
       bPaginate: false,
       bFilter: false,
       bInfo: false,
       iDisplayLength: 5,
       aaData: this.examens,
-      aoColumns: _.map(_.keys(this.examens[0]), function(key) {
-        console.log(key);
-        return {
-          sTitle: key,
-          mData: key
-        };
-      })
+      aoColumns: aoColumns
     });
     dt.addClass("table table-striped table-bordered");
     return dt.on("click", "tbody tr td", function(e) {
       var aPos, content;
       aPos = dt.fnGetPosition(e.target);
       content = dt.fnGetData(aPos[0], aPos[2]);
-      console.log(content);
-      return dt.fnUpdate("bla", aPos[0], aPos[2]);
+      return console.log(content);
     });
   };
 

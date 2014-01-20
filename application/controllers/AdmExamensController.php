@@ -19,7 +19,18 @@ class AdmExamensController extends KleinExtController {
 
     public function actionShow() {
         $examens = Examen::getAll();
-        $this->_rs->jsp->examens = $examens->asArray();
+        $pools = $examens->rel("pools");
+
+        $exPoolCount = array();
+
+        foreach ($examens as $examen) {
+            # nombre de pools pour cet examen
+            $count = $examen->rel("pools")->count();
+            $exPoolCount[$examen->id] = $count;
+        }
+
+        $this->_rs->jsp->examens     = $examens->asArray();
+        $this->_rs->jsp->exPoolCount = $exPoolCount;
         $this->_rs->render("views/admin/examens/index.phtml");
 
     }
