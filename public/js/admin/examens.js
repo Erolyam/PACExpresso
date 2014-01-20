@@ -14,7 +14,10 @@ AdminExamens = (function() {
   }
 
   AdminExamens.prototype.go = function() {
-    $("div.examens table.dteditor").dataTable({
+    var dt,
+      _this = this;
+    dt = $("div.examens table.dteditor");
+    dt.dataTable({
       bPaginate: false,
       bFilter: false,
       bInfo: false,
@@ -28,7 +31,14 @@ AdminExamens = (function() {
         };
       })
     });
-    return $("div.examens table.dteditor").addClass("table table-striped table-bordered");
+    dt.addClass("table table-striped table-bordered");
+    return dt.on("click", "tbody tr td", function(e) {
+      var aPos, content;
+      aPos = dt.fnGetPosition(e.target);
+      content = dt.fnGetData(aPos[0], aPos[2]);
+      console.log(content);
+      return dt.fnUpdate("bla", aPos[0], aPos[2]);
+    });
   };
 
   return AdminExamens;
