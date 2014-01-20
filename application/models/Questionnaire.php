@@ -13,6 +13,7 @@ class Questionnaire extends \Gb\Model\Model {
     );
 
     static $_buffer = array();
+    static $_isFullyLoaded = false;
 
     /**
      * Tire des questions. N'écrit rien dans la bdd

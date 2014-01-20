@@ -10,4 +10,6 @@ class User extends \Gb\Model\Model {
     );
 
     static $_buffer = array();
+    static $_isFullyLoaded = false;
+
 }

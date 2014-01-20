@@ -9,6 +9,7 @@ class Question extends \Gb\Model\Model {
     );
 
     static $_buffer = array();
+    static $_isFullyLoaded = false;
 
     public static function getNbAlineasPerQuestion($theme_id=0) {
         // construit un array(questioncontext_id=>question_alineas.length)
