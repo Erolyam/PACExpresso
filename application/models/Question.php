@@ -6,6 +6,7 @@ class Question extends \Gb\Model\Model {
 
     static $rels = array(
         'author'        =>array('reltype'=>'belongs_to',      'class_name'=>'Author',         'foreign_key'=>'author_id'),
+        'theme'         =>array('reltype'=>'belongs_to',      'class_name'=>'Theme',          'foreign_key'=>'theme_id'),
     );
 
     static $_buffer = array();

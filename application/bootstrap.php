@@ -11,6 +11,8 @@ require_once "models/Question.php";
 require_once "models/QuestionAlinea.php";
 require_once "models/Questionnaire.php";
 require_once "models/QuestionnaireAlinea.php";
+require_once "models/Referentiel.php";
+require_once "models/Theme.php";
 require_once "models/User.php";
 require_once "models/Userprofile.php";
 
