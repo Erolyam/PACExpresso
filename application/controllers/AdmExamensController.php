@@ -34,4 +34,18 @@ class AdmExamensController extends KleinExtController {
         $this->_rs->render("views/admin/examens/index.phtml");
 
     }
+
+    public function actionRepool() {
+        $id = $this->_rq->param("id");
+        $Examen = Examen::getOne($id);
+        echo $Examen;
+
+        $slashed = $Examen->themes_ids;
+        $aThemesIds = Gb_String::explode("/", substr($slashed, 1, strlen($slashed)-2));
+        $slashed = $Examen->questions_ids;
+        $aQuestionsIds = Gb_String::explode("/", substr($slashed, 1, strlen($slashed)-2));
+
+        print_r($aThemesIds);
+        print_r($aQuestionsIds);
+    }
 }

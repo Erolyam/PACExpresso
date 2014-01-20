@@ -1,5 +1,5 @@
 <?php
-class Qairepools extends \Gb\Model\Model {
+class Qairepool extends \Gb\Model\Model {
 
     static $_tablename = "qairepools";
     static $_pk        = "id";

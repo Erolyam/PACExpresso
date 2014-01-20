@@ -9,7 +9,7 @@ class Examen extends \Gb\Model\Model {
         'questionnaires'        =>array('reltype'=>'has_many',              'class_name'=>'Questionnaire',  'foreign_key'=>'examen_id'),
         'themes'                =>array('reltype'=>'belongs_to_slashed',    'class_name'=>'Theme',          'foreign_key'=>'themes_ids'),
         'questions'             =>array('reltype'=>'belongs_to_slashed',    'class_name'=>'Question',       'foreign_key'=>'questions_ids'),
-        'pools'                 =>array('reltype'=>'has_many',              'class_name'=>'Qairepools',     'foreign_key'=>'examen_id'),
+        'pools'                 =>array('reltype'=>'has_many',              'class_name'=>'Qairepool',      'foreign_key'=>'examen_id'),
     );
 
     static $_buffer = array();

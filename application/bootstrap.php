@@ -6,7 +6,7 @@ require_once "Gb/Log.php";
 require_once "Gb/Model.php";
 
 require_once "models/Examen.php";
-require_once "models/Qairepools.php";
+require_once "models/Qairepool.php";
 require_once "models/Question.php";
 require_once "models/QuestionAlinea.php";
 require_once "models/Questionnaire.php";
@@ -121,6 +121,8 @@ respondExt("adshal",       "GET  /admin/alinea[i:id]/[show|popover:type]",
                                                         "admin#alineashow");
 
 respondExt("poolsl",       "GET  /admin/examens",          "admExamens#show");
+respondExt("repool",       "GET  /admin/examens/[i:id]/repool",
+                                                           "admExamens#repool");
 
 
 respondExt(404, function(){echo "Page inexistante";});
