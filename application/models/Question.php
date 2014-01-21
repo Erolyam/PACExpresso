@@ -14,6 +14,7 @@ class Question extends \Gb\Model\Model {
     static $_isFullyLoaded = false;
 
     public static function getNbAlineasPerQuestion($theme_id=0) {
+        echo "DEPRECATED !!";
         // construit un array(questioncontext_id=>question_alineas.length)
         $aNbAlineasPerQuestion = array();
         $questions = self::findAll(array("is_validated"=>1, "is_active"=>1, "theme_id"=>$theme_id));

@@ -29,16 +29,27 @@ class Examen extends \Gb\Model\Model {
     /**
      * Renvoie toutes les questions concernées par cet examen
      * éclate questions_ids, themes_ids (+pathmatch)
+     * @param $params["filter"] boolean filter only valid/active questions
      * @return \Gb\Model\Rows of Question
      */
-    public function questions_all() {
+    public function questions_all($params = null) {
+        if (null === $params) {
+            $params = array();
+        }
         $questions = $this->questions();
         $themes = $this->themes_pathmatch();
         foreach ($themes as $theme) {
             $q = $theme->rel("questions");
             $questions->append($q);
         }
-        $questions->unique();
+        $questions = $questions->unique();
+
+        if (isset($params["filter"]) && $params["filter"]) {
+            $questions = $questions->filter(function($row) {
+                return ($row->is_active==1) && ($row->is_validated==1); /* ne pas faire === */
+            });
+        }
+
         return $questions;
     }
 

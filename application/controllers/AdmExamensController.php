@@ -39,14 +39,19 @@ class AdmExamensController extends KleinExtController {
         $id = $this->_rq->param("id");
         $Examen = Examen::getOne($id);
 
-        $questions = $Examen->questions_all();
-        $questions->rel("alineas");
+        $questions = $Examen->questions_all(array("filter"=>true));
 
         $qDetails = array();
         foreach ($questions as $question) {
+            $alineas = $question->rel("alineas");
+            $alineas = $alineas->filter(function($row){
+                $a = $row->is_active;
+                $b = $row->is_validated;
+                return ($row->is_active==1) && ($row->is_validated==1); /* ne pas faire === */
+            });
             $qDetails[] = array(
                 "id"=>$question->id,
-                "alineas"=>$question->rel("alineas")->count(),
+                "alineas"=>$alineas->count(),
                 "diff"=>$question->difficulty
             );
         }
