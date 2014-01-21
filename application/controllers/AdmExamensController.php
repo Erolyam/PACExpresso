@@ -37,6 +37,32 @@ class AdmExamensController extends KleinExtController {
 
     public function actionRepool() {
         $id = $this->_rq->param("id");
+
+        $qDetails = $this->getQuestionsDetailsForExamen($id);
+
+        $aQuestionIds = $this->drawQuestions($qDetails, 7);
+        $qairePool = $this->createQairepool($id, $aQuestionIds);
+
+        echo Gb_String::formatTable($qDetails, "html");
+
+        for ($i=0; $i<100; $i++) {
+            $aQuestionIds = $this->drawQuestions($qDetails, 7);
+            $qairepool = $this->createQairepool($id, $aQuestionIds);
+            $qairepool->save();
+        }
+
+        echo "Ok. 100 questionnaires tirés";
+
+        $this->_rs->render("views/empty.phtml");
+    }
+
+
+    /**
+     * Renvoie un array des questions avec difficulté et nombre d'alinéas
+     * @param integer $id
+     * @return array("id"=>, "nbalineas"=>, "diff")
+     */
+    protected function getQuestionsDetailsForExamen($id) {
         $Examen = Examen::getOne($id);
 
         $questions = $Examen->questions_all(array("filter"=>true));
@@ -45,19 +71,88 @@ class AdmExamensController extends KleinExtController {
         foreach ($questions as $question) {
             $alineas = $question->rel("alineas");
             $alineas = $alineas->filter(function($row){
-                $a = $row->is_active;
-                $b = $row->is_validated;
                 return ($row->is_active==1) && ($row->is_validated==1); /* ne pas faire === */
             });
             $qDetails[] = array(
                 "id"=>$question->id,
-                "alineas"=>$alineas->count(),
+                "nbalineas"=>$alineas->count(),
                 "diff"=>$question->difficulty
             );
         }
-
-        echo Gb_String::formatTable($qDetails, "html");
-
-        $this->_rs->render("views/empty.phtml");
+        return $qDetails;
     }
+
+    /**
+     * Tire des questions. N'écrit rien dans la bdd.
+     * @param array $detailsQuestions
+     * @param integer $nombreDemandeMin
+     * @param integer[optional] $nombreDemandeMax
+     * @throws Exception
+     * @return array: array de questionContexts Ids
+     */
+    public function drawQuestions($detailsQuestions, $nombreDemandeMin, $nombreDemandeMax=null) {
+        // order les alineas par chem_num
+        if (null == $nombreDemandeMax) {
+            $nombreDemandeMax = $nombreDemandeMin;
+        }
+
+        $nbQuestions = count($detailsQuestions);
+
+        $aQuestionIds = array();
+        $total      = 0;
+        $tries      = 0;
+
+        while($total < $nombreDemandeMin) {
+            if ($tries++ > 100) {
+                throw new Exception("Cannot create a new Questionnaire");
+            }
+            $rand = rand(0, $nbQuestions-1);
+            $detailsQuestion = $detailsQuestions[$rand];
+
+            $qWeight = $detailsQuestion["nbalineas"];
+            $qId     = $detailsQuestion["id"];
+            if ($total + $qWeight <= $nombreDemandeMax) {
+                // la question tirée n'excède pas le total demandé
+                if (!in_array($qId, $aQuestionIds)) {
+                    // la question n'est pas déjà dans le questionnaire
+                    $aQuestionIds[] = $qId;
+                    $total += $qWeight;
+                }
+            }
+        }
+
+        return $aQuestionIds;
+    }
+
+
+    /**
+     * Crée un Qairepool (n'écrit rien dans la bdd). Renvoie un nouveau Qairepool
+     * Get the alineas for the questions and compute difficulty
+     * @param integer $examId
+     * @param array $aQuestionIds
+     * @return Qairepool
+     */
+    protected function createQairepool($examId, $aQuestionIds) {
+        $diff = 0;
+        $alineasIds = array();
+        foreach ($aQuestionIds as $qid) {
+            $question = Question::getOne($qid);
+            $alineas = $question->rel("alineas");
+            foreach ($alineas as $alinea) {
+                $alineasIds[] = $alinea->id;
+            }
+            $diff += $question->difficulty * 1000;
+        }
+
+        // difficulté moyenne par question (et non par alinéa)
+        $diff = (int) ($diff / count($aQuestionIds));
+
+        $p = array("examen_id"=>$examId, "alineas_ids" => "/" . implode("/", $alineasIds) . "/", "difficulty"=>$diff);
+
+        $qairepool = Qairepool::create($p);
+
+        return $qairepool;
+    }
+
+
 }
