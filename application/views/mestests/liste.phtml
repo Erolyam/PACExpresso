@@ -4,39 +4,6 @@
 <?= Gb_String::formatTable($this->jsp->aQaires, "html") ?>
 <?php */ ?>
 
-  <h2>Vos tests</h2>
-  <table class="mestests">
-    <tr>
-      <th>Numéro</th>
-      <th>Examen</th>
-      <th>Date de début</th>
-      <th>Score</th>
-      <th></th>
-    </tr>
-    <? $num = 1; ?>
-    <? foreach ($this->jsp->aQaires as $qaire): ?>
-      <? $url = str_replace("[:id]", $qaire["id"], $this->jsp->aUrls['onetst']); ?>
-      <tr>
-        <td><?= $num ?></td>
-        <td><?= $qaire->rel("examen")->title ?></td>
-        <td><?= $qaire['created_at'] ?></td>
-        <td><?= $qaire['score'] ?></td>
-        <td>
-          <? if (null === $qaire['score']): ?>
-            <a href="<?= $url ?>">Continuer le test</a>
-          <? else: ?>
-            <a href="<?= $url ?>">Voir votre résultat</a>
-          <? endif; ?>
-        </td>
-      </tr>
-      <? $num++; ?>
-    <? endforeach; ?>
-  </table>
-
-  <? if ($this->jsp->canCreate): ?>
-    <a href="<?= $this->jsp->aUrls['newtst'] ?>">Nouveau test</a>
-  <? endif; ?>
-
   <h2>Examens disponibles</h2>
   <table class="mesexamens">
     <tr>
@@ -52,11 +19,50 @@
       <tr>
         <td><?= $num ?></td>
         <td><?= $examen['title'] ?></td>
-        <td><?= $examen['date_start'] ?></td>
-        <td><?= $examen['date_end'] ?></td>
+        <td><? if ($examen['date_start']) { echo substr(Gb_String::date_fr($examen['date_start']), 0, 19); } ?></td>
+        <td><? if ($examen['date_end'])   { echo substr(Gb_String::date_fr($examen['date_end']), 0, 19); } ?></td>
         <td>
           <? if ($examen['is_active']): ?>
-            <a href="<?= $url ?>">Nouveau test</a>
+            <a href="<?= $url ?>" class="btn btn-primary">Commencer</a>
+          <? endif; ?>
+        </td>
+      </tr>
+
+      <? $num++; ?>
+    <? endforeach; ?>
+  </table>
+
+  <br />
+
+  <form>
+    L'examen que vous cherchez n'est pas listé ?
+    <input type="text" placeholder="Entrez son nom" />
+    <input type="submit" class="btn btn-primary" />
+  </form>
+
+
+  <h2>Tests que vous avez commencés</h2>
+  <table class="mestests">
+    <tr>
+      <th>Numéro</th>
+      <th>Examen</th>
+      <th>Date de début</th>
+      <th>Score</th>
+      <th></th>
+    </tr>
+    <? $num = 1; ?>
+    <? foreach ($this->jsp->aQaires as $qaire): ?>
+      <? $url = str_replace("[:id]", $qaire["id"], $this->jsp->aUrls['onetst']); ?>
+      <tr>
+        <td><?= $num ?></td>
+        <td><?= $qaire->rel("examen")->title ?></td>
+        <td><? if ($qaire['created_at']) { echo substr(Gb_String::date_fr($qaire['created_at']), 0, 19); } ?></td>
+        <td><?= $qaire['score'] ?></td>
+        <td>
+          <? if (null === $qaire['score']): ?>
+            <a href="<?= $url ?>">Continuer le test</a>
+          <? else: ?>
+            <a href="<?= $url ?>">Voir votre résultat</a>
           <? endif; ?>
         </td>
       </tr>

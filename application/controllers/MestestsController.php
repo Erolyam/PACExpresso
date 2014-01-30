@@ -31,9 +31,26 @@ class MestestsController extends KleinExtController {
             // n'est pas authentifié
             $this->_rs->redirect(getUrlExt("home"));
         }
+
+        // les questionnaires de l'utilisateur en cours
         $this->_aQaires = Questionnaire::findAll(array("etudiant_id"=>$this->_ap->auth["id"]));
-        $this->_aExamens = Examen::findAll(array("is_public"=>1));
         $this->_aQaires->rel("examen");
+
+        // les examens ouverts et publics
+        $this->_aExamens = Examen::findAll(array("is_public"=>1, "is_active"=>1));
+
+        // ne garde que les examens dont la date correspond
+        $time = Gb_String::date_iso();
+        $this->_aExamens = $this->_aExamens->filter(function($ex) use ($time) {
+            $start = $ex->date_start;
+            $end   = $ex->date_end;
+            if ($start !== null && $time < $start) {
+                return false;
+            } elseif ($end !== null && $time > $end) {
+                return false;
+            }
+            return true;
+        });
 
         // vérifie que le questionnaire demandé existe et appartient à l'utilisateur courant
         if (in_array($action, array("actionOne", "actionSaveone", "actionSubmit"))) {
@@ -62,7 +79,7 @@ class MestestsController extends KleinExtController {
     }
 
     /**
-     * Liste les tests ouverts, offre la possiblité d'en créer un nouveau
+     * Liste les tests publics ouverts, offre la possiblité d'en créer un nouveau
      */
     public function actionIndex() {
         Gb_Log::logInfo("mestests:index");
@@ -70,11 +87,12 @@ class MestestsController extends KleinExtController {
         $rs = $this->_rs;
         $canCreate = $this->canCreateNew();
 
+        $exams = $this->_aExamens;
+
         $rs->jsp->aQaires  = $this->_aQaires;
         $rs->jsp->aExamens = $this->_aExamens;
         $rs->jsp->canCreate = $canCreate;
         $rs->jsp->aUrls['onetst'] = getUrlExt('onetst', true);
-        $rs->jsp->aUrls['newtst'] = getUrlExt('newtst', true);
         $rs->jsp->aUrls['newtstexam'] = getUrlExt('newtstexam', true);
         $this->_rs->layout->current = "mestst";
 
