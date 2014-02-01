@@ -13,19 +13,19 @@ var cssc = require('css-condense');    /* total size : 142110  consolidateViaSel
 
 var js = {
     "public/compiled/layout_all.js": [
-        //"public/extlib/es5-shim/es5-shim.js",
-        //"public/extlib/es5-shim/es5-sham.js",
-        //"public/extlib/es6-shim/es6-shim.js",
-        "public/extlib/jquery/jquery-1.9.1.js",
+        "public/extlib/es5-shim/es5-shim.js",
+        "public/extlib/es5-shim/es5-sham.js",
+        "public/extlib/es6-shim/es6-shim.js",
+        "public/extlib/jquery1/jquery.js",
         "public/extlib/twitter-bootstrap/js/bootstrap.js",
-        "public/extlib/lodash/lodash.js",
-        //"public/extlib/backbone.js/backbone.js",
+        "public/extlib/lodash-compat/lodash.js",
         "public/js/mestests/passer.js",
         "public/js/admin/stats.js",
     ],
     "public/compiled/layout_admin.js": [
         "public/extlib/datatables/jquery.dataTables.js",
         "public/extlib/datatables/DT_bootstrap.js",
+        "public/js/admin/examens.js",
     ],
 };
 
