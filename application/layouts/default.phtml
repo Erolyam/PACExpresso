@@ -106,15 +106,13 @@
     <?php if ("devel"===$GLOBALS["_ENV"]): ?>
       <footer style="white-space:pre; font-family:monospace;"><?= Gb_Response::get_footer(); ?></footer>
     <?php else: ?>
-      <footer class="container">
-        <div class="row">
-          <div class="pull-left">
-            En cas de problème, envoyez un mail à<br />
-            <span class='tt'>gilles.bouthenot@univ-fcomte.fr</span>
-          </div>
-          <div class="pull-right">
-            <a href="public/credits.txt">Credits</a>
-          </div>
+      <footer class="">
+        <div class="pull-left">
+          En cas de problème, envoyez un mail à<br />
+          <span class='tt'>gilles.bouthenot@univ-fcomte.fr</span>
+        </div>
+        <div class="pull-right">
+          <a href="public/credits.txt">Credits</a>
         </div>
       </footer>
     <?php endif; ?>
