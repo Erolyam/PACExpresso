@@ -23,7 +23,7 @@
 <?php endif; ?>
 
     <!--  jQuery -->
-    <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/jquery/jquery-1.9.1.js"></script><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/jquery1/jquery.js"></script><?php endif; ?>
 
     <!--  Bootstrap -->
     <?php if(!$GLOBALS["_min"]):?><link href="public/extlib/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" media="screen"><?php endif; ?>
@@ -31,10 +31,7 @@
     <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/twitter-bootstrap/js/bootstrap.js"></script><?php endif; ?>
 
     <!--  Backbone -->
-    <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/lodash/lodash.js"></script><?php endif; ?>
-<?php if (FALSE): ?>
-    <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/backbone.js/backbone.js"></script><?php endif; ?>
-<?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/lodash-compat/lodash.js"></script><?php endif; ?>
 
     <!--  Our js / css -->
     <?php if(!$GLOBALS["_min"]):?><script src="public/js/mestests/passer.js"></script><?php endif; ?>
