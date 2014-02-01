@@ -25,6 +25,13 @@ img {
 .navbar-fixed-top {
   z-index: 100;
 }
+.jumbocafe {
+  background-image: url("../img/cafe_con_leche_opti.jpg");
+  background-size: cover;
+  background-position: 75% 5%;
+  color: #e5e5e5;
+  text-shadow: #000 1px 1px 3px;
+}
 /******************/
 /* liste de tests */
 /******************/
