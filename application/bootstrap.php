@@ -70,6 +70,24 @@ respondExt(function($rq, $rs, $ap) {
     }
     apply_env();
 
+    /**
+     * Traduction de chaine. Cherche dans $GLOBALS["translate"].
+     * @param string $in chaine à traduire
+     */
+    $rs->tr = function($in) {
+        $tr = &$GLOBALS["translate"];
+        if (isset($tr[$in])) {
+            $out = $tr[$in];
+        } else {
+            $vd = debug_backtrace();
+            $file = $vd[1]["file"];
+            $line = $vd[1]["line"];
+            Gb_Log::logWarning("Texte non traduit : $in ----- $file:$line");
+            $out = $in;
+        }
+        return $out;
+    };
+
 });
 
 

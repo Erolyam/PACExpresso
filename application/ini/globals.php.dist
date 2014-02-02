@@ -2,12 +2,20 @@
 $GLOBALS["env_default"]      = "prod";  // "prod", "devel"
 $GLOBALS["allow_bypassAuth"] = true;    // Permet de pouvoir bypasser l'authentification
 
+$GLOBALS["translate"] = array();
+$tr = &$GLOBALS["translate"];
+
+$tr["title"] ="PACExpresso";       // <title>
+$tr["title_short"] ="PACExpresso"; // utilisé dans navbar
+
+
+
 function apply_env() {
     // LES PARAMETRES PAR DEFAUT:
     $GLOBALS["_min"]   = true;
 
     if ("devel"===$GLOBALS["_ENV"]) {
-	// LES PARAMETRES EN MODE DEVEL:
+        // LES PARAMETRES EN MODE DEVEL:
         $GLOBALS["_min"]   = false;
     }
 }

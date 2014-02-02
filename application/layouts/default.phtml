@@ -45,7 +45,7 @@
     <?php if( $GLOBALS["_min"]):?><link type="text/css" href="public/compiled/layout_all.css" rel="stylesheet" /><?php endif; ?>
 
     <meta name="robots" content="noindex, nofollow">
-    <title>Evaluations Pharma</title>
+    <title><?= $this->tr("title") ?></title>
 </head>
 <body class="<?php echo $this->layout->bodyclass ?>">
 
@@ -57,7 +57,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="<?= $this->layout->urlHome ?>">Paces-QCM</a>
+          <a class="navbar-brand" href="<?= $this->layout->urlHome ?>"><?= $this->tr("title_short") ?></a>
         </div><!--/.navbar-header -->
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
