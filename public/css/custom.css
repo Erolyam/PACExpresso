@@ -26,6 +26,7 @@ img {
   z-index: 100;
 }
 .jumbocafe {
+  background-color: #7c7773;
   background-image: url("../img/cafe_con_leche_opti.jpg");
   background-size: cover;
   background-position: 75% 5%;
