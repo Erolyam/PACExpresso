@@ -86,7 +86,7 @@
           <div class="navbar-right">
             <? if (isset($this->auth['login'])) :?>
               <span class="navbar-text">
-                Connecté en tant que : <?= $this->auth['login'] ?>
+                Connecté en tant que : <?= ucfirst(strtolower($this->auth['displayname'])) ?>
               </span>
               <a href="<?= $this->auth['logoutUrl'] ?>" class='btn btn-default navbar-btn'>Déconnexion</a>
             <? else: ?>

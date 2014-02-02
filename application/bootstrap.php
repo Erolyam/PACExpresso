@@ -80,6 +80,7 @@ respondExt(function($rq, $rs, $ap) {
     require_once "lib/SessionCas.php";
     $sessionCas = SessionCas::getSingleton();
     if (isset($_GET["caslogout"])) {
+        Gb_Log::logInfo("logout");
         $sessionCas->logout();
     }
     if ($GLOBALS["allow_bypassAuth"]) {
@@ -92,14 +93,27 @@ respondExt(function($rq, $rs, $ap) {
     if ($isAuth) {
         $login = $sessionCas->getUser();
 
-        $user = User::findFirst(array("login"=>$login));
-        if (!$user) {
-            $user = User::create();
-            $user->login = $login;
-            $res = $user->save();
+        if (!( isset($_SESSION["auth"]) && is_array($_SESSION["auth"]) && isset($_SESSION["auth"]["login"]) && $login === $_SESSION["auth"]["login"] )) {
+            $url = "https://applications.univ-fcomte.fr/fastannu/fastsearch.php?f=json&uid=$login";
+            Gb_Log::logInfo("fastannu request for uid=$login");
+            $userinfo = file_get_contents($url);
+            Gb_Log::logDebug("fastannu response:", $userinfo);
+            $userinfo = json_decode($userinfo);
+            if (empty($userinfo->mail)) {
+                throw new Exception("Cannot get fastannu info for user $login");
+            }
+
+            $user = User::findFirst(array("login"=>$login));
+            if (!$user) {
+                $user = User::create();
+                $user->login = $login;
+                $res = $user->save();
+            }
+
+            $_SESSION["auth"] = array("id"=>$user->id, "login"=>$login, "logoutUrl"=>$sessionCas->getLogoutUrl(), "email"=>$userinfo->mail, "firstname"=>$userinfo->pren, "lastname"=>$userinfo->nom, "displayname"=>$userinfo->disp);
         }
 
-        $ap->auth = array("id"=>$user->id, "login"=>$login, "logoutUrl"=>$sessionCas->getLogoutUrl());
+        $ap->auth = $_SESSION["auth"];
         Gb_Log::$file_prepend .= "user:$login ";
 
     } else {
