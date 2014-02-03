@@ -1368,12 +1368,14 @@ div.DTFC_LeftBodyWrapper table{border-top:0;margin-bottom:0!important;}
 div.DTFC_LeftBodyWrapper tbody tr:first-child td,div.DTFC_LeftBodyWrapper tbody tr:first-child th{border-top:0;}
 div.DTFC_LeftFootWrapper table{border-top:0;}
 body{margin:0;padding-bottom:1px;padding-top:70px;}
-span.nobr{white-space:nowrap;}
+.nobr{white-space:nowrap;}
 .templates{display:none;}
-img{border:0;}
+ul.dropdown-menu li.navbar-text{float:none;}
 .tt{font-family:monospace;}
 .navbar-fixed-top{z-index:100;}
 .jumbocafe{background-color:#7c7773;background-image:url(../img/cafe_con_leche_opti.jpg);background-position:75% 5%;background-size:cover;color:#e5e5e5;padding-bottom:96px;padding-top:96px;text-shadow:#000 1px 1px 3px;}
+.navbar img.gravatar{border:1px solid #888;border-radius:10px;}
+.navbar img.gravatar:hover{border-color:#ccc;}
 table.mestests td:nth-child(1){text-align:center;}
 table.mestests td:nth-child(3){padding:0 2em;}
 footer{border-top:1px solid #ddd;color:#ccc;font-size:90%;line-height:110%;margin-top:3em;padding-top:1em;}

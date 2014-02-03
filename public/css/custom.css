@@ -10,14 +10,17 @@ body {
   font-weight: normal;
   font-style: normal;
 }
-span.nobr {
+.nobr {
   white-space: nowrap;
 }
 .templates {
   display: none;
 }
-img {
-  border: 0;
+/***************/
+/* bootstrap 3 */
+/***************/
+ul.dropdown-menu li.navbar-text {
+  float: none;
 }
 .tt {
   font-family: monospace;
@@ -34,6 +37,13 @@ img {
   text-shadow: #000 1px 1px 3px;
   padding-top: 96px;
   padding-bottom: 96px;
+}
+.navbar img.gravatar {
+  border: 1px solid #888;
+  border-radius: 10px;
+}
+.navbar img.gravatar:hover {
+  border-color: #ccc;
 }
 /******************/
 /* liste de tests */

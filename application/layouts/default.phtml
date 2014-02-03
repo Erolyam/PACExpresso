@@ -89,15 +89,19 @@
 
           <ul class="nav navbar-nav navbar-right">
             <? if (isset($this->auth['login'])) :?>
-              <li class="navbar-text">
-                Connecté en tant que : <?= ucfirst(strtolower($this->auth['displayname'])) ?>
-              </li>
-              <li style="margin-right:15px;">
-                <form>
-                  <a href="<?= $this->auth['logoutUrl'] ?>" class="btn btn-default navbar-btn">
-                    Déconnexion
-                  </a>
-                </form>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding-top:0; padding-bottom:0; line-height:50px;">
+                  <img class="gravatar" src="http://www.gravatar.com/avatar/<?= md5(strtolower($this->auth['email'])) ?>?s=48" ? />
+                </a>
+                <ul class="dropdown-menu">
+                  <li class="navbar-text nobr">Connecté en tant que<br /><?= ucfirst(strtolower($this->auth['displayname'])) ?></li>
+                  <li class="divider"></li>
+                  <li class="navbar-text">
+                    <a href="<?= $this->auth['logoutUrl'] ?>" class="btn btn-default navbar-btn">
+                      Déconnexion
+                    </a>
+                  </li>
+                </ul>
               </li>
             <? else: ?>
               <li class="navbar-text">
