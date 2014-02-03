@@ -91,10 +91,11 @@
             <? if (isset($this->auth['login'])) :?>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding-top:0; padding-bottom:0; line-height:50px;">
-                  <img class="gravatar" src="http://www.gravatar.com/avatar/<?= md5(strtolower($this->auth['email'])) ?>?s=48" ? />
+                  <img class="gravatar" src="https://secure.gravatar.com/avatar/<?= md5(strtolower($this->auth['email'])) ?>?d=monsterid&s=48" title="Gravatar de <?= ucfirst(strtolower($this->auth['email'])) ?>" />
                 </a>
                 <ul class="dropdown-menu">
-                  <li class="navbar-text nobr">Connecté en tant que<br /><?= ucfirst(strtolower($this->auth['displayname'])) ?></li>
+                  <li class="navbar-text nobr">Connecté en tant que<br /><?= ucwords(strtolower($this->auth['displayname'])) ?></li>
+                  <li class=""><a class="" href="http://www.gravatar.com/">Gérer votre Gravatar</a></li>
                   <li class="divider"></li>
                   <li class="navbar-text">
                     <a href="<?= $this->auth['logoutUrl'] ?>" class="btn btn-default navbar-btn">

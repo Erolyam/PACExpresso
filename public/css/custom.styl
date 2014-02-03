@@ -28,7 +28,6 @@ ul.dropdown-menu li.navbar-text
 .navbar-fixed-top
   z-index:100 // permet au popover de s'afficher au dessus de la navbar
 
-
 .jumbocafe
   background-color:#7C7773
   background-image:url('../img/cafe_con_leche_opti.jpg')
@@ -38,14 +37,25 @@ ul.dropdown-menu li.navbar-text
   text-shadow:#000 1px 1px 3px
   padding-top:96px
   padding-bottom:96px
+  .container
+    max-width:700px
 
 
 .navbar
   img.gravatar
     border:1px solid #888
     border-radius:10px
+    width:48px
+    height:48px
     &:hover
       border-color:#ccc
+  ul.dropdown-menu
+    a.simple
+      /* liens simples */
+      display:inline;
+      padding:0 !important
+    a
+      padding:3px 15px !important /* 3px 20px par défaut */
 
 
 /******************/
