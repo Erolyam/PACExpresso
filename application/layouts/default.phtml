@@ -92,15 +92,23 @@
               <li class="navbar-text">
                 Connecté en tant que : <?= ucfirst(strtolower($this->auth['displayname'])) ?>
               </li>
-              <li>
-                <a href="<?= $this->auth['logoutUrl'] ?>" class='navbar-link'>Déconnexion</a>
+              <li style="margin-right:15px;">
+                <form>
+                  <a href="<?= $this->auth['logoutUrl'] ?>" class="btn btn-default navbar-btn">
+                    Déconnexion
+                  </a>
+                </form>
               </li>
             <? else: ?>
               <li class="navbar-text">
                 Vous n'êtes pas connecté
               </li>
-              <li>
-                <a href="<?= $this->auth['loginUrl'] ?>" class='nabvar-link'>Connexion</a>
+              <li style="margin-right:15px;">
+                <form>
+                  <a href="<?= $this->auth['loginUrl'] ?>" class="btn btn-primary navbar-btn">
+                    Connexion
+                  </a>
+                </form>
               </li>
             <? endif; ?>
           </ul>
