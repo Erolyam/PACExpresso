@@ -92,7 +92,7 @@ respondExt(function($rq, $rs, $ap) {
 
 
 
-// Gestion de l'authentification. Fournit $_SESSION["auth"] = &$rs->auth
+// Gestion de l'authentification. Fournit $_SESSION["auth"]
 respondExt(                                                "auth#auth");
 
 respondExt("home",         "/",                            "default#root");

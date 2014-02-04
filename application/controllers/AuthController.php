@@ -59,7 +59,22 @@ class AuthController extends KleinExtController {
         } else {
             $_SESSION["auth"] = array("loginUrl"=>$sessionCas->getLoginUrl());
         }
-        $this->_rs->auth = &$_SESSION["auth"];
     }
+
+    public static function getAuth() {
+        return $_SESSION["auth"];
+    }
+
+    public static function get($attr, $default="THROW") {
+        $auth = self::getAuth();
+        if (isset($auth[$attr])) {
+            return $auth[$attr];
+        } elseif ($default !== "THROW") {
+            return $default;
+        } else {
+            throw new Exception("login not set");
+        }
+    }
+
 
 }

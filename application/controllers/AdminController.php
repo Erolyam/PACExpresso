@@ -61,7 +61,7 @@ class AdminController extends KleinExtController {
     }
 
     public function before($action) {
-        $login = (isset($this->_rs->auth['login'])) ? ($this->_rs->auth['login']) : ("");
+        $login = AuthController::get("login", null);
         if ($login !== "ecavalli" && $login !== "gbouthen") {
             // n'a pas accès
             $this->_rs->redirect(getUrlExt("home"));

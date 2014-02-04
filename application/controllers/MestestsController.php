@@ -27,13 +27,13 @@ class MestestsController extends KleinExtController {
     }
 
     public function before($action) {
-        if (!isset($this->_rs->auth['id'])) {
+        if (AuthController::get("id", null) === null) {
             // n'est pas authentifié
             $this->_rs->redirect(getUrlExt("home"));
         }
 
         // les questionnaires de l'utilisateur en cours
-        $this->_aQaires = Questionnaire::findAll(array("etudiant_id"=>$this->_ap->auth["id"]));
+        $this->_aQaires = Questionnaire::findAll(array("etudiant_id"=>AuthController::get("id")));
         $this->_aQaires->rel("examen");
 
         // les examens ouverts et publics
@@ -115,7 +115,7 @@ class MestestsController extends KleinExtController {
 
         $aAlineas = $qaire->createNew(7);
 
-        $qaire->etudiant_id = $this->_ap->auth["id"];
+        $qaire->etudiant_id = AuthController::get("id");
 
         $this->_ap->db->beginTransaction();
         $qaire->save();
@@ -162,7 +162,8 @@ class MestestsController extends KleinExtController {
 
         $aAlineas = $qaire->createNew($Examen['nbalineas'], null, 568);
 
-        $qaire->etudiant_id = $this->_ap->auth["id"];
+        $auth = AuthController::getAuth();
+        $qaire->etudiant_id = $auth["id"];
 
         $this->_ap->db->beginTransaction();
         $qaire->save();

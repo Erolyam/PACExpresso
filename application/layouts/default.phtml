@@ -1,4 +1,7 @@
-<?php if(0){$content="";} ?>
+<?php
+    if(0){$content="";}
+    $auth = AuthController::getAuth();
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -68,7 +71,7 @@
           <ul class="nav navbar-nav">
             <? $active = ""; if ($this->layout->current==="home") {$active = "active"; } ?>
             <li class="<?= $active ?>"><a href="<?= $this->layout->urlHome ?>">Accueil</a></li>
-            <? if (isset($this->auth['login'])) :?>
+            <? if (isset($auth['login'])) :?>
               <? $active = ""; if ($this->layout->current==="mestst") {$active = "active"; } ?>
               <li class="<?= $active ?>"><a href="<?= $this->layout->urlQuests?>">Vos tests</a></li>
             <? endif; ?>
@@ -89,20 +92,20 @@
           </ul>
 
           <ul class="nav navbar-nav navbar-right">
-            <? if (isset($this->auth['login'])) :?>
+            <? if (isset($auth['login'])) :?>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding-top:0; padding-bottom:0; line-height:50px;">
-                  <img class="gravatar" src="https://secure.gravatar.com/avatar/<?= md5(strtolower($this->auth['email'])) ?>?d=monsterid&s=48" title="Gravatar de <?= ucfirst(strtolower($this->auth['email'])) ?>" />
+                  <img class="gravatar" src="https://secure.gravatar.com/avatar/<?= md5(strtolower($auth['email'])) ?>?d=monsterid&s=48" title="Gravatar de <?= ucfirst(strtolower($auth['email'])) ?>" />
                 </a>
                 <ul class="dropdown-menu">
-                  <li class="navbar-text nobr"><?= ucwords(strtolower($this->auth['displayname'])) ?></li>
+                  <li class="navbar-text nobr"><?= ucwords(strtolower($auth['displayname'])) ?></li>
                   <li class="navbar-text nobr">
                     <a class="simple" href="http://www.gravatar.com/">Gérer votre Gravatar</a><br />
-                    <small><?= strtolower($this->auth['email']) ?></small>
+                    <small><?= strtolower($auth['email']) ?></small>
                   </li>
                   <li class="divider"></li>
                   <li class="navbar-text">
-                    <a href="<?= $this->auth['logoutUrl'] ?>" class="btn btn-default navbar-btn">
+                    <a href="<?= $auth['logoutUrl'] ?>" class="btn btn-default navbar-btn">
                       Déconnexion
                     </a>
                   </li>
@@ -114,7 +117,7 @@
               </li>
               <li style="margin-right:15px;">
                 <form>
-                  <a href="<?= $this->auth['loginUrl'] ?>" class="btn btn-primary navbar-btn">
+                  <a href="<?= $auth['loginUrl'] ?>" class="btn btn-primary navbar-btn">
                     Connexion
                   </a>
                 </form>
