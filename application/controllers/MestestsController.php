@@ -27,7 +27,7 @@ class MestestsController extends KleinExtController {
     }
 
     public function before($action) {
-        if (!isset($this->_ap->auth['id'])) {
+        if (!isset($this->_rs->auth['id'])) {
             // n'est pas authentifié
             $this->_rs->redirect(getUrlExt("home"));
         }
