@@ -35,6 +35,7 @@ var css = {
         "public/extlib/twitter-bootstrap/css/bootstrap-theme.css",
         "public/extlib/datatables/DT_bootstrap.css",
         "public/css/custom.css", // doit être après DT_bootstrap.css
+        "public/css/fonts/GillSans/webfont.css",
     ]
 };
 
@@ -76,10 +77,15 @@ Object.keys(css).forEach(function(fname){
     str = stripComments(str);
     var aRpl = [
         ["url(Neuton-Italic-webfont.woff)" ,                                           "url(../css/Neuton-Italic-webfont.woff)"],
+        ["url(GillSans-Regular-webfont.woff)",                                         "url(../css/fonts/GillSans/GillSans-Regular-webfont.woff)"],
+        ["url(GillSans-Light-webfont.woff)",                                           "url(../css/fonts/GillSans/GillSans-Light-webfont.woff)"],
+        ["url(GillSans-Bold-webfont.woff)",                                            "url(../css/fonts/GillSans/GillSans-Bold-webfont.woff)"],
+        ["url(GillSans-BoldItalic-webfont.woff)",                                      "url(../css/fonts/GillSans/GillSans-BoldItalic-webfont.woff)"],
         ["url(../fonts/glyphicons-halflings-regular.eot)",                             "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.eot)"],
         ["url(../fonts/glyphicons-halflings-regular.eot?#iefix)",                      "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix)"],
         ["url(../fonts/glyphicons-halflings-regular.woff)",                            "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.woff)"],
         ["url(../fonts/glyphicons-halflings-regular.ttf)",                             "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.ttf)"],
+        ["url(../fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)", "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)"],
         ["url(../fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)", "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)"],
         ["url(../img/glyphicons-halflings.png)",                                       "url(../extlib/twitter-bootstrap/img/glyphicons-halflings.png)"],
         ["url(../img/glyphicons-halflings-white.png)",                                 "url(../extlib/twitter-bootstrap/img/glyphicons-halflings-white.png)"],

@@ -9,6 +9,10 @@ to{background-position:0 0;}
 }
 @font-face{font-family:Glyphicons Halflings;src:url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.eot);src:url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix) format('embedded-opentype'), url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.woff) format('woff'), url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.ttf) format('truetype'), url(../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg');}
 @font-face{font-family:NeutonItalic;font-style:normal;font-weight:normal;src:url(../css/Neuton-Italic-webfont.woff) format('woff');}
+@font-face{font-family:GillSans;font-style:normal;font-weight:300;src:url(../css/fonts/GillSans/GillSans-Light-webfont.woff) format('woff');}
+@font-face{font-family:GillSans;font-style:normal;font-weight:700;src:url(../css/fonts/GillSans/GillSans-Bold-webfont.woff) format('woff');}
+@font-face{font-family:GillSans;font-style:italic;font-weight:700;src:url(../css/fonts/GillSans/GillSans-BoldItalic-webfont.woff) format('woff');}
+@font-face{font-family:GillSans;font-style:normal;font-weight:400;src:url(../css/fonts/GillSans/GillSans-Regular-webfont.woff) format('woff');}
 html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
 body{margin:0;}
 article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary{display:block;}
@@ -1367,7 +1371,7 @@ div.DTFC_LeftHeadWrapper table thead tr:last-child td:first-child,div.DTFC_LeftH
 div.DTFC_LeftBodyWrapper table{border-top:0;margin-bottom:0!important;}
 div.DTFC_LeftBodyWrapper tbody tr:first-child td,div.DTFC_LeftBodyWrapper tbody tr:first-child th{border-top:0;}
 div.DTFC_LeftFootWrapper table{border-top:0;}
-body{margin:0;padding-bottom:1px;padding-top:70px;}
+body{font-family:GillSans,Helvetica Neue,Helvetica,Arial,sans-serif;margin:0;padding-bottom:1px;padding-top:70px;}
 .nobr{white-space:nowrap;}
 .templates{display:none;}
 ul.dropdown-menu li.navbar-text{float:none;}
@@ -1375,7 +1379,7 @@ ul.dropdown-menu li.navbar-text{float:none;}
 .navbar-fixed-top{z-index:100;}
 .jumbocafe{background-color:#7c7773;background-image:url(../img/cafe_con_leche_opti.jpg);background-position:75% 5%;background-size:cover;color:#e5e5e5;padding-bottom:96px;padding-top:96px;text-shadow:#000 1px 1px 3px;}
 .jumbocafe .container{max-width:700px;}
-.navbar img.gravatar{border:1px solid #888;border-radius:10px;}
+.navbar img.gravatar{border:1px solid #888;border-radius:10px;height:48px;width:48px;}
 .navbar img.gravatar:hover{border-color:#ccc;}
 .navbar ul.dropdown-menu a.simple{display:inline;padding:0!important;}
 .navbar ul.dropdown-menu a{padding:3px 15px!important;}
