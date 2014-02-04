@@ -17,9 +17,8 @@ class AdmExamensController extends KleinExtController {
         return true;
     }
 
-    public function actionShow() {
+    public function actionShowMany() {
         $examens = Examen::getAll();
-        $pools = $examens->rel("pools");
 
         $exPoolCount = array();
 
@@ -32,8 +31,20 @@ class AdmExamensController extends KleinExtController {
         $this->_rs->jsp->examens     = $examens->asArray();
         $this->_rs->jsp->exPoolCount = $exPoolCount;
         $this->_rs->render("views/admin/examens/index.phtml");
-
     }
+
+
+    public function actionShowOne() {
+        $id = $this->_rq->param("id");
+        $examen = Examen::getOne($id);
+
+        $form = $examen->getGbForm();
+
+        $this->_rs->examen = $examen->asArray();
+        $this->_rs->gbform = $form;
+        $this->_rs->render("views/admin/examens/showone.phtml");
+        }
+
 
     public function actionRepool() {
         $id = $this->_rq->param("id");

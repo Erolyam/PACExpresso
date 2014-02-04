@@ -2,17 +2,19 @@
 <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/datatables/DT_bootstrap.js"></script><?php endif; ?>
 <?php if(!$GLOBALS["_min"]):?><script src="public/js/admin/examens.js"></script><?php endif; ?>
 <?php if( $GLOBALS["_min"]):?><script src="public/compiled/layout_admin.js"></script><?php endif; ?>
-<div class='container examens'>
+<div class='examens'>
 
 <?php /* ?>
 <?= Gb_String::formatTable($this->jsp->aQaires, "html") ?>
 <?php */ ?>
 
   <h2>Examens disponibles</h2>
-  <table class="dteditor">
-  </table>
+  <table class="dteditor"></table>
 
-</div><!-- .container -->
+
+
+</div><!-- .examens -->
+
 
 <? $this->onready.= <<<HEREDOC
 window.adminexamens = new AdminExamens();

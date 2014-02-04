@@ -50,8 +50,7 @@ respondExt(function($rq, $rs, $ap) {
     $rs->layout = new stdClass();
     $rs->layout->urlHome   = getUrlExt("home");
     $rs->layout->urlQuests = getUrlExt("mestst");
-    $rs->layout->urlExamens= getUrlExt("poolsl");
-    $rs->layout->urlExamens= getUrlExt("poolsl");
+    $rs->layout->urlExamens= getUrlExt("adexas");
     $rs->layout->urlBilan  = getUrlExt("adbilh");
     $rs->layout->current   = "";
     $rs->layout->bodyclass = "";
@@ -112,7 +111,8 @@ respondExt("adbilg",       "GET  /admin/bilan/[details|stats:type].[csv|txt|html
 respondExt("adshal",       "GET  /admin/alinea[i:id]/[show|popover:type]",
                                                         "admin#alineashow");
 
-respondExt("poolsl",       "GET  /admin/examens",          "admExamens#show");
+respondExt("adexas",       "GET  /admin/examens",          "admExamens#showMany");
+respondExt("adexa1",       "GET  /admin/examens/[i:id]",   "admExamens#showOne");
 respondExt("repool",       "GET  /admin/examens/[i:id]/repool",
                                                            "admExamens#repool");
 
