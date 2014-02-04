@@ -23,7 +23,9 @@ class AuthController extends KleinExtController {
         if ($isAuth) {
             $login = $sessionCas->getUser();
 
-            if (!( isset($_SESSION["auth"]) && is_array($_SESSION["auth"]) && isset($_SESSION["auth"]["login"]) && $login === $_SESSION["auth"]["login"] )) {
+            if (!( isset($_SESSION["auth"]) && is_array($_SESSION["auth"])
+                    && isset($_SESSION["auth"]["user"]) && is_array($_SESSION["auth"]["user"])
+                    && isset($_SESSION["auth"]["user"]["login"]) && $login === $_SESSION["auth"]["user"]["login"] )) {
                 // utilisateur n'est pas déjà connecté à cette appli
                 $url = "https://applications.univ-fcomte.fr/fastannu/fastsearch.php?f=json&uid=$login";
                 Gb_Log::logInfo("fastannu request for uid=$login");
@@ -53,11 +55,16 @@ class AuthController extends KleinExtController {
                 $user->last_at    = Gb_String::date_iso();
                 $res = $user->save();
 
-                $_SESSION["auth"] = array("id"=>$user->id, "login"=>$login, "logoutUrl"=>$sessionCas->getLogoutUrl(), "email"=>$userinfo->mail, "firstname"=>$userinfo->pren, "lastname"=>$userinfo->nom, "displayname"=>$userinfo->disp);
+                $profile = $user->rel("profile");
+                $_SESSION["auth"] = array(
+                    "logoutUrl"=>$sessionCas->getLogoutUrl(), "displayname"=>$userinfo->disp,
+                    "user"=>$user->asArray(),
+                    "profile"=>$profile->asArray(),
+                );
             }
             Gb_Log::$file_prepend .= "user:$login ";
         } else {
-            $_SESSION["auth"] = array("loginUrl"=>$sessionCas->getLoginUrl());
+            $_SESSION["auth"] = array("loginUrl"=>$sessionCas->getLoginUrl(), "user"=>array(), "profile"=>array());
         }
     }
 
@@ -65,6 +72,13 @@ class AuthController extends KleinExtController {
         return $_SESSION["auth"];
     }
 
+    /**
+     * renvoie un attribut de auth
+     * @param string $attr
+     * @param string[optional] $default="THROWS" if "THROWS", throws exception if attr is not found
+     * @throws Exception
+     * @return mixed
+     */
     public static function get($attr, $default="THROW") {
         $auth = self::getAuth();
         if (isset($auth[$attr])) {
@@ -72,8 +86,67 @@ class AuthController extends KleinExtController {
         } elseif ($default !== "THROW") {
             return $default;
         } else {
-            throw new Exception("login not set");
+            throw new Exception("$attr not set");
         }
+    }
+
+    /**
+     * renvoie un attribut de auth["user"]
+     * @param string $attr
+     * @param string[optional] $default="THROWS" if "THROWS", throws exception if attr is not found
+     * @throws Exception
+     * @return mixed
+     */
+    public static function getUser($attr=null, $default="THROW") {
+        $auth = self::getAuth();
+        if ($attr === null) {
+            if ( $default === "THROW" && (!isset($auth["user"]) || count($auth["user"]) === 0) ) {
+                throw new Exception("user not set");
+            }
+            return array();
+        }
+        $auth = $auth["user"];
+        if (isset($auth[$attr])) {
+            return $auth[$attr];
+        } elseif ($default !== "THROW") {
+            return $default;
+        } else {
+            throw new Exception("user $attr not set");
+        }
+    }
+
+    /**
+     * renvoie un attribut de auth["profile"]
+     * @param string $attr
+     * @param string[optional] $default="THROWS" if "THROWS", throws exception if attr is not found
+     * @throws Exception
+     * @return mixed
+     */
+    public static function getProfile($attr=null, $default="THROW") {
+        $auth = self::getAuth();
+        if ($attr === null) {
+            if ( $default === "THROW" && (!isset($auth["profile"]) || count($auth["profile"]) === 0) ) {
+                throw new Exception("profile not set");
+            }
+            return array();
+        }
+        $auth = $auth["profile"];
+        if (isset($auth[$attr])) {
+            return $auth[$attr];
+        } elseif ($default !== "THROW") {
+            return $default;
+        } else {
+            throw new Exception("profile $attr not set");
+        }
+    }
+
+    /**
+     * return true if logged
+     * @return boolean
+     */
+    public static function isLogged() {
+        $auth = self::getUser("id", null);
+        return $auth !== null;
     }
 
 

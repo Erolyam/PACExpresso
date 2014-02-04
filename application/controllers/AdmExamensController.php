@@ -8,7 +8,7 @@ class AdmExamensController extends KleinExtController {
     }
 
     public function before($action) {
-        $login = AuthController::get("login", null);
+        $login = AuthController::getUser("login", null);
         if ($login !== "ecavalli" && $login !== "gbouthen") {
             // n'a pas accès
             $this->_rs->redirect(getUrlExt("home"));
