@@ -75,6 +75,7 @@ class MestestsController extends KleinExtController {
             }
         }
 
+        $this->_rs->layout->current = "mestst";
         return true;
     }
 
@@ -94,7 +95,6 @@ class MestestsController extends KleinExtController {
         $rs->jsp->canCreate = $canCreate;
         $rs->jsp->aUrls['onetst'] = getUrlExt('onetst', true);
         $rs->jsp->aUrls['newtstexam'] = getUrlExt('newtstexam', true);
-        $this->_rs->layout->current = "mestst";
 
         $rs->render("views/mestests/liste.phtml");
     }

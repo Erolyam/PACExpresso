@@ -10,10 +10,10 @@ class AdmExamensController extends KleinExtController {
     public function before($action) {
         if ((int) AuthController::getProfile("is_author", 0) !== 1) {
             Gb_Log::logNotice("Ungranted access to " . __CLASS__);
-            // n'a pas accès
             $this->_rs->redirect(getUrlExt("home"));
         }
 
+        $this->_rs->layout->current = "examens";
         return true;
     }
 

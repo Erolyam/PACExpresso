@@ -66,6 +66,7 @@ class AdminController extends KleinExtController {
             $this->_rs->redirect(getUrlExt("home"));
         }
 
+        $this->_rs->layout->current = "bilan";
         return true;
     }
 

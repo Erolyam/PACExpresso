@@ -50,6 +50,9 @@ respondExt(function($rq, $rs, $ap) {
     $rs->layout = new stdClass();
     $rs->layout->urlHome   = getUrlExt("home");
     $rs->layout->urlQuests = getUrlExt("mestst");
+    $rs->layout->urlExamens= getUrlExt("poolsl");
+    $rs->layout->urlExamens= getUrlExt("poolsl");
+    $rs->layout->urlBilan  = getUrlExt("adbilh");
     $rs->layout->current   = "";
     $rs->layout->bodyclass = "";
 });
