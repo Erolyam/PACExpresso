@@ -61,9 +61,8 @@ class AdminController extends KleinExtController {
     }
 
     public function before($action) {
-        $login = AuthController::getUser("login", null);
-        if ($login !== "ecavalli" && $login !== "gbouthen") {
-            // n'a pas accès
+        if ((int) AuthController::getProfile("is_author", 0) !== 1) {
+            Gb_Log::logNotice("Ungranted access to " . __CLASS__);
             $this->_rs->redirect(getUrlExt("home"));
         }
 

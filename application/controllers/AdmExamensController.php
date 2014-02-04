@@ -8,8 +8,8 @@ class AdmExamensController extends KleinExtController {
     }
 
     public function before($action) {
-        $login = AuthController::getUser("login", null);
-        if ($login !== "ecavalli" && $login !== "gbouthen") {
+        if ((int) AuthController::getProfile("is_author", 0) !== 1) {
+            Gb_Log::logNotice("Ungranted access to " . __CLASS__);
             // n'a pas accès
             $this->_rs->redirect(getUrlExt("home"));
         }
