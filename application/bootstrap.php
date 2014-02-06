@@ -112,7 +112,7 @@ respondExt("adshal",       "GET  /admin/alinea[i:id]/[show|popover:type]",
                                                         "admin#alineashow");
 
 respondExt("adexas",       "GET  /admin/examens",          "admExamens#showMany");
-respondExt("adexa1",       "GET  /admin/examens/[i:id]",   "admExamens#showOne");
+respondExt("adexa1",       "GET|POST /admin/examens/[i:id]",   "admExamens#showOne");
 respondExt("repool",       "GET  /admin/examens/[i:id]/repool",
                                                            "admExamens#repool");
 
