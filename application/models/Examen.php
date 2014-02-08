@@ -1,4 +1,11 @@
 <?php
+require_once "Gb/Form2.php";
+require_once "Gb/Form/Group.php";
+require_once "Gb/Form/Elem/Select.php";
+require_once "Gb/Form/Elem/Submit.php";
+require_once "Gb/Form/Elem/Text.php";
+require_once "Gb/Form/Elem/Textarea.php";
+
 class Examen extends \Gb\Model\Model {
 
     static $_tablename = "examens";
@@ -103,42 +110,70 @@ class Examen extends \Gb\Model\Model {
 //"updated_at"      => array("typ"=>"",       "des"=>""),
     );
 
+    /**
+     * @return Gb_Form2
+     */
     public function getGbForm() {
-        require_once "Gb/Form2.php";
-        require_once "Gb/Form/Group.php";
-        require_once "Gb/Form/Elem/Select.php";
-        require_once "Gb/Form/Elem/Submit.php";
-        require_once "Gb/Form/Elem/Text.php";
-        require_once "Gb/Form/Elem/Textarea.php";
 
-        $form = new Gb_Form2(array("classForm"=>"form-horizontal"));
-        $group = new Gb_Form_Group("grp1", array("format"=>'<div class="form-group">_LABELS__ELEMS_</div>'));
+        $form = new Gb_Form2(array("classForm"=>"form-horizontal", "toStringRendersAs"=>"HTML"));
+        $group = new Gb_Form_Group("grp1",
+            array("format"=>'<div class="form-group">_LABELS__ELEMS_</div>'),
+            array("javascriptEnabled"=>false, "classLabel"=>"control-label col-sm-2", "classContainer"=>"col-sm-10", "classInput"=>"form-control")
+        );
 
 
-        $group->append(new Gb_Form_Elem_Text(    "id",               array("label"=>"Id: ",               "postInput"=>"Numéro interne. Laisser vide pour créer un nouvel examen")));
-        $group->append(new Gb_Form_Elem_Text(    "urlname",          array("label"=>"Urlname: ",          "postInput"=>"Url courte. Permet d'accéder à l'examen sans qu'il soit visible dans la liste des examens ouverts. Pas d'espaces.")));
-        $group->append(new Gb_Form_Elem_Text(    "title",            array("label"=>"Titre: ",            "postInput"=>"Titre de l'examen, affiché dans la liste.")));
-        $group->append(new Gb_Form_Elem_Textarea("comment",          array("label"=>"Commentaire: ",      "postInput"=>"Commentaire. Visible par tout le monde.")));
-        $group->append(new Gb_Form_Elem_Text(    "date_start",       array("label"=>"Date début: ",       "postInput"=>"Si renseigné, date mini")));
-        $group->append(new Gb_Form_Elem_Text(    "date_end",         array("label"=>"Date fin: ",         "postInput"=>"Si renseigné, date maxi de soumission")));
-        $group->append(new Gb_Form_Elem_Text(    "password",         array("label"=>"Mot de passe: ",     "postInput"=>"Si renseigné, l'ouverture de l'examen demandera ce mot de passe")));
-        $group->append(new Gb_Form_Elem_Select(  "is_public",        array("label"=>"Public?:",           "postInput"=>"L'examen doit être affiché dans la liste ?",
-            "args"=>array(array(null, ""), array("1", "Oui"), array("0", "Non")))));
-        $group->append(new Gb_Form_Elem_Select(  "is_active",        array("label"=>"Actif ?",            "postInput"=>"L'examen peut être passé",
-            "args"=>array(array(null, ""), array("1", "Oui"), array("0", "Non")))));
-        $group->append(new Gb_Form_Elem_Select(  "is_redoable",      array("label"=>"Recommençable ?",    "postInput"=>"Une fois terminé, peut-on repasser l'examen ?",
-            "args"=>array(array(null, ""), array("1", "Oui"), array("0", "Non")))));
-        $group->append(new Gb_Form_Elem_Text(    "nbalineas",        array("label"=>"nbAlineas: ",        "postInput"=>"Nombre de questions total que doit avoir l'examen",
-            "minValue"=>1, "maxValue"=>50)));
-        $group->append(new Gb_Form_Elem_Text(    "maxminutes",       array("label"=>"Temps max: ",        "postInput"=>"Limite (en minutes) la durée qu'à l'étudiant pour répondre.")));
-        $group->append(new Gb_Form_Elem_Select(  "correction",       array("label"=>"Type de correction: ",
-            "fMandatory"=>true, "args"=>array(array('false', ""), array("0", "aucune, pas même le total"), array("1", "indique juste le total"), array("2", "montre les questions fausses"), array("3", "montre la solution")))));
+        $group->append(new Gb_Form_Elem_Text(    "id",               array("label"=>"Id: ",
+            "postInput"=>"Numéro interne. Laisser vide pour créer un nouvel examen",
+        )));
+        $group->append(new Gb_Form_Elem_Text(    "urlname",          array("label"=>"Urlname: ",
+            "postInput"=>"Url courte. Permet d'accéder à l'examen sans qu'il soit visible dans la liste des examens ouverts. Pas d'espaces.",
+        )));
+        $group->append(new Gb_Form_Elem_Text(    "title",            array("fMandatory"=>true, "label"=>"Titre: ",
+            "postInput"=>"Titre de l'examen, affiché dans la liste.",
+        )));
+        $group->append(new Gb_Form_Elem_Textarea("comment",          array("label"=>"Commentaire: ",
+            "postInput"=>"Commentaire. Visible par tout le monde.",
+        )));
+        $group->append(new Gb_Form_Elem_Text(    "date_start",       array("label"=>"Date début: ",
+            "postInput"=>"Si renseigné, date mini",
+            "title"=>"jj/mm/aaaa hh:mm", "placeholder"=>"jj/mm/aaaa hh:mm", "regexp"=>'/[0-3][0-9]\/[0-1][0-9]\/20[1-2][0-9] [0-2][0-9]:[0-5][0-9]/',
+            "fromBackendFunc"=>function($val){return substr(Gb_String::date_fr($val), 0, 16);},
+            "toBackendFunc"=>function($val){if (strlen($val)==16) { return Gb_String::date_iso($val) . ":00";}},
+        )));
+        $group->append(new Gb_Form_Elem_Text(    "date_end",         array("label"=>"Date fin: ",
+            "postInput"=>"Si renseigné, date maxi de soumission",
+            "title"=>"jj/mm/aaaa hh:mm", "placeholder"=>"jj/mm/aaaa hh:mm", "regexp"=>'/[0-3][0-9]\/[0-1][0-9]\/20[1-2][0-9] [0-2][0-9]:[0-5][0-9]/',
+            "fromBackendFunc"=>function($val){return substr(Gb_String::date_fr($val), 0, 16);},
+            "toBackendFunc"=>function($val){if (strlen($val)==16) { return Gb_String::date_iso($val) . ":00";}},
+        )));
+        $group->append(new Gb_Form_Elem_Text(    "password",         array("label"=>"Mot de passe: ",
+            "postInput"=>"Si renseigné, l'ouverture de l'examen demandera ce mot de passe",
+        )));
+        $group->append(new Gb_Form_Elem_Select(  "is_public",        array("fMandatory"=>true, "label"=>"Public?:",
+            "postInput"=>"L'examen doit être affiché dans la liste ?",
+            "args"=>array(array('false', ""), array("1", "Oui"), array("0", "Non"))
+        )));
+        $group->append(new Gb_Form_Elem_Select(  "is_active",        array("fMandatory"=>true, "label"=>"Actif ?",
+            "postInput"=>"L'examen peut être passé",
+            "args"=>array(array('false', ""), array("1", "Oui"), array("0", "Non"))
+        )));
+        $group->append(new Gb_Form_Elem_Select(  "is_redoable",      array("fMandatory"=>true, "label"=>"Recommençable ?",
+            "postInput"=>"Une fois terminé, peut-on repasser l'examen ?",
+            "args"=>array(array('false', ""), array("1", "Oui"), array("0", "Non"))
+        )));
+        $group->append(new Gb_Form_Elem_Text(    "nbalineas",        array("fMandatory"=>true, "label"=>"nbAlineas: ",
+            "postInput"=>"Nombre de questions total que doit avoir l'examen",
+            "minValue"=>1, "maxValue"=>50
+        )));
+        $group->append(new Gb_Form_Elem_Text(    "maxminutes",       array("label"=>"Temps max: ",
+            "postInput"=>"Limite (en minutes) la durée qu'à l'étudiant pour répondre.",
+        )));
+        $group->append(new Gb_Form_Elem_Select(  "correction",       array("fMandatory"=>true, "label"=>"Type de correction: ",
+            "args"=>array(array('false', ""), array("0", "aucune, pas même le total"), array("1", "indique juste le total"), array("2", "montre les questions fausses"), array("3", "montre la solution"))
+        )));
 
         foreach ($group as $a=>$b) {
-            $group->$a->value($this->$a);
-            $group->$a->classContainer("col-sm-10");
-            $group->$a->classLabel("control-label col-sm-2");
-            $group->$a->classInput("form-control");
+            //$group->$a->value($this->$a);
         }
 
         $form->append($group);

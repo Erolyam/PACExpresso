@@ -87,6 +87,32 @@ footer a,footer a:hover
   color:#ccc
 
 
+/*********/
+/* flash */
+/*********/
+.flash
+  display: block;
+  padding: 10px
+  margin: 10px 10px
+  font-size: 13px
+  line-height: 1.428571429
+  color: #000
+  word-break: break-all
+  word-wrap: break-word
+  background-color: #f5f5f5
+  border: 1px solid #ccc
+  border-radius: 4px
+  ul
+    border:1px solid #000
+    margin:0
+    &.warn
+      background:#ffff94
+    &.error
+      background:#fa8a8a
+    &.success
+      background:#B6FFB3
+
+
 body.bodypasser
   background:#f6f6f6
 
@@ -277,6 +303,11 @@ body.bodypasser
       padding:0px
     .NOK input
       background:#faa
+    input:valid,textarea:valid,select:valid
+      background:#efe
+    input:invalid,textarea:invalid,select:invalid
+      background:#fee
+
 
 
 // images pour datatables

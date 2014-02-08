@@ -35,15 +35,40 @@ class AdmExamensController extends KleinExtController {
 
 
     public function actionShowOne() {
+        require_once("Gb/Form2.php");
+        require_once("Gb/Form/Backend/GbModel.php");
+
         $id = $this->_rq->param("id");
         $examen = Examen::getOne($id);
 
         $form = $examen->getGbForm();
+        $backend = new Gb_Form_Backend_GbModel($examen);
+        $form->backend($backend);
+        $res = $form->process();
+        if ($res===true) {
+            $this->_rs->flash("Les informations ont bien été enregistrées.");
+        } elseif ($res===false) {
+            $this->_rs->flash("ERREUR LORS DE L'ENREGISTREMENT. VEUILLEZ NOUS CONTACTER !");
+        } elseif (is_array($res)) {
+            $msg = "Erreur: merci de corriger les informations suivantes:<br />";
+            foreach ($res as $key=>$msg) {
+                $this->_rs->flash($msg, "warn");
+            }
+        }
+
+
+
+
+        // try {
+        //     $this->_rq->validate('key', 'The key was invalid')->isLen(32);
+        // } catch (ValidatorException $e) {
+        //     $this->_rs->flash($e->getMessage());
+        // }
 
         $this->_rs->examen = $examen->asArray();
         $this->_rs->gbform = $form;
         $this->_rs->render("views/admin/examens/showone.phtml");
-        }
+    }
 
 
     public function actionRepool() {
