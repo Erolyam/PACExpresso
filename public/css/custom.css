@@ -286,6 +286,9 @@ body.bodypasser {
 .bilan .popover {
   max-width: 900px;
 }
+#perfectovr {
+  background: url("../img/source/perfect_trans");
+}
 /****************/
 /* Partie admin */
 /****************/

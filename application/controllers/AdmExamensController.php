@@ -30,6 +30,7 @@ class AdmExamensController extends KleinExtController {
 
         $this->_rs->jsp->examens     = $examens->asArray();
         $this->_rs->jsp->exPoolCount = $exPoolCount;
+        $this->_rs->jsp->urlAdexa1   = getUrlExt("adexa1", true);
         $this->_rs->render("views/admin/examens/index.phtml");
     }
 

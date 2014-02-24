@@ -19,6 +19,7 @@ var js = {
         "public/extlib/jquery1/jquery.js",
         "public/extlib/twitter-bootstrap/js/bootstrap.js",
         "public/extlib/lodash-compat/lodash.js",
+        "public/js/gb.js",
         "public/js/mestests/passer.js",
         "public/js/admin/stats.js",
     ],
