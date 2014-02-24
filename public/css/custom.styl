@@ -112,6 +112,9 @@ footer a,footer a:hover
     &.success
       background:#B6FFB3
 
+/****************************************/
+/**** CANDIDAT : ECRAN QUESTIONNAIRE ****/
+/****************************************/
 
 body.bodypasser
   background:#f6f6f6
@@ -124,78 +127,50 @@ body.bodypasser
   .qtabctn {
     // la barre à gauche avec les alineas
     // http://colorschemedesigner.com/#0J51Tw0w0w0w0
-    @media(max-width:767px) {
-      ul {
-        list-style:none
-        margin:0 0 0 -40px
-        border-collapse:collapse
-        li {
+    ul {
+      list-style:none
+      margin:0 0 0 -40px
+      border-collapse:collapse
+      li {
+        img {
+          position:relative
+          width:20px
+          top:-2px
+          left:5px
+        }
+        @media(max-width:767px) {
           text-align:center
           width:60px
           height:40px
           line-height:40px
           border:1px solid #000
           cursor:pointer
-          background:#FFC473
           display:table-cell
           &.selected {
-            // en premier pour ne pas prendre priorité
-            background:#FF9400
             border-width:4px
           }
-          &.result-right {
-            background:#bbff33
-          }
-          &.result-wrong {
-            background:#ff4d50
-          }
-          &:hover {
-            background:#FF9400
-          }
         }
-      }//ul
-    }
-    @media(min-width:768px) {
-      ul {
-        list-style:none
-        margin:0 0 0 -40px
-        li {
+        @media(min-width:768px) {
           text-align:center
           width:60px
           height:40px
           line-height:40px
           border-bottom:1px solid #000
           cursor:pointer
-          background:#FFC473
+          position:relative
           &:first-child {
             border-top:1px solid #000
           }
           &.selected {
-            // en premier pour ne pas prendre priorité
-            background:#FF9400
             border-left:4px solid #000
             padding-right:4px
           }
-          &.result-right {
-            background:#bbff33
-          }
-          &.result-wrong {
-            background:#ff4d50
-          }
-          &:hover {
-            background:#FF9400
-          }
         }
-      }//ul
+      }
     }
   }
   .qbodyctn {
-    .context {
-      .body {
-        text-align:justify
-      }
-    }
-    .alineabody {
+    .context .body, .alineabody {
       text-align:justify
     }
   }
@@ -222,6 +197,30 @@ body.bodypasser
     margin-bottom:0
   }
 }
+
+
+/***************************/
+/* QUESTIONNAIRE: COULEURS */
+/***************************/
+.passer .qtabctn li {
+  transition-property:background-color
+  transition-duration:.5s
+  transition-timing-function:ease
+  background:#FFC473                                            // couleur neutre
+  &.selected { // en premier pour ne pas prendre priorité
+    background:#FF9400                                          // couleur neutre, sélectionnée
+  }
+  &.result-right {
+    background:#C7FF73                                          /* couleur RIGHT */
+  }
+  &.result-wrong {
+    background:#FF8673                                          /* couleur WRONG */
+  }
+  &:hover {
+    background:#FF9400
+  }
+}
+
 
 
 .passer .oneanswer

@@ -52,13 +52,19 @@ class MestestsPasser
       qaireAlineaId = qaireAlinea.id
       index    = parseInt(qaireAlinea.order, 10)
       resultClass = 'result'
+      img = ""
       if qaireAlinea.solution?
         #console.log(@Qaire.solution_json)
-        resultClass = 'result-wrong'
+        #img = "<img src='public/img/red_64.png' />"
         etu_ans = parseInt(qaireAlinea.answer, 10)
         solutio = parseInt(qaireAlinea.solution,10)
-        resultClass = 'result-right' if etu_ans is solutio
-      html = "<li class='#{resultClass}' data-qairealineaid='#{qaireAlineaId}' data-num='#{index}'>#{index+1}</li>"
+        if etu_ans is solutio
+          resultClass = 'result-right'
+          img = "<img src='public/img/green_64black.png' />"
+        else
+          resultClass = 'result-wrong'
+          img = "<img src='public/img/red_64black.png' />"
+      html = "<li class='#{resultClass}' data-qairealineaid='#{qaireAlineaId}' data-num='#{index}'>#{index+1}#{img}</li>"
       target.append $(html)
 
     # un dernier <li> pour récapitulatif
