@@ -15,66 +15,6 @@ class Questionnaire extends \Gb\Model\Model {
     static $_buffer = array();
     static $_isFullyLoaded = false;
 
-    /**
-     * Tire des questions. N'écrit rien dans la bdd
-     * @todo mettre dans un controlleur, ou lib, pas dans model !
-     * @param integer $nombreDemandeMin
-     * @param integer[optional] $nombreDemandeMax
-     * @throws Exception
-     * @return array: array de questionAlineas
-     */
-    public function createNew($nombreDemandeMin, $nombreDemandeMax=null, $theme_id=null) {
-        // todo : rajouter validated/active aux alineas
-        // order les alineas par chem_num
-        if (null == $nombreDemandeMax) {
-            $nombreDemandeMax = $nombreDemandeMin;
-        }
-
-        // récupère le nombre d'alinéas par question
-        $aNbAlineasPerQuestion = Question::getNbAlineasPerQuestion($theme_id);
-        $nbQuestions           = count($aNbAlineasPerQuestion);
-        //print_r($aNbAlineasPerQuestion);
-
-        $aQuestions = array();
-        $total      = 0;
-        $tries      = 0;
-
-        while($total < $nombreDemandeMin) {
-            if ($tries++ > 100) {
-                throw new Exception("Cannot create Questionnaire");
-            }
-            $rand = rand(0, $nbQuestions-1);
-            $qNum    = array_keys($aNbAlineasPerQuestion);
-            $qNum    = $qNum[$rand];
-            $qWeight = $aNbAlineasPerQuestion[$qNum];
-            if ($total + $qWeight <= $nombreDemandeMax) {
-                // la question tirée n'excède pas le total demandé
-                if (!in_array($qNum, $aQuestions)) {
-                    // la question n'est pas déjà dans le questionnaire
-                    $aQuestions[] = $qNum;
-                    $total += $qWeight;
-                }
-            }
-        }
-        //echo "total : $total\n";
-        //echo "questions: ";
-        //print_r($aQuestions);
-
-        // convertit la liste de question en liste de questionAlineas
-        // TODO : order by chem_num
-        $aAlineas = array();
-        foreach ($aQuestions as $question_id) {
-            $alineas = QuestionAlinea::findAll(array("questioncontext_id"=>$question_id));
-            foreach ($alineas as $alinea) {
-                $aAlineas[] = (int)$alinea->id;
-            }
-
-        }
-
-        //var_dump($aAlineas); exit();
-        return $aAlineas;
-    }
-
 
     /**
      * Calcule le score

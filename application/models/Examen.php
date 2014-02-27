@@ -183,4 +183,22 @@ class Examen extends \Gb\Model\Model {
         return $form;
     }
 
+    /**
+     * Renvoie -1 si pas encore ouvert
+     * Renvoie 0 si ok
+     * Renvoie  1 si fermé
+     */
+    public function date_isIntoInterval() {
+        // failback
+        $start = "2013-01-01 00:00:00";
+        $end = "2037-12-31 23:59:59";
+        if (strlen($this->date_start)>10) {
+            $start = $this->date_start;
+        }
+        if (strlen($this->date_end)>10) {
+            $end = $this->date_end;
+        }
+        return Gb_String::date_isIntoInterval($start, $end);
+    }
+
 }

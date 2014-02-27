@@ -86,13 +86,11 @@ class MestestsController extends KleinExtController {
         Gb_Log::logInfo("mestests:index");
 
         $rs = $this->_rs;
-        $canCreate = $this->canCreateNew();
 
         $exams = $this->_aExamens;
 
         $rs->jsp->aQaires  = $this->_aQaires;
         $rs->jsp->aExamens = $this->_aExamens;
-        $rs->jsp->canCreate = $canCreate;
         $rs->jsp->aUrls['onetst'] = getUrlExt('onetst', true);
         $rs->jsp->aUrls['newtstexam'] = getUrlExt('newtstexam', true);
 
@@ -101,76 +99,80 @@ class MestestsController extends KleinExtController {
 
 
     /**
-     * Crée un nouveau test, si autorisé
-     * Redirige vers la liste de tests
-     */
-    public function actionNew() {
-        Gb_Log::logInfo("mestests:new");
-        if (!$this->canCreateNew()) {
-            Gb_Log::logWarning("creation rejetée");
-            $this->_rs->renderJSON("Vous ne pouvez pas créer de questionnaire, parce que un questionnaire est déjà commencé");
-        }
-
-        $qaire = Questionnaire::create();
-
-        $aAlineas = $qaire->createNew(7);
-
-        $qaire->etudiant_id = AuthController::getUser("id");
-
-        $this->_ap->db->beginTransaction();
-        $qaire->save();
-        foreach ($aAlineas as $order=>$questionalinea_id) {
-            $a = QuestionnaireAlinea::create(array("questionnaire_id"=>$qaire->id, "questionalinea_id"=>$questionalinea_id, "order"=>$order));
-            $a->save();
-        }
-        $this->_ap->db->commit();
-        $this->_rs->redirect(getUrlExt("mestst"));
-    }
-
-
-
-    /**
      * Crée un nouveau test dans l'examen précisé, si autorisé
      * Redirige vers la liste de tests
      */
     public function actionNewtstexam() {
-        Gb_Log::logInfo("mestests:newexamtst");
 
         $examen_id = $this->_rq->param("id");
-        $Examen = Examen::getOne($examen_id);
-
-        if (false) {
-            // TODO: honor is_active, is_public, is_redoable
-            if (!$this->canCreateNew()) {
-                Gb_Log::logWarning("creation rejetée");
-                $this->_rs->renderJSON("Vous ne pouvez pas créer de questionnaire, parce que un questionnaire est déjà commencé");
-            }
+        Gb_Log::logInfo("mestests:newexamtst examen_id=$examen_id");
+        try {
+            $Examen = Examen::getOne($examen_id);
+        } catch (Gb_Exception $e) {
+            die("Impossible: examen introuvable");
         }
 
-        $qaire = Questionnaire::create(array("examen_id"=>$examen_id));
-
-        if (false) {
-            $aAlineas = $qaire->createNewCustom(
-                array(
-                    "nbalineas"=>$Examen['nbalineas'],
-                    "themes_ids"=>array(568),
-                    "questions_ids"=>array(),
-                )
-            );
+        if ($Examen->is_active !== "1") {
+            // TODO: superadmin peut quand même
+            die("Impossible: examen non actif");
         }
 
+        if ($Examen->date_isIntoInterval() === -1) {
+            die("Impossible: L'examen n'est pas encore ouvert");
+        } elseif ($Examen->date_isIntoInterval() === 1) {
+            die("Impossible: L'examen n'est plus ouvert");
+        }
 
-        $aAlineas = $qaire->createNew($Examen['nbalineas'], null, 568);
+        // charge les questionnaires que l'étudiant a passé pour cet examen
+        $qaires = Questionnaire::findAll(array("etudiant_id"=>AuthController::getUser("id"), "examen_id"=>$examen_id));
 
-        $qaire->etudiant_id = AuthController::getUser("id");
+        $qaires_nbStarted = $qaires->count();
+        $qaires_notSubmitted = $qaires->filter(function($qaire) {
+            return $qaire->score === null;
+        });
 
+
+        // Empêche la création d'un nouveau questionnaire si un questionnaire a déjà été commencé, mais pas fini
+        if ($qaires_notSubmitted->count() > 0) {
+            Gb_Log::logDebug("creation rejected: there is already an open qaire");
+            $this->_rs->renderJSON("Vous ne pouvez pas créer de questionnaire, parce que un questionnaire est déjà commencé");
+        }
+
+        // Empêche la création d'un nouveau questionnaire si is_redoable=0 et qu'on questionnaire a déjà été ouvert
+        // Doit appararaître après "there is already an open qaire"
+        if ($Examen->is_redoable === "0" && $qaires->count() > 0) {
+            // Examen ne peut pas être recommencé
+            Gb_Log::logDebug("creation rejected: qaire is not redoable");
+            $this->_rs->renderJSON("Vous ne pouvez pas recommencer ce questionnaire");
+        }
+
+        // Utilise le pool de questionnaires
+        $pools = Qairepool::findAll(array("examen_id"=>$examen_id));
+        $poolcount = $pools->count();
+        $rowNumber = rand(0, $poolcount-1);  // une ligne au hasard
+        $pool = $pools->index($rowNumber);
+        $alineas_ids = $pool->alineas_ids; // "/140/137/132/138/152/143/136/"
+        $alineas_ids = explode("/", substr($alineas_ids, 1, -1));
+
+
+        // CREATION
         $this->_ap->db->beginTransaction();
-        $qaire->save();
-        foreach ($aAlineas as $order=>$questionalinea_id) {
-            $a = QuestionnaireAlinea::create(array("questionnaire_id"=>$qaire->id, "questionalinea_id"=>$questionalinea_id, "order"=>$order));
+        $qaire = Questionnaire::create(array(
+            "examen_id"=>$examen_id,
+            "etudiant_id"=>AuthController::getUser("id")
+        ));
+        $qaire->save(); // permet d'avoir $qaire->id
+        $order = 0;
+        foreach ($alineas_ids as $alinea_id) {
+            $a = QuestionnaireAlinea::create(array(
+                "questionnaire_id"=>$qaire->id,
+                "questionalinea_id"=>$alinea_id,
+                "order"=>$order++
+            ));
             $a->save();
         }
         $this->_ap->db->commit();
+        //$this->_ap->db->rollback();
         $this->_rs->redirect(getUrlExt("mestst"));
 
 
@@ -262,28 +264,6 @@ class MestestsController extends KleinExtController {
         $ret["aQaireAlineas"] = $this->_qaire->rel("alineas")->asArray();
 
         $rs->renderJSON($ret, 200);
-    }
-
-
-    // *********************************
-    // *********************************
-    // *********************************
-
-
-    /**
-     * Vérifie si l'étudiant peut demander un nouveau questionnaire
-     * @return boolean
-     */
-    protected function canCreateNew()
-    {return true;
-        $rs = $this->_rs;
-        $fCanCreate = true;
-        foreach ($this->_aQaires as $aQaire) {
-            if (null === $aQaire["score"]) {
-                $fCanCreate = false; break;
-            }
-        }
-        return $fCanCreate;
     }
 
 }
