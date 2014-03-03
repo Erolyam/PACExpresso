@@ -1,36 +1,38 @@
-<div class='container'>
+<div class=''>
 
 <?php /* ?>
 <?= Gb_String::formatTable($this->jsp->aQaires, "html") ?>
 <?php */ ?>
 
-  <h2>Examens disponibles</h2>
-  <table class="mesexamens">
-    <tr>
-      <th>Numéro</th>
-      <th>Titre</th>
-      <th>Date de début</th>
-      <th>Date de fin</th>
-      <th></th>
-    </tr>
-    <? $num = 1; ?>
-    <? foreach ($this->jsp->aExamens as $examen): ?>
-      <? $url = str_replace("[:id]", $examen["id"], $this->jsp->aUrls['newtstexam']); ?>
-      <tr>
-        <td><?= $num ?></td>
-        <td><?= $examen['title'] ?></td>
-        <td><? if ($examen['date_start']) { echo substr(Gb_String::date_fr($examen['date_start']), 0, 19); } ?></td>
-        <td><? if ($examen['date_end'])   { echo substr(Gb_String::date_fr($examen['date_end']), 0, 19); } ?></td>
-        <td>
-          <? if ($examen['is_active']): ?>
-            <a href="<?= $url ?>" class="btn btn-primary">Commencer</a>
-          <? endif; ?>
-        </td>
-      </tr>
 
-      <? $num++; ?>
-    <? endforeach; ?>
-  </table>
+<h2>Examens disponibles</h2>
+<div class="container row examens-tiles">
+  <? $num = 1; ?>
+  <? foreach ($this->jsp->aExamens as $examen): ?>
+    <? $url = str_replace("[:id]", $examen["id"], $this->jsp->aUrls['newtstexam']); ?>
+    <div class="col-sm-4 tile height-2 examen-tile">
+      <h3 class="title"><?= $examen['title'] ?></h3>
+      <div class="comment"><?= $examen['comment'] ?></div>
+      <? if ($examen['date_start'] || $examen['date_end']): ?>
+        <div class="dates">
+          <? if     ($examen['date_start'] && $examen['date_end']): ?>
+            Du <span class="nobr"><?= substr(Gb_String::date_fr($examen['date_start']), 0, 16) ?></span> au <span class="nobr"><?= substr(Gb_String::date_fr($examen['date_end']), 0, 16); ?></span>
+          <? elseif ($examen['date_start']): ?>
+            À partir du: <span class="nobr"><?= substr(Gb_String::date_fr($examen['date_start']), 0, 16); ?></span>
+          <? elseif ($examen['date_end']): ?>
+            Jusqu'au: <span class="nobr"><?= substr(Gb_String::date_fr($examen['date_end']), 0, 16); ?></span>
+          <? endif; ?>
+        </div>
+      <? endif; ?>
+      <div class="buttons">
+        <a href="<?= $url ?>" class="btn btn-primary">Commencer</a>
+      </div>
+    </div>
+
+    <? $num++; ?>
+  <? endforeach; ?>
+</div>
+
 
   <br />
 
