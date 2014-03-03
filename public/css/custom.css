@@ -113,6 +113,58 @@ footer a:hover {
 .flash ul.success {
   background: #b6ffb3;
 }
+/*********************************/
+/** CANDIDAT: LISTE DES EXAMENS **/
+/*********************************/
+.tile {
+  padding: 2px 6px;
+  text-align: left;
+}
+.tile h3.title {
+  margin: inherit;
+  font-style: italic;
+  font-weight: 300;
+}
+.tile.height-1 {
+  height: 130px;
+}
+.tile.height-2 {
+  height: 260px;
+}
+.tile.height-3 {
+  height: 390px;
+}
+/* http://colorschemedesigner.com/#0.41TlRqFxQDG */
+.tile:nth-child(4n) {
+  background-color: #9c754e;
+}
+.tile:nth-child(4n+1) {
+  background-color: #f0b880;
+}
+.tile:nth-child(4n+2) {
+  background-color: #f0cdaa;
+}
+.tile:nth-child(4n+3) {
+  background-color: #d48d43;
+}
+.examens-tiles .examen-tile {
+  position: relative;
+}
+.examens-tiles .examen-tile .title {
+  margin-bottom: 0.5em;
+}
+.examens-tiles .examen-tile .dates {
+  font-size: 90%;
+  font-weight: 300;
+  font-style: italic;
+  text-align: right;
+  margin-top: 1em;
+}
+.examens-tiles .examen-tile .buttons {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
 /****************************************/
 /**** CANDIDAT : ECRAN QUESTIONNAIRE ****/
 /****************************************/
