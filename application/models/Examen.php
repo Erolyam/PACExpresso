@@ -201,4 +201,69 @@ class Examen extends \Gb\Model\Model {
         return Gb_String::date_isIntoInterval($start, $end);
     }
 
+
+    /**
+     * Renvoie le statut d'ouverture de l'examen
+     * @return stdClass
+     *           isOpen
+     *           tooSoon : boolean
+     *           tooLate : boolean
+     */
+    public function openStatus() {
+        $status = new stdClass();
+        $status->isOpen = true;
+        $status->tooSoon = true;
+        $status->tooLate = true;
+
+        if ($this->is_active !== "1") {
+            $status->isOpen = false;
+        }
+        if ($this->date_isIntoInterval() === -1) {
+            $status->isOpen = false;
+            $status->tooSoon = true;
+        } elseif ($this->date_isIntoInterval() === 1) {
+            $status->isOpen = false;
+            $status->tooLate = true;
+        }
+
+        return $status;
+    }
+
+
+    public function statusForStudent($etudiant_id) {
+        $examenStatus = $this->openStatus();
+        $isOpen = $examenStatus->isOpen;
+        $isRedoable = $this->is_redoable === "1";
+
+        // charge les questionnaires que l'étudiant a passé pour cet examen
+        $qaires = Questionnaire::findAll(array("examen_id"=>$this->id, "etudiant_id"=>$etudiant_id));
+        $nbStarted = $qaires->count();
+        $notSubmitted = $qaires->filter(function($qaire) {
+            return $qaire->score === null;
+        });
+        $nbSubmitted = $nbStarted - $notSubmitted->count();
+
+        $status = new stdClass();
+
+
+        if ($isOpen) {
+            if ($nbStarted === 0) {
+                // Commencer le test pour la première fois
+            } elseif ($isRedoable && $nbStarted === $nbSubmitted) {
+                // Recommencer le test
+            } elseif ($isRedoable && $nbStarted < $nbSubmitted) {
+                // Continuer le test commencé
+                $examen = $notSubmitted->first();
+            } elseif (!$isRedoable && $nbSubmitted > 0) {
+                // Résultats de ce test (ne peut plus être refait)
+            }
+        } else {
+            if ($nbSubmitted > 0) {
+                // Résultats de cet ancien test
+            }
+        }
+
+    }
+
+
 }

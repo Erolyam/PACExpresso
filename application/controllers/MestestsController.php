@@ -90,7 +90,7 @@ class MestestsController extends KleinExtController {
         $exams = $this->_aExamens;
 
         $rs->jsp->aQaires  = $this->_aQaires;
-        $rs->jsp->aExamens = $this->_aExamens;
+        $rs->jsp->aExamens = $exams;
         $rs->jsp->aUrls['onetst'] = getUrlExt('onetst', true);
         $rs->jsp->aUrls['newtstexam'] = getUrlExt('newtstexam', true);
 
@@ -112,15 +112,15 @@ class MestestsController extends KleinExtController {
             die("Impossible: examen introuvable");
         }
 
-        if ($Examen->is_active !== "1") {
+        $openStatus = $Examen->openStatus();
+
+        if ($openStatus->tooSoon) {
+            die("Impossible: L'examen n'est pas encore ouvert");
+        } elseif ($openStatus->tooLate) {
+            die("Impossible: L'examen n'est plus ouvert");
+        } elseif ($openStatus->isOpen) {
             // TODO: superadmin peut quand même
             die("Impossible: examen non actif");
-        }
-
-        if ($Examen->date_isIntoInterval() === -1) {
-            die("Impossible: L'examen n'est pas encore ouvert");
-        } elseif ($Examen->date_isIntoInterval() === 1) {
-            die("Impossible: L'examen n'est plus ouvert");
         }
 
         // charge les questionnaires que l'étudiant a passé pour cet examen
