@@ -124,24 +124,18 @@ class MestestsController extends KleinExtController {
             die("Impossible: examen non actif");
         }
 
-        // charge les questionnaires que l'étudiant a passé pour cet examen
-        $qaires = Questionnaire::findAll(array("etudiant_id"=>AuthController::getUser("id"), "examen_id"=>$examen_id));
-
-        $qaires_nbStarted = $qaires->count();
-        $qaires_notSubmitted = $qaires->filter(function($qaire) {
-            return $qaire->score === null;
-        });
-
+        $examStatus = $Examen->statusForStudent(AuthController::getUser("id"));
+        // Gb_Log::logInfo($examStatus);
 
         // Empêche la création d'un nouveau questionnaire si un questionnaire a déjà été commencé, mais pas fini
-        if ($qaires_notSubmitted->count() > 0) {
+        if (!$examStatus->canCreate && $examStatus->canResume) {
             Gb_Log::logDebug("creation rejected: there is already an open qaire");
             $this->_rs->renderJSON("Vous ne pouvez pas créer de questionnaire, parce que un questionnaire est déjà commencé");
         }
 
         // Empêche la création d'un nouveau questionnaire si is_redoable=0 et qu'on questionnaire a déjà été ouvert
         // Doit appararaître après "there is already an open qaire"
-        if ($Examen->is_redoable === "0" && $qaires->count() > 0) {
+        if ($examStatus->resultOnly) {
             // Examen ne peut pas être recommencé
             Gb_Log::logDebug("creation rejected: qaire is not redoable");
             $this->_rs->renderJSON("Vous ne pouvez pas recommencer ce questionnaire");
@@ -175,9 +169,6 @@ class MestestsController extends KleinExtController {
         $this->_ap->db->commit();
         //$this->_ap->db->rollback();
         $this->_rs->redirect(getUrlExt("mestst"));
-
-
-
     }
 
 

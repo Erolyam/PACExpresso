@@ -205,7 +205,7 @@ class Examen extends \Gb\Model\Model {
     /**
      * Renvoie le statut d'ouverture de l'examen
      * @return stdClass
-     *           isOpen
+     *           isOpen  : boolean
      *           tooSoon : boolean
      *           tooLate : boolean
      */
@@ -230,6 +230,18 @@ class Examen extends \Gb\Model\Model {
     }
 
 
+    /**
+     * Renvoie le statut d'un examen pour un étudiant
+     * @param integer $etudiant_id
+     * @return stdClass
+     *           canCreate  : boolean
+     *           canResume  : boolean
+     *           neverStarted:boolean
+     *           resultOnly : boolean
+     *           lastId     : integer
+     *           nbStarted  : integer
+     *           nbSubmitted: integer
+     */
     public function statusForStudent($etudiant_id) {
         $examenStatus = $this->openStatus();
         $isOpen = $examenStatus->isOpen;
@@ -242,27 +254,45 @@ class Examen extends \Gb\Model\Model {
             return $qaire->score === null;
         });
         $nbSubmitted = $nbStarted - $notSubmitted->count();
+        $examen = $notSubmitted->first();
 
         $status = new stdClass();
-
+        $status->canCreate    = false;
+        $status->neverStarted = false;
+        $status->canResume    = false;
+        $status->resultOnly   = false;
+        $status->lastId       = null;
+        $status->nbStarted    = $nbStarted;
+        $status->nbSubmitted  = $nbSubmitted;
 
         if ($isOpen) {
             if ($nbStarted === 0) {
                 // Commencer le test pour la première fois
+                $status->canCreate    = true;
+                $status->neverStarted = true;
             } elseif ($isRedoable && $nbStarted === $nbSubmitted) {
-                // Recommencer le test
-            } elseif ($isRedoable && $nbStarted < $nbSubmitted) {
+                // Recommencer le test (nouveau questionnaire)
+                $status->canCreate = true;
+            } elseif ($isRedoable && $nbStarted > $nbSubmitted) {
                 // Continuer le test commencé
-                $examen = $notSubmitted->first();
+                $status->canResume    = true;
+                $status->lastId       = $examen->id;
             } elseif (!$isRedoable && $nbSubmitted > 0) {
-                // Résultats de ce test (ne peut plus être refait)
+                // Résultats de ce test (ne peut plus être refait parce que déjà fait)
+                $status->lastId       = $examen->id;
+                $status->resultOnly   = true;
             }
         } else {
             if ($nbSubmitted > 0) {
-                // Résultats de cet ancien test
+                // Résultats de cet ancien test (ne peut plus être refait, parce que fermé)
+                $status->lastId       = $examen->id;
+                $status->resultOnly   = true;
+            } else {
+                $status->neverStarted = true;
             }
         }
 
+        return $status;
     }
 
 
