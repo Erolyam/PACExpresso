@@ -21,7 +21,8 @@ class AdminExamens
       aPos = dt.fnGetPosition(e.target)
       row = dt.fnGetData(aPos[0])
       url = gb.urlHelper @urlAdexa1,{id:row.id}
-      window.open url, "adexa1"
+      #window.open url, "adexa1"
+      window.location.href = url
 
       #dt.fnUpdate("bla", aPos[0], aPos[2])
 

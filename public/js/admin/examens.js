@@ -32,7 +32,7 @@ AdminExamens = (function() {
         url = gb.urlHelper(_this.urlAdexa1, {
           id: row.id
         });
-        return window.open(url, "adexa1");
+        return window.location.href = url;
       };
     })(this));
   };

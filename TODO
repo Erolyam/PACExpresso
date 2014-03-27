@@ -3,3 +3,5 @@ partie candidat/questionnaire:
 
  - Si auth rejetée (timeout ?), ramener vers la page qui a généré l'erreur
 
+partie admin/examens/[id]:
+on doit pouvoir copier vers un nouveau
