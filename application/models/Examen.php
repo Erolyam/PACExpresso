@@ -212,8 +212,8 @@ class Examen extends \Gb\Model\Model {
     public function openStatus() {
         $status = new stdClass();
         $status->isOpen = true;
-        $status->tooSoon = true;
-        $status->tooLate = true;
+        $status->tooSoon = false;
+        $status->tooLate = false;
 
         if ($this->is_active !== "1") {
             $status->isOpen = false;

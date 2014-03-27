@@ -118,7 +118,8 @@ class MestestsController extends KleinExtController {
             die("Impossible: L'examen n'est pas encore ouvert");
         } elseif ($openStatus->tooLate) {
             die("Impossible: L'examen n'est plus ouvert");
-        } elseif ($openStatus->isOpen) {
+        } elseif (!$openStatus->isOpen) {
+            // toujours tester d'abord tooSoon et tooLate
             // TODO: superadmin peut quand même
             die("Impossible: examen non actif");
         }
