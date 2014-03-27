@@ -68,6 +68,7 @@ class AdmExamensController extends KleinExtController {
 
         $this->_rs->examen = $examen->asArray();
         $this->_rs->gbform = $form;
+        $this->_rs->urlBilan = getUrlExt("adbilh", array("id"=>$id));
         $this->_rs->render("views/admin/examens/showone.phtml");
     }
 
