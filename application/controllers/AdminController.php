@@ -66,58 +66,76 @@ class AdminController extends KleinExtController {
             $this->_rs->redirect(getUrlExt("home"));
         }
 
-        $this->_rs->layout->current = "bilan";
+        $this->_rs->layout->current = "examens";
         return true;
     }
 
     public function actionBilanhome() {
         $rs = $this->_rs;
-        Gb_Log::logInfo("admin#bilanhome");
+        $examenId = $this->_rq->param("id");
+        Gb_Log::logInfo("admin#bilanhome examen=$examenId ");
 
+        $rs->examenId = $examenId;
         $rs->render("views/admin/bilan/home.phtml");
     }
 
     public function actionBilango() {
         $type   = $this->_rq->param("type");
         $format = $this->_rq->param("format", "html");
+        $examenId = $this->_rq->param("id");
+
         if ("txt" === $format) {
           $format = "text";
         }
-        Gb_Log::logInfo("admin#bilango type=$type format=$format");
-        $rs = $this->_rs;
+        Gb_Log::logInfo("admin#bilango examen=$examenId type=$type format=$format");
 
-        $aQaires = Questionnaire::findAll($this->_ap->db, array("score"=>new Zend_Db_Expr("IS NOT NULL")));
-        $aQaireAlineas = $aQaires->rel("alineas");
+        // Cherche toutes les questions puis tous les alinéas de l'examen
+        $examen = Examen::getOne($examenId);
+        $questions = $examen->questions_all();                      // toutes les questions de l'examen
+        $examenAlineas = $questions->rel("alineas");                // les alineas de ces questions
+        //$qaireAlineas = $alineas->rel("questionnairealineas");      // les questionnaireAlineas où ces alinéas apparaissent
+
+        // Cherche tous les questionnaires qui ont été submitted
+        $qaires = Questionnaire::findAll($this->_ap->db, array("score"=>new Zend_Db_Expr("IS NOT NULL"), "examen_id"=>$examenId));
+        $qairesAlineas = $qaires->rel("alineas");
 
         // eager load
-        $aQaires->rel("etudiant");
-        $aQaireAlineas->rel("questionalinea")->rel("question");
+        //$aQaires->rel("etudiant");
+        //$aQaireAlineas->rel("questionalinea")->rel("question");
 
-        //$log = &Gb_Db::$sqlLog;
-
-        $aLignes = array();
+        // initialisation
         $aStats  = array();
-        foreach ($aQaireAlineas as $QaireAlinea) {
-            $Qaire = $QaireAlinea->rel("questionnaire");
-            $user = $Qaire->rel("etudiant");
-            $login = $user->login;
-            $submited_at    = $Qaire->submited_at;
+        foreach ($examenAlineas as $alinea) {
+            $question = $alinea->rel("question");
+            $aStats[$alinea->id] = array(
+                "title"        => $question->title. " - " . $alinea->chem_num,
+                "nbJuste"      => 0,
+                "nbFaux"       => 0,
+              );
+        }
 
-            $Alinea = $QaireAlinea->rel("questionalinea");
+//        $aLignes = array();
+        foreach ($qairesAlineas as $qaireAlinea) {
+            $alinea_id = $qaireAlinea->questionalinea_id;
+/*
+            $qaire = $qaireAlinea->rel("questionnaire");
+            $user = $qaire->rel("etudiant");
+            $login = $user->login;
+            $submited_at    = $qaire->submited_at;
+
+            $Alinea = $qaireAlinea->rel("questionalinea");
             $Question = $Alinea->rel("question");
-            $alinea_id = $Alinea->id;
             $chem_num = $Alinea->chem_num;
             $title = $Question->title;
-            $submited = $QaireAlinea->answer;
-            $solution = $QaireAlinea->solution;
-
+*/
             if (!isset($aStats[$alinea_id])) {
-                $aStats[$alinea_id] = array(
-                    "title"        => $title. " - " . $chem_num,
-                    "nbJuste"      => 0,
-                    "nbFaux"       => 0,
-              );
+                // il est possible qu'un questionnaire ait fait référence à une question qui ne fait plus partie de l'examen
+                continue;
             }
+
+            $submited = $qaireAlinea->answer;
+            $solution = $qaireAlinea->solution;
+
             if ($submited === $solution) {
                 $status = "JUSTE";
                 $aStats[$alinea_id]["nbJuste"]++;
@@ -125,7 +143,7 @@ class AdminController extends KleinExtController {
                 $status = "FAUX";
                 $aStats[$alinea_id]["nbFaux"]++;
             }
-
+/*
             $aLigne = array(
                 "etudiant"     => $login,
                 "submited_at"  => $submited_at,
@@ -134,21 +152,25 @@ class AdminController extends KleinExtController {
             );
 
           $aLignes[] = $aLigne;
-
+*/
         }
 
         if ("details" === $type) {
-            $aOut = $aLignes;
+            // $aOut = $aLignes;
         } elseif ("stats" === $type) {
             foreach ($aStats as $index=>$stat) {
                 $juste    = $stat["nbJuste"];
                 $faux     = $stat["nbFaux"];
-                $pourcent = round($juste * 100 / ($juste + $faux));
+                $pourcent = 0;
+                if ($juste + $faux !== 0) {
+                    $pourcent = round($juste * 100 / ($juste + $faux));
+                }
                 $aStats[$index]["pourcent"] = $pourcent;
             }
             $aOut = $aStats;
         }
 
+        $rs = $this->_rs;
         if ("csv" === $format) {
             Gb_Util::sendString(Gb_String::arrayToCsv($aOut), $type . ".csv");
         } else {

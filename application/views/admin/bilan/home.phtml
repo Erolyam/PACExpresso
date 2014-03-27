@@ -1,12 +1,13 @@
-
-
-<?php $name = "adbilg"; ?>
+<?php
+    $name = "adbilg";
+    $examenId = $this->examenId;
+?>
 
 <div class='container'>
 
 <? foreach (array("details", "stats") as $type):?>
   <? foreach (array("txt", "html", "csv") as $format):?>
-    <? $url = getUrlExt($name, array("type"=>$type, "format"=>$format))?>
+    <? $url = getUrlExt($name, array("id"=>$examenId, "type"=>$type, "format"=>$format))?>
     <a href="<?= $url ?>">Bilan <?= $type ?>, format <?= $format ?></a><br />
   <? endforeach; ?>
 <? endforeach; ?>

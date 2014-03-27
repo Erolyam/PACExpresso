@@ -23,7 +23,8 @@ class Examen extends \Gb\Model\Model {
     static $_isFullyLoaded = false;
 
     /**
-     * renvoie les questioncontexts
+     * renvoie les questioncontexts éclatés. ne prend en compte que questions_ids.
+     * Utiliser questions_all pour avoir aussi les questions concernées par themes_ids
      * @return \Gb\Model\Rows of Question
      */
     public function questions() {
