@@ -31,32 +31,12 @@ Gb_Log::installErrorHandlers();
 //set_include_path(dirname(__FILE__) . PATH_SEPARATOR . get_include_path());
 require_once "lib/kleinExt.php";
 
-// démarrage session, mise en place du layout et de la bdd
+
+// démarrage session, env processing
 respondExt(function($rq, $rs, $ap) {
     session_name("s" . md5(__DIR__));
     session_start();
 
-    require_once "Gb/Db.php";
-//    $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"/home/gilles/data/src/rails/mine2/db/development.sqlite3"));
-    $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"../var/db.sqlite"));
-    \Gb\Model\Model::setAdapter($ap->db);
-
-
-    if (!$rs->isAjax()) {
-        $rs->layout("layouts/default.phtml");
-    }
-    $rs->jsp = new stdClass();
-    $rs->onready = "";
-    $rs->layout = new stdClass();
-    $rs->layout->urlHome   = getUrlExt("home");
-    $rs->layout->urlQuests = getUrlExt("mestst");
-    $rs->layout->urlExamens= getUrlExt("adexas");
-    $rs->layout->urlBilan  = getUrlExt("adbilh");
-    $rs->layout->current   = "";
-    $rs->layout->bodyclass = "";
-});
-
-respondExt(function($rq, $rs, $ap) {
     // env processing
     include "ini/globals.php";
     if (isset($_REQUEST["env"]) && strlen($_REQUEST["env"])) {
@@ -92,6 +72,27 @@ respondExt(function($rq, $rs, $ap) {
 
 });
 
+// démarrage session, mise en place du layout et de la bdd
+respondExt(function($rq, $rs, $ap) {
+    require_once "Gb/Db.php";
+//    $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"/home/gilles/data/src/rails/mine2/db/development.sqlite3"));
+    $ap->db = new Gb_Db(array("type"=>"sqlite", "name"=>"../var/db.sqlite"));
+    \Gb\Model\Model::setAdapter($ap->db);
+
+
+    if (!$rs->isAjax()) {
+        $rs->layout("layouts/" . $GLOBALS["layout"]);
+    }
+    $rs->jsp = new stdClass();
+    $rs->onready = "";
+    $rs->layout = new stdClass();
+    $rs->layout->urlHome   = getUrlExt("home");
+    $rs->layout->urlQuests = getUrlExt("mestst");
+    $rs->layout->urlExamens= getUrlExt("adexas");
+    $rs->layout->urlBilan  = getUrlExt("adbilh");
+    $rs->layout->current   = "";
+    $rs->layout->bodyclass = "";
+});
 
 
 // Gestion de l'authentification. Fournit $_SESSION["auth"]
