@@ -126,13 +126,28 @@ footer a:hover {
   font-weight: 300;
 }
 .tile.height-1 {
-  height: 130px;
+  height: 65px;
 }
 .tile.height-2 {
-  height: 260px;
+  height: 130px;
 }
 .tile.height-3 {
+  height: 195px;
+}
+.tile.height-4 {
+  height: 260px;
+}
+.tile.height-5 {
+  height: 325px;
+}
+.tile.height-6 {
   height: 390px;
+}
+.tile.height-7 {
+  height: 455px;
+}
+.tile.height-8 {
+  height: 520px;
 }
 /* http://colorschemedesigner.com/#0.41TlRqFxQDG */
 .tile:nth-child(4n) {
