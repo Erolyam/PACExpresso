@@ -96,26 +96,25 @@ respondExt(function($rq, $rs, $ap) {
 
 
 // Gestion de l'authentification. Fournit $_SESSION["auth"]
-respondExt(                                                "auth#auth");
+respondExt(                                                                     "auth#auth");
 
-respondExt("home",         "/",                            "default#root");
-respondExt("mestst",       "/vostests",                    "mestests#index");
-respondExt("newtst",       "/vostests/new",                "mestests#new");
-respondExt("newtstexam",   "/vostests/examen[i:id]/new",   "mestests#newtstexam");
-respondExt("onetst",       "GET  /vostests/[i:id]",        "mestests#one");
-respondExt(                "PUT  /vostests/[i:id]",        "mestests#saveone");
-respondExt(                "POST /vostests/[i:id]",        "mestests#submit");
+respondExt("home",         "/",                                                 "default#root");
+respondExt("mestst",       "/vostests",                                         "mestests#index");
+respondExt("newtst",       "/vostests/new",                                     "mestests#new");
+respondExt("newtstexam",   "/vostests/examen[i:id]/new",                        "mestests#newtstexam");
+respondExt("onetst",       "GET /vostests/[i:id]",                              "mestests#one");
+respondExt(                "PUT /vostests/[i:id]",                              "mestests#saveone");
+respondExt(                "POST /vostests/[i:id]",                             "mestests#submit");
 
-respondExt("adbilh",       "GET  /admin/bilan",            "admin#bilanhome");
-respondExt("adbilg",       "GET  /admin/bilan/[details|stats:type].[csv|txt|html:format]?",
-                                                        "admin#bilango");
-respondExt("adshal",       "GET  /admin/alinea[i:id]/[show|popover:type]",
-                                                        "admin#alineashow");
+respondExt("adexas",       "GET /admin/examens",                                "admExamens#showMany");
+respondExt("adbilh",       "GET /admin/examens/bilan",                          "admin#bilanhome");
+respondExt("adbilg",       "GET /admin/examens/bilan/[details|stats:type].[csv|txt|html:format]?",
+                                                                                "admin#bilango");
+respondExt("adexa1",       "GET|POST /admin/examens/[i:id]",                    "admExamens#showOne");
+respondExt("repool",       "GET /admin/examens/[i:id]/repool",                  "admExamens#repool");
 
-respondExt("adexas",       "GET  /admin/examens",          "admExamens#showMany");
-respondExt("adexa1",       "GET|POST /admin/examens/[i:id]",   "admExamens#showOne");
-respondExt("repool",       "GET  /admin/examens/[i:id]/repool",
-                                                           "admExamens#repool");
+respondExt("adshal",       "GET /admin/alinea[i:id]/[show|popover:type]",       "admin#alineashow");
+
 
 
 respondExt(404, function(){echo "Page inexistante";});

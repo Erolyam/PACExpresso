@@ -82,13 +82,14 @@ class AdmExamensController extends KleinExtController {
 
         echo Gb_String::formatTable($qDetails, "html");
 
-        for ($i=0; $i<100; $i++) {
+        $number = 500;
+        for ($i=0; $i<$number; $i++) {
             $aQuestionIds = $this->drawQuestions($qDetails, 7);
             $qairepool = $this->createQairepool($id, $aQuestionIds);
             $qairepool->save();
         }
 
-        echo "Ok. 100 questionnaires tirés";
+        echo "Ok. $number questionnaires tirés";
 
         $this->_rs->render("views/empty.phtml");
     }

@@ -254,7 +254,7 @@ class Examen extends \Gb\Model\Model {
             return $qaire->score === null;
         });
         $nbSubmitted = $nbStarted - $notSubmitted->count();
-        $examen = $notSubmitted->first();
+        $examen = $notSubmitted->first(false);
 
         $status = new stdClass();
         $status->canCreate    = false;
