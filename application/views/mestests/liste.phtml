@@ -1,16 +1,16 @@
 <div class=''>
 
 <?php /* ?>
-<?= Gb_String::formatTable($this->jsp->aQaires, "html") ?>
+<?= Gb_String::formatTable($this->aQaires, "html") ?>
 <?php */ ?>
 
 
 <h2>Examens disponibles</h2>
 <div class="container row examens-tiles">
   <? $num = 1; ?>
-  <? foreach ($this->jsp->aExamens as $examen): ?>
-    <? $url = str_replace("[:id]", $examen["id"], $this->jsp->aUrls['newtstexam']); ?>
-    <div class="col-sm-4 tile height-2 examen-tile">
+  <? foreach ($this->aExamens as $examen): ?>
+    <? $examStatus = $examen->statusForStudent($this->etuId); ?>
+    <div class="col-sm-4 tile height-3 examen-tile">
       <h3 class="title"><?= $examen['title'] ?></h3>
       <div class="comment"><?= $examen['comment'] ?></div>
       <? if ($examen['date_start'] || $examen['date_end']): ?>
@@ -25,7 +25,13 @@
         </div>
       <? endif; ?>
       <div class="buttons">
-        <a href="<?= $url ?>" class="btn btn-primary">Commencer</a>
+        <? if ($examStatus->canCreate): ?>
+            <? $url    = str_replace("[:id]", $examen["id"], $this->aUrls['newtstexam']); ?>
+            <a href="<?= $url ?>" class="btn btn-primary">Commencer</a>
+        <? elseif ($examStatus->canResume): ?>
+            <? $url    = str_replace("[:id]", $examStatus->lastId, $this->aUrls['onetst']); ?>
+            <a href="<?= $url ?>" class="btn btn-primary">Continuer</a>
+        <? endif; ?>
       </div>
     </div>
 
@@ -53,8 +59,8 @@
       <th></th>
     </tr>
     <? $num = 1; ?>
-    <? foreach ($this->jsp->aQaires as $qaire): ?>
-      <? $url = str_replace("[:id]", $qaire["id"], $this->jsp->aUrls['onetst']); ?>
+    <? foreach ($this->aQaires as $qaire): ?>
+      <? $url = str_replace("[:id]", $qaire["id"], $this->aUrls['onetst']); ?>
       <tr>
         <td><?= $num ?></td>
         <td><?= $qaire->rel("examen")->title ?></td>

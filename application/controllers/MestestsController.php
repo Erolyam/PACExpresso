@@ -69,7 +69,7 @@ class MestestsController extends KleinExtController {
         if (in_array($action, array("actionSaveone"))) {
             $qaire_id      = (int) $this->_rq->param("id");
             $qaireAlineaId = (int) $this->_rq->param("qaireAlineaId");
-            $this->_qaireAlinea = QuestionnaireAlinea::fetch($qaireAlineaId);
+            $this->_qaireAlinea = QuestionnaireAlinea::getOne($qaireAlineaId);
             if ($qaire_id !== (int) $this->_qaireAlinea->questionnaire_id) {
                 $this->_rs->renderJSON("QuestionnaireAlinea pas dans ce Questionnaire");
             }
@@ -89,10 +89,11 @@ class MestestsController extends KleinExtController {
 
         $exams = $this->_aExamens;
 
-        $rs->jsp->aQaires  = $this->_aQaires;
-        $rs->jsp->aExamens = $exams;
-        $rs->jsp->aUrls['onetst'] = getUrlExt('onetst', true);
-        $rs->jsp->aUrls['newtstexam'] = getUrlExt('newtstexam', true);
+        $rs->aQaires  = $this->_aQaires;
+        $rs->aExamens = $exams;
+        $rs->etuId = AuthController::getUser("id");
+        $rs->aUrls['onetst'] = getUrlExt('onetst', true);
+        $rs->aUrls['newtstexam'] = getUrlExt('newtstexam', true);
 
         $rs->render("views/mestests/liste.phtml");
     }
