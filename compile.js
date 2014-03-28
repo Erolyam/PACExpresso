@@ -13,19 +13,20 @@ var cssc = require('css-condense');    /* total size : 142110  consolidateViaSel
 
 var js = {
     "public/compiled/layout_all.js": [
-        //"public/extlib/es5-shim/es5-shim.js",
-        //"public/extlib/es5-shim/es5-sham.js",
-        //"public/extlib/es6-shim/es6-shim.js",
-        "public/extlib/jquery/jquery-1.9.1.js",
+        "public/extlib/es5-shim/es5-shim.js",
+        "public/extlib/es5-shim/es5-sham.js",
+        "public/extlib/es6-shim/es6-shim.js",
+        "public/extlib/jquery1/jquery.js",
         "public/extlib/twitter-bootstrap/js/bootstrap.js",
-        "public/extlib/lodash/lodash.js",
-        //"public/extlib/backbone.js/backbone.js",
+        "public/extlib/lodash-compat/lodash.js",
+        "public/js/gb.js",
         "public/js/mestests/passer.js",
         "public/js/admin/stats.js",
     ],
     "public/compiled/layout_admin.js": [
         "public/extlib/datatables/jquery.dataTables.js",
         "public/extlib/datatables/DT_bootstrap.js",
+        "public/js/admin/examens.js",
     ],
 };
 
@@ -35,6 +36,7 @@ var css = {
         "public/extlib/twitter-bootstrap/css/bootstrap-theme.css",
         "public/extlib/datatables/DT_bootstrap.css",
         "public/css/custom.css", // doit être après DT_bootstrap.css
+        "public/css/fonts/GillSans/webfont.css",
     ]
 };
 
@@ -76,10 +78,15 @@ Object.keys(css).forEach(function(fname){
     str = stripComments(str);
     var aRpl = [
         ["url(Neuton-Italic-webfont.woff)" ,                                           "url(../css/Neuton-Italic-webfont.woff)"],
+        ["url(GillSans-Regular-webfont.woff)",                                         "url(../css/fonts/GillSans/GillSans-Regular-webfont.woff)"],
+        ["url(GillSans-Light-webfont.woff)",                                           "url(../css/fonts/GillSans/GillSans-Light-webfont.woff)"],
+        ["url(GillSans-Bold-webfont.woff)",                                            "url(../css/fonts/GillSans/GillSans-Bold-webfont.woff)"],
+        ["url(GillSans-BoldItalic-webfont.woff)",                                      "url(../css/fonts/GillSans/GillSans-BoldItalic-webfont.woff)"],
         ["url(../fonts/glyphicons-halflings-regular.eot)",                             "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.eot)"],
         ["url(../fonts/glyphicons-halflings-regular.eot?#iefix)",                      "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix)"],
         ["url(../fonts/glyphicons-halflings-regular.woff)",                            "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.woff)"],
         ["url(../fonts/glyphicons-halflings-regular.ttf)",                             "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.ttf)"],
+        ["url(../fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)", "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)"],
         ["url(../fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)", "url(../extlib/twitter-bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular)"],
         ["url(../img/glyphicons-halflings.png)",                                       "url(../extlib/twitter-bootstrap/img/glyphicons-halflings.png)"],
         ["url(../img/glyphicons-halflings-white.png)",                                 "url(../extlib/twitter-bootstrap/img/glyphicons-halflings-white.png)"],
