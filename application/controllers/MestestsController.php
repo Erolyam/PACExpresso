@@ -101,7 +101,7 @@ class MestestsController extends KleinExtController {
 
     /**
      * Crée un nouveau test dans l'examen précisé, si autorisé
-     * Redirige vers la liste de tests
+     * Redirige vers le questionnaire généré
      */
     public function actionNewtstexam() {
 
@@ -173,7 +173,7 @@ class MestestsController extends KleinExtController {
         }
         $this->_ap->db->commit();
         //$this->_ap->db->rollback();
-        $this->_rs->redirect(getUrlExt("mestst"));
+        $this->_rs->redirect(getUrlExt("onetst", array("id"=>$qaire->id)));
     }
 
 
