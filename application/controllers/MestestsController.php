@@ -145,6 +145,10 @@ class MestestsController extends KleinExtController {
         // Utilise le pool de questionnaires
         $pools = Qairepool::findAll(array("examen_id"=>$examen_id));
         $poolcount = $pools->count();
+        if ($poolcount === 0) {
+            $url = getUrlExt("adexre", array("id"=>$examen_id));
+            throw new Exception("Aucun questionnaire pré-généré. Vous devez aller sur la page $url pour en générer");
+        }
         $rowNumber = rand(0, $poolcount-1);  // une ligne au hasard
         $pool = $pools->index($rowNumber);
         $alineas_ids = $pool->alineas_ids; // "/140/137/132/138/152/143/136/"
