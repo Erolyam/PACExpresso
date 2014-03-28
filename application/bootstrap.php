@@ -111,7 +111,7 @@ respondExt(                "POST /vostests/[i:id]",                             
 
 respondExt("adexas",       "GET /admin/examens",                                "admExamens#showMany");
 respondExt("adexa1",       "GET|POST /admin/examens/[i:id]",                    "admExamens#showOne");
-respondExt("repool",       "GET /admin/examens/[i:id]/repool",                  "admExamens#repool");
+respondExt("adexre",       "GET /admin/examens/[i:id]/repool",                  "admExamens#repool");
 respondExt("adbilh",       "GET /admin/examens/[i:id]/bilan",                   "admin#bilanhome");
 respondExt("adbilg",       "GET /admin/examens/[i:id]/bilan/[details|stats:type].[csv|txt|html:format]?",
                                                                                 "admin#bilango");
