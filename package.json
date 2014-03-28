@@ -1,0 +1,25 @@
+{
+  "name": "PACExpresso",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gilles Bouthenot",
+  "license": "MIT",
+  "dependencies": {
+    "uglify-js": ">=2.2.4",
+    "css-condense": ">=0.0.6",
+    "grunt-cli": "~0.1.9",
+    "grunt": "~0.4.1",
+    "grunt-cssc": "~0.2.6",
+    "grunt-contrib-jshint": "~0.7.1",
+    "grunt-contrib-uglify": "~0.2.5",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-css-url-replace": "~0.1.3"
+  },
+  "repository": {
+      "type": "git",
+      "url": "https://applications.univ-fcomte.fr/rhodecode/pacesqcm"
+  }
+}

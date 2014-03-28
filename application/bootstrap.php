@@ -1,6 +1,11 @@
 <?php
 
 chdir(dirname(__FILE__));
+set_include_path(
+    dirname(__FILE__) . PATH_SEPARATOR .
+    dirname(__FILE__) . DIRECTORY_SEPARATOR . 'extlib' . PATH_SEPARATOR .
+    get_include_path()
+);
 
 require_once "Gb/Log.php";
 require_once "Gb/Model.php";
@@ -28,7 +33,6 @@ Gb_Log::installErrorHandlers();
 // Gb_Log::$file_prepend .= "user:$user ";
 //Gb_Glue::registerPlugin("Gb_Log", array("auth", 'logPlugin'));
 
-//set_include_path(dirname(__FILE__) . PATH_SEPARATOR . get_include_path());
 require_once "lib/kleinExt.php";
 
 

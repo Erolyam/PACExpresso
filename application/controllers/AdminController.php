@@ -202,7 +202,8 @@ class AdminController extends KleinExtController {
         $qaireAlineas = QuestionnaireAlinea::findAll(array("questionalinea_id"=>$id));
         $qaireAlineas->rel("questionnaire"); // eager load
         $qaireAlineas = $qaireAlineas->filter(function($qaireAlinea) {
-            return $qaireAlinea->rel("questionnaire")["score"] !== null;
+            $f = $qaireAlinea->rel("questionnaire");
+            return $f["score"] !== null;
         });
 
         $aAnswers = array();
