@@ -9,15 +9,15 @@ class MestestsPasser
   @Qaire = null
 
   constructor: () ->
-    @Qaire     = window.jsp.qaire
-    @aAlineas  = window.jsp.aAlineas
-    @aContexts = window.jsp.aContexts
+    @Qaire         = window.jsp.qaire
+    @aAlineas      = window.jsp.aAlineas
+    @aContexts     = window.jsp.aContexts
+    @aQaireAlineas = window.jsp.aQaireAlineas
 
-    # initialise submited_data_json
-    if @Qaire.submited_data_json is null
-      submited_data = _.times JSON.parse(@Qaire.questionAlineas_json).length, ()->
-        return 0;
-      @Qaire.submited_data_json = JSON.stringify(submited_data)
+    # initialise les réponses à zéro
+    _.forEach @aQaireAlineas, (qaireAlinea, index) =>
+      qaireAlinea.answer ?= 0
+
 
   ###
     Prépare le questionnaire, installe les handlers
@@ -48,15 +48,23 @@ class MestestsPasser
     target.empty()
 
     # ajoute un <li> pour chaque alinéa
-    _.forEach JSON.parse(@Qaire.questionAlineas_json), (alineaId, index) =>
+    _.forEach @aQaireAlineas, (qaireAlinea) =>
+      qaireAlineaId = qaireAlinea.id
+      index    = parseInt(qaireAlinea.order, 10)
       resultClass = 'result'
-      if (@Qaire.solution_json?)
+      img = ""
+      if qaireAlinea.solution?
         #console.log(@Qaire.solution_json)
-        resultClass = 'result-wrong'
-        etu_ans = JSON.parse(@Qaire.submited_data_json)[index]
-        solutio = JSON.parse(@Qaire.solution_json)[index]
-        resultClass = 'result-right' if etu_ans is solutio
-      html = "<li class='#{resultClass}' data-alineaid='#{alineaId}' data-num='#{index}'>#{index+1}</li>"
+        #img = "<img src='public/img/red_64.png' />"
+        etu_ans = parseInt(qaireAlinea.answer, 10)
+        solutio = parseInt(qaireAlinea.solution,10)
+        if etu_ans is solutio
+          resultClass = 'result-right'
+          img = "<img src='public/img/green_64black.png' />"
+        else
+          resultClass = 'result-wrong'
+          img = "<img src='public/img/red_64black.png' />"
+      html = "<li class='#{resultClass}' data-qairealineaid='#{qaireAlineaId}' data-num='#{index}'>#{index+1}#{img}</li>"
       target.append $(html)
 
     # un dernier <li> pour récapitulatif
@@ -74,7 +82,8 @@ class MestestsPasser
     @handleUserAnswer()
 
     li = $(e.currentTarget)
-    alineaId = li.data('alineaid')
+    qaireAlineaId = li.data('qairealineaid') # un nombre, ou '#''
+
     target  = $('.passer .qbodyctn')
     target.empty()
 
@@ -87,16 +96,17 @@ class MestestsPasser
     $(".passer .navbuttons button.actionprev").addClass("disabled") if (li.prev().length is 0)
     $(".passer .navbuttons button.actionnext").addClass("disabled") if (li.next().length is 0)
 
-    if (alineaId?)
+    if (qaireAlineaId?)
       # clic sur un alinéa
-      alinea  = @aAlineas[alineaId]
-      context = @aContexts[alinea.question_id]
+      qaireAlinea = @aQaireAlineas[qaireAlineaId]
+      alinea  = @aAlineas[qaireAlinea.questionalinea_id]
+      context = @aContexts[alinea.questioncontext_id]
       num     = li.data("num") # numéro (de 0 à 6)
       #console.log context, alinea
 
       # contexte : titre et éventuel body
       tpl = _.template $('#tplqContext').html().trim()
-      html = tpl({title:context.title, body:context.context})
+      html = tpl({title:context.title, body:context.body})
       target.append(html)
 
       # contexte : titre et éventuel body
@@ -107,16 +117,17 @@ class MestestsPasser
       # ajoute les différentes réponses
       targetAnswers = target.find(".alineaanswers")
       tpl = _.template $('#tplqAlineaAnswer').html().trim()
-      total = JSON.parse(@Qaire.submited_data_json)[num]
-      solution = @Qaire.solution_json
-      if (solution isnt null)
-        solution = JSON.parse(solution)[num]
+      total = parseInt(qaireAlinea.answer, 10)  # la réponse de l'étudiant
+      solution = qaireAlinea.solution           # la solution cachée (si indiquée)
+      # on utilise la solution fournie. Si on veut la solution réelle: solution = alinea.solution
+      if solution?
+        solution = parseInt(solution, 10)
       curWeight = 1
-      _.forEach JSON.parse(alinea.answers), (answer, index) ->
+      _.forEach JSON.parse(alinea.answers_json), (answer, index) ->
         checked    = ""
         checked    = "checked" if (total & curWeight)
         checkedSol = ""
-        if solution isnt null
+        if solution?
           checkedSol = "checked" if (solution & curWeight)
         curWeight <<= 1
         html = tpl({body:answer, letter:String.fromCharCode(65+index), checked:checked, solution:solution, checkedSol:checkedSol})
@@ -158,42 +169,41 @@ class MestestsPasser
   ###
   handleUserAnswer: () =>
     res = @retrieveUserAnswer();
-    return if (res is null)
-
-    newsub = JSON.parse(@Qaire.submited_data_json)
-    newsub[res.num] = res.val
-    newsub = JSON.stringify(newsub)
-
-    if _.isEqual(newsub, @Qaire.submited_data_json)
-      # pas de différence: retour
+    if res is null
+      # aucune page sélectionnée. (c'est le cas avant renderLis)
       return
 
-    # enregistre nouvelle version
-    @Qaire.submited_data_json = newsub
+    qaireAlineaId = res.qaireAlineaId
+    qaireAlinea = @aQaireAlineas[qaireAlineaId]
+
+    before = parseInt(qaireAlinea.answer, 10)
+    after  = res.val
+
+    # pas de différence: retour
+    return if before == after
 
     # enregistre les réponses sur le serveur
     url = window.jsp.aUrls.thistst
     $.ajax({
       url:url
       method:'POST'
-      data:{_method:'PUT', values:newsub}
+      data:{_method:'PUT', qaireAlineaId:qaireAlineaId, answer:after}
     }).fail (jqXHR, textStatus, errorThrown) =>
       alert "Erreur lors de l'enregistrement"
-
+    .done (data, textStatus, jqXHR) =>
+      # save the result once the request is done
+      qaireAlinea.answer = after
 
 
   ###
   ###
   handlerSubmitQuestionnaire: () =>
-    # récupère les réponses de l'atudiant
-    newsub = @Qaire.submited_data_json
-
     # envoi au serveur
     url = window.jsp.aUrls.thistst
     $.ajax({
       url:url
       method:'POST'
-      data:{_method:'POST', values:newsub}
+      data:{_method:'POST', submit:'true'}
     })
       .fail (jqXHR, textStatus, errorThrown) =>
         alert "Erreur lors de l'enregistrement"
@@ -201,7 +211,10 @@ class MestestsPasser
         if jqXHR.status isnt 200 or !(jqXHR.getResponseHeader('content-type').substr(0, 16) is "application/json")
           alert "Le serveur n'a pas pu enregistrer le questionnaire"
           return
-        @Qaire = JSON.parse(jqXHR.responseText)
+        ret = JSON.parse(jqXHR.responseText)
+        @Qaire = ret.qaire
+        @aQaireAlineas = ret.aQaireAlineas
+
         @solutionsReceived()
 
   ###
@@ -220,12 +233,13 @@ class MestestsPasser
 
   ###
     Renvoie le résultat coché, en un nombre bitwise
-    @returns null ou {num:, val:}
+    @returns null ou {num:, val:, qaireAlineasId}
   ###
   retrieveUserAnswer: () =>
     li = $(".passer .qtabctn li.selected")
     curIndex = li.data("num")
-    return null if (!curIndex?) # le li selected n'a pas de data-alineaid
+    qaireAlineaId = li.data("qairealineaid")
+    return null if (!qaireAlineaId?) # aucun le li selected ou page en cours: récapitulatif
 
     # curIndex : numéro (entre 0 et 6)
     aChks = $(".passer .alineaanswers").find(".letter input.etu[type=checkbox]")
@@ -234,4 +248,4 @@ class MestestsPasser
     _.each aChks, (elem) ->
       total += curWeight if $(elem).prop("checked")
       curWeight <<= 1
-    return {num:curIndex, val:total}
+    return {num:curIndex, val:total, qaireAlineaId: qaireAlineaId}

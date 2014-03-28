@@ -1,4 +1,6 @@
-<?php if(0){$content="";} ?>
+<?php
+    if(0){$content="";}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,7 +25,7 @@
 <?php endif; ?>
 
     <!--  jQuery -->
-    <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/jquery/jquery-1.9.1.js"></script><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><script type="text/javascript" src="public/extlib/jquery1/jquery.js"></script><?php endif; ?>
 
     <!--  Bootstrap -->
     <?php if(!$GLOBALS["_min"]):?><link href="public/extlib/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" media="screen"><?php endif; ?>
@@ -31,45 +33,53 @@
     <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/twitter-bootstrap/js/bootstrap.js"></script><?php endif; ?>
 
     <!--  Backbone -->
-    <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/lodash/lodash.js"></script><?php endif; ?>
-<?php if (FALSE): ?>
-    <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/backbone.js/backbone.js"></script><?php endif; ?>
-<?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><script src="public/extlib/lodash-compat/lodash.js"></script><?php endif; ?>
 
     <!--  Our js / css -->
+    <?php if(!$GLOBALS["_min"]):?><script src="public/js/gb.js"></script><?php endif; ?>
     <?php if(!$GLOBALS["_min"]):?><script src="public/js/mestests/passer.js"></script><?php endif; ?>
     <?php if(!$GLOBALS["_min"]):?><script src="public/js/admin/stats.js"></script><?php endif; ?>
 <?php if (FALSE): ?>
     <?php if(!$GLOBALS["_min"]):?><link type="text/css" href="public/css/default.css" rel="stylesheet" /><?php endif; ?>
 <?php endif; ?>
     <?php if(!$GLOBALS["_min"]):?><link type="text/css" href="public/css/custom.css" rel="stylesheet" /><?php endif; ?>
+    <?php if(!$GLOBALS["_min"]):?><link href="public/css/fonts/GillSans/webfont.css" rel="stylesheet"><?php endif; ?>
 
     <?php if( $GLOBALS["_min"]):?><script type="text/javascript" src="public/compiled/layout_all.js"></script><?php endif; ?>
     <?php if( $GLOBALS["_min"]):?><link type="text/css" href="public/compiled/layout_all.css" rel="stylesheet" /><?php endif; ?>
 
     <meta name="robots" content="noindex, nofollow">
-    <title>Evaluations Pharma</title>
+    <title><?= $this->tr("title") ?></title>
 </head>
 <body class="<?php echo $this->layout->bodyclass ?>">
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#togglenavigation">
+            <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="<?= $this->layout->urlHome ?>">Paces-QCM</a>
+          <a class="navbar-brand" href="<?= $this->layout->urlHome ?>"><?= $this->tr("title_short") ?></a>
         </div><!--/.navbar-header -->
-        <div class="navbar-collapse collapse">
+
+        <!-- toggle navigation -->
+        <div class="collapse navbar-collapse" id="togglenavigation">
           <ul class="nav navbar-nav">
             <? $active = ""; if ($this->layout->current==="home") {$active = "active"; } ?>
             <li class="<?= $active ?>"><a href="<?= $this->layout->urlHome ?>">Accueil</a></li>
-            <? if (isset($this->auth['login'])) :?>
+            <? if (AuthController::isLogged()) :?>
               <? $active = ""; if ($this->layout->current==="mestst") {$active = "active"; } ?>
               <li class="<?= $active ?>"><a href="<?= $this->layout->urlQuests?>">Vos tests</a></li>
             <? endif; ?>
+            <? if ((int) AuthController::getProfile("is_author", 0) === 1) :?>
+              <? $active = ""; if ($this->layout->current==="examens") {$active = "active"; } ?>
+              <li class="<?= $active ?>"><a href="<?= $this->layout->urlExamens?>">Examens</a></li>
+            <? endif; ?>
+
             <!--
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
@@ -86,38 +96,56 @@
             -->
           </ul>
 
-          <div class="navbar-right">
-            <? if (isset($this->auth['login'])) :?>
-              <span class="navbar-text">
-                Connecté en tant que : <?= $this->auth['login'] ?>
-              </span>
-              <a href="<?= $this->auth['logoutUrl'] ?>" class='btn btn-default navbar-btn'>Déconnexion</a>
+          <ul class="nav navbar-nav navbar-right">
+            <? if (AuthController::isLogged()) :?>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding-top:0; padding-bottom:0; line-height:50px;">
+                  <img class="gravatar" src="https://secure.gravatar.com/avatar/<?= md5(strtolower(AuthController::getUser("email"))) ?>?d=monsterid&s=48" title="Gravatar de <?= ucfirst(strtolower(AuthController::getUser("email"))) ?>" />
+                </a>
+                <ul class="dropdown-menu">
+                  <li class="navbar-text nobr"><?= ucwords(strtolower(AuthController::get('displayname'))) ?></li>
+                  <li class="navbar-text nobr">
+                    <a class="simple" href="http://www.gravatar.com/">Gérer votre Gravatar</a><br />
+                    <small><?= strtolower(AuthController::getUser("email")) ?></small>
+                  </li>
+                  <li class="divider"></li>
+                  <li class="navbar-text">
+                    <a href="<?= AuthController::get('logoutUrl') ?>" class="btn btn-default navbar-btn">
+                      Déconnexion
+                    </a>
+                  </li>
+                </ul>
+              </li>
             <? else: ?>
-              <span class="navbar-text">
+              <li class="navbar-text">
                 Vous n'êtes pas connecté
-              </span>
-              <a href="<?= $this->auth['loginUrl'] ?>" class='btn btn-default navbar-btn'>Connexion</a>
+              </li>
+              <li style="margin-right:15px;">
+                <form>
+                  <a href="<?= AuthController::get('loginUrl') ?>" class="btn btn-primary navbar-btn">
+                    Connexion
+                  </a>
+                </form>
+              </li>
             <? endif; ?>
-          </div>
+          </ul>
 
         </div><!--/.navbar-collapse -->
-      </div><!--/.container -->
-    </div><!--/.navbar -->
+      </div><!--/.container-fluid -->
+    </nav>
 
     <?php echo $this->yield(); ?>
 
     <?php if ("devel"===$GLOBALS["_ENV"]): ?>
       <footer style="white-space:pre; font-family:monospace;"><?= Gb_Response::get_footer(); ?></footer>
     <?php else: ?>
-      <footer class="container">
-        <div class="row">
-          <div class="pull-left">
-            En cas de problème, envoyez un mail à<br />
-            <span class='tt'>gilles.bouthenot@univ-fcomte.fr</span>
-          </div>
-          <div class="pull-right">
-            <a href="public/credits.txt">Credits</a>
-          </div>
+      <footer class="">
+        <div class="pull-left">
+          En cas de problème, envoyez un mail à<br />
+          <span class='tt'>gilles.bouthenot@univ-fcomte.fr</span>
+        </div>
+        <div class="pull-right">
+          <a href="public/credits.txt">Credits</a>
         </div>
       </footer>
     <?php endif; ?>

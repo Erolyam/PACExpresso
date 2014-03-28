@@ -1,9 +1,21 @@
 Conception et programmation : Gilles Bouthenot, université de Franche-Comté
 
 Partie client:
-jQuery 1.9.1 : http://jquery.org/
-Lo-Dash 1.1.1 : http://lodash.com/
-twitter-bootstrap 3.0.0 : https://github.com/twbs/bootstrap/releases/download/v3.0.0/bootstrap-3.0.0-dist.zip
+datatables 1.9.4            : http://datatables.net/                            -- http://datatables.net/releases/DataTables-1.9.4.zip
+es5-shim 2.3.0              : https://github.com/kriskowal/es5-shim             -- https://github.com/es-shims/es5-shim/archive/v2.3.0.tar.gz
+es6-shim 0.8.0              : https://github.com/paulmillr/es6-shim             -- https://github.com/paulmillr/es6-shim/archive/0.8.0.tar.gz
+html5shiv (IE8) 3.7.0       : https://github.com/aFarkas/html5shiv              -- https://raw2.github.com/aFarkas/html5shiv/3.7.0/src/html5shiv.js
+html5sortable 2012-08-03    : http://farhadi.ir/projects/html5sortable/         -- https://github.com/farhadi/html5sortable/raw/b90b6baac95cdc0df1ec1682b7181ff94b1f7820/jquery.sortable.js
+javaScript-Templates 2.5.3  : https://github.com/blueimp/JavaScript-Templates   -- https://github.com/blueimp/JavaScript-Templates/raw/2.5.3/js/tmpl.js
+jQuery 1.11.0               : http://jquery.com/download/                       -- http://code.jquery.com/jquery-1.11.0.js
+JSON-js (IE7) 2013-05-26    : https://github.com/douglascrockford/JSON-js/      -- https://github.com/douglascrockford/JSON-js/raw/e39db4b7e6249f04a195e7dd0840e610cc9e941e/json2.js
+jsviews: commit 51          : http://www.jsviews.com/                           -- http://www.jsviews.com/download/jsviews.js
+Lo-Dash compat 2.4.1        : http://lodash.com/                                -- https://raw.github.com/lodash/lodash/2.4.1/dist/lodash.compat.js
+Respond (IE8) 1.4.2         : https://github.com/scottjehl/Respond/             -- https://raw2.github.com/scottjehl/Respond/1.4.2/dest/respond.src.js
+twitter-bootstrap 3.1.0     : http://getbootstrap.com/                          -- https://github.com/twbs/bootstrap/releases/download/v3.1.0/bootstrap-3.1.0-dist.zip
+
+
+
 
 Partie serveur:
 Php 5.3 : http://www.php.net/

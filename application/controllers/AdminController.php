@@ -1,10 +1,5 @@
 <?php
 
-require "models/Question.php";
-require "models/Questionnaire.php";
-require "models/QuestionAlinea.php";
-require "models/Author.php";
-
 class AdminController extends KleinExtController {
 
     public function initialize() {
@@ -66,99 +61,116 @@ class AdminController extends KleinExtController {
     }
 
     public function before($action) {
-        $login = (isset($this->_ap->auth['login'])) ? ($this->_ap->auth['login']) : ("");
-        if ($login !== "ecavalli" && $login !== "gbouthen") {
-            // n'a pas accès
+        if ((int) AuthController::getProfile("is_author", 0) !== 1) {
+            Gb_Log::logNotice("Ungranted access to " . __CLASS__);
             $this->_rs->redirect(getUrlExt("home"));
         }
 
+        $this->_rs->layout->current = "examens";
         return true;
     }
 
     public function actionBilanhome() {
         $rs = $this->_rs;
-        Gb_Log::logInfo("admin#bilanhome");
+        $examenId = $this->_rq->param("id");
+        Gb_Log::logInfo("admin#bilanhome examen=$examenId ");
 
+        $rs->examenId = $examenId;
         $rs->render("views/admin/bilan/home.phtml");
     }
 
     public function actionBilango() {
         $type   = $this->_rq->param("type");
         $format = $this->_rq->param("format", "html");
+        $examenId = $this->_rq->param("id");
+
         if ("txt" === $format) {
           $format = "text";
         }
-        Gb_Log::logInfo("admin#bilango type=$type format=$format");
-        $rs = $this->_rs;
+        Gb_Log::logInfo("admin#bilango examen=$examenId type=$type format=$format");
 
-        $aQaires = Questionnaire::getAll($this->_ap->db);
+        // Cherche toutes les questions puis tous les alinéas de l'examen
+        $examen = Examen::getOne($examenId);
+        $questions = $examen->questions_all();                      // toutes les questions de l'examen
+        $examenAlineas = $questions->rel("alineas");                // les alineas de ces questions
+        //$qaireAlineas = $alineas->rel("questionnairealineas");      // les questionnaireAlineas où ces alinéas apparaissent
 
-        $aLignes = array();
+        // Cherche tous les questionnaires qui ont été submitted
+        $qaires = Questionnaire::findAll($this->_ap->db, array("score"=>new Zend_Db_Expr("IS NOT NULL"), "examen_id"=>$examenId));
+        $qairesAlineas = $qaires->rel("alineas");
+
+        // eager load
+        //$aQaires->rel("etudiant");
+        //$aQaireAlineas->rel("questionalinea")->rel("question");
+
+        // initialisation
         $aStats  = array();
-        foreach ($aQaires as $Qaire) {
-            $etudiant_id    = $Qaire->etudiant_id;
-            $pourcent          = $Qaire->score;
-            if ($pourcent === NULL) {
-              // non terminé
-              continue;
+        foreach ($examenAlineas as $alinea) {
+            $question = $alinea->rel("question");
+            $aStats[$alinea->id] = array(
+                "title"        => $question->title. " - " . $alinea->chem_num,
+                "nbJuste"      => 0,
+                "nbFaux"       => 0,
+              );
+        }
+
+//        $aLignes = array();
+        foreach ($qairesAlineas as $qaireAlinea) {
+            $alinea_id = $qaireAlinea->questionalinea_id;
+/*
+            $qaire = $qaireAlinea->rel("questionnaire");
+            $user = $qaire->rel("etudiant");
+            $login = $user->login;
+            $submited_at    = $qaire->submited_at;
+
+            $Alinea = $qaireAlinea->rel("questionalinea");
+            $Question = $Alinea->rel("question");
+            $chem_num = $Alinea->chem_num;
+            $title = $Question->title;
+*/
+            if (!isset($aStats[$alinea_id])) {
+                // il est possible qu'un questionnaire ait fait référence à une question qui ne fait plus partie de l'examen
+                continue;
             }
-            $Author         = Author::getOne($etudiant_id);
-            $login          = $Author->login;
-            $Aalineas       = JSON_decode($Qaire->questionAlineas_json);
-            $aSubmited_data = JSON_decode($Qaire->submited_data_json);
-            $aSolutions     = JSON_decode($Qaire->solution_json);
-            $submited_at    = $Qaire->submited_at;
-            foreach ($Aalineas as $index=>$alinea_id) {
-                $Alinea      = QuestionAlinea::getOne($alinea_id);
-                $question_id = $Alinea->question_id;
-                $chemNum     = $Alinea->chemNum;
-                $Question    = Question::getOne($question_id);
-                $title       = $Question->title;
-                $submited    = $aSubmited_data[$index];
-                $solution    = $aSolutions[$index];
 
-                if (!isset($aStats[$alinea_id])) {
-                    $aStats[$alinea_id] = array(
-                        "title"        => $title. " - " . $chemNum,
-                        "nbJuste"      => 0,
-                        "nbFaux"       => 0,
-                  );
-                }
-                if ($submited === $solution) {
-                    $status = "JUSTE";
-                    $aStats[$alinea_id]["nbJuste"]++;
-                } else {
-                    $status = "FAUX";
-                    $aStats[$alinea_id]["nbFaux"]++;
-                }
+            $submited = $qaireAlinea->answer;
+            $solution = $qaireAlinea->solution;
 
-                $aLigne = array(
-                    "etudiant"     => $login,
-                    "submited_at"  => $submited_at,
-                    "title"        => $title . " - " . $chemNum,
-                    "status"       => $status,
-//                    "submited"     => $submited,
-//                    "solution"     => $solution,
-                );
-
-              //print_r($aLigne);
-              $aLignes[] = $aLigne;
-
+            if ($submited === $solution) {
+                $status = "JUSTE";
+                $aStats[$alinea_id]["nbJuste"]++;
+            } else {
+                $status = "FAUX";
+                $aStats[$alinea_id]["nbFaux"]++;
             }
+/*
+            $aLigne = array(
+                "etudiant"     => $login,
+                "submited_at"  => $submited_at,
+                "title"        => $title . " - " . $chem_num,
+                "status"       => $status,
+            );
+
+          $aLignes[] = $aLigne;
+*/
         }
 
         if ("details" === $type) {
-            $aOut = $aLignes;
+            // $aOut = $aLignes;
         } elseif ("stats" === $type) {
             foreach ($aStats as $index=>$stat) {
                 $juste    = $stat["nbJuste"];
                 $faux     = $stat["nbFaux"];
-                $pourcent = round($juste * 100 / ($juste + $faux));
+                $pourcent = 0;
+                if ($juste + $faux !== 0) {
+                    $pourcent = round($juste * 100 / ($juste + $faux));
+                }
                 $aStats[$index]["pourcent"] = $pourcent;
             }
             $aOut = $aStats;
         }
 
+        $rs = $this->_rs;
         if ("csv" === $format) {
             Gb_Util::sendString(Gb_String::arrayToCsv($aOut), $type . ".csv");
         } else {
@@ -179,34 +191,31 @@ class AdminController extends KleinExtController {
         $id = $this->_rq->param("id");
         Gb_Log::logInfo("admin#alineashow id=$id");
         $rs = $this->_rs;
-        $Alinea      = QuestionAlinea::getOne($id);
-        $question_id = $Alinea["question_id"];
-        $Question    = Question::getOne($question_id);
+        $QuestionAlinea  = QuestionAlinea::getOne($id);
+        $QuestionContext = $QuestionAlinea->rel("question");
 
         // totaux des cases cochées:
 
         // recherche l'alinéa demandé dans tous les questionnaires validés
         // remplit $aSubmitted avec les reponses données
-        $qaires = Questionnaire::findAll("score is not null");
-        $aSubmitted = array();
 
-        foreach ($qaires as $qaire) {
-            $alineas = json_decode($qaire->questionAlineas_json);
-            $index = array_search($id, $alineas);
-            if ($index !== false) {
-                //echo $index . " dans " . json_encode($alineas) . " " . $qaire->score . " " . $qaire->submited_data_json . " submitted:" . json_decode($qaire->submited_data_json)[$index] . "\n";
-                // 2 dans [34,30,28,31,22,18,17] 3/7 [7,2,4,4,2,3,4] submitted:4
-                $submitted = json_decode($qaire->submited_data_json);
-                $submitted = $submitted[$index];
-                $aSubmitted[] = $submitted;
-            }
+        $qaireAlineas = QuestionnaireAlinea::findAll(array("questionalinea_id"=>$id));
+        $qaireAlineas->rel("questionnaire"); // eager load
+        $qaireAlineas = $qaireAlineas->filter(function($qaireAlinea) {
+            return $qaireAlinea->rel("questionnaire")["score"] !== null;
+        });
+
+        $aAnswers = array();
+        foreach ($qaireAlineas as $qaireAlinea) {
+            $answer = (int) $qaireAlinea->answer;
+            $aAnswers[] = $answer;
         }
         //print_r($aSubmitted);
 
-        // construit un tableau avec le nombre de fois où la réponse a été cochée par l'étudiant:
+        // construit un tableau avec le nombre de fois où la réponse a été cochée par les étudiants:
         // $aChecked[0] = 4  -> la réponse A a été cochée 4 fois
         $aChecked = array();
-        foreach ($aSubmitted as $answer) {
+        foreach ($aAnswers as $answer) {
             $index = 0; // commence par réponse A
             while ($answer>0) {
                 if (($answer & 1) === 1) {
@@ -220,14 +229,13 @@ class AdminController extends KleinExtController {
         //print_r($aChecked);
 
         $obj = new stdClass();
-        $obj->title    = $Question["title"];
-        $obj->context  = $Question["context"];
-        $obj->body     = $Alinea["body"];
-        $obj->answers  = JSON_decode($Alinea["answers"]);
-        $obj->solution = JSON_decode($Alinea["solutions"]);
-        $obj->solution = $obj->solution[0];
-        $obj->chemNum  = $Alinea["chemNum"];
-        $obj->count    = count($aSubmitted);
+        $obj->title    = $QuestionContext["title"];
+        $obj->context  = $QuestionContext["body"];
+        $obj->body     = $QuestionAlinea["body"];
+        $obj->answers  = JSON_decode($QuestionAlinea["answers_json"]);
+        $obj->solution = $QuestionAlinea["solution"];
+        $obj->chem_num = $QuestionAlinea["chem_num"];
+        $obj->count    = count($aAnswers);
         $obj->aChecked = $aChecked;
         $obj->type     = $this->_rq->param("type");
         $rs->o = $obj;

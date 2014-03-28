@@ -1,0 +1,15 @@
+<?php
+$flashes = $this->flashes();
+?>
+
+<? if (count($flashes)): ?>
+  <div class="flash">
+    <? foreach ($flashes as $type=>$messages): ?>
+      <ul class="flashtype <?= $type ?>">
+        <? foreach ($messages as $message): ?>
+          <li><?= $this->h($message); ?></li>
+        <? endforeach; ?>
+      </ul>
+    <? endforeach; ?>
+  </div>
+<? endif; ?>

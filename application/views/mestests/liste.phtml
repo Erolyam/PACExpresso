@@ -1,22 +1,70 @@
-<div class='container'>
+<div class=''>
 
 <?php /* ?>
-<?= Gb_String::formatTable($this->jsp->aQaires, "html") ?>
+<?= Gb_String::formatTable($this->aQaires, "html") ?>
 <?php */ ?>
 
+
+<h2>Examens disponibles</h2>
+<div class="container row examens-tiles">
+  <? $num = 1; ?>
+  <? foreach ($this->aExamens as $examen): ?>
+    <? $examStatus = $examen->statusForStudent($this->etuId); ?>
+    <div class="col-sm-4 tile height-3 examen-tile">
+      <h3 class="title"><?= $examen['title'] ?></h3>
+      <div class="comment"><?= $examen['comment'] ?></div>
+      <? if ($examen['date_start'] || $examen['date_end']): ?>
+        <div class="dates">
+          <? if     ($examen['date_start'] && $examen['date_end']): ?>
+            Du <span class="nobr"><?= substr(Gb_String::date_fr($examen['date_start']), 0, 16) ?></span> au <span class="nobr"><?= substr(Gb_String::date_fr($examen['date_end']), 0, 16); ?></span>
+          <? elseif ($examen['date_start']): ?>
+            À partir du: <span class="nobr"><?= substr(Gb_String::date_fr($examen['date_start']), 0, 16); ?></span>
+          <? elseif ($examen['date_end']): ?>
+            Jusqu'au: <span class="nobr"><?= substr(Gb_String::date_fr($examen['date_end']), 0, 16); ?></span>
+          <? endif; ?>
+        </div>
+      <? endif; ?>
+      <div class="buttons">
+        <? if ($examStatus->canCreate): ?>
+            <? $url    = str_replace("[:id]", $examen["id"], $this->aUrls['newtstexam']); ?>
+            <a href="<?= $url ?>" class="btn btn-primary">Commencer</a>
+        <? elseif ($examStatus->canResume): ?>
+            <? $url    = str_replace("[:id]", $examStatus->lastId, $this->aUrls['onetst']); ?>
+            <a href="<?= $url ?>" class="btn btn-primary">Continuer</a>
+        <? endif; ?>
+      </div>
+    </div>
+
+    <? $num++; ?>
+  <? endforeach; ?>
+</div>
+
+
+  <br />
+
+  <form>
+    L'examen que vous cherchez n'est pas listé ?
+    <input type="text" placeholder="Entrez son nom" />
+    <input type="submit" class="btn btn-primary" />
+  </form>
+
+
+  <h2>Tests que vous avez commencés</h2>
   <table class="mestests">
     <tr>
       <th>Numéro</th>
+      <th>Examen</th>
       <th>Date de début</th>
       <th>Score</th>
       <th></th>
     </tr>
     <? $num = 1; ?>
-    <? foreach ($this->jsp->aQaires as $qaire): ?>
-      <? $url = str_replace("[:id]", $qaire["id"], $this->jsp->aUrls['onetst']); ?>
+    <? foreach ($this->aQaires as $qaire): ?>
+      <? $url = str_replace("[:id]", $qaire["id"], $this->aUrls['onetst']); ?>
       <tr>
         <td><?= $num ?></td>
-        <td><?= $qaire['created_at'] ?></td>
+        <td><?= $qaire->rel("examen")->title ?></td>
+        <td><? if ($qaire['created_at']) { echo substr(Gb_String::date_fr($qaire['created_at']), 0, 19); } ?></td>
         <td><?= $qaire['score'] ?></td>
         <td>
           <? if (null === $qaire['score']): ?>
@@ -29,10 +77,6 @@
       <? $num++; ?>
     <? endforeach; ?>
   </table>
-
-  <? if ($this->jsp->canCreate): ?>
-    <a href="<?= $this->jsp->aUrls['newtst'] ?>">Nouveau test</a>
-  <? endif; ?>
 
 </div><!-- .container -->
 

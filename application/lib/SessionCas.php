@@ -27,11 +27,12 @@ echo "<a href='$url'>s'authentifier</a>";
 
 /**
  * @author gbouthenot
- * @version 1.2+ (dév)
- * changes:
+ * @version 1.4
+ * changes: 1.3 -> 1.4
+ *   * 2013-09-28: bypassLogin() replaces casUser if already set
+ * changes: 1.2 -> 1.3
  *   * handle $_SERVER["X_SSL"]: make Client->isHttps handle proxyfied ssl
  *   * example update
- *   * 2013-09-28: bypassLogin() replaces casUser if already set
  */
 class SessionCas {
     protected static $_instance = null;     // singleton

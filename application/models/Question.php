@@ -1,23 +1,27 @@
 <?php
 class Question extends \Gb\Model\Model {
 
-    static $_tablename = "questions";
+    static $_tablename = "questioncontexts";
     static $_pk        = "id";
 
     static $rels = array(
         'author'        =>array('reltype'=>'belongs_to',      'class_name'=>'Author',         'foreign_key'=>'author_id'),
+        'theme'         =>array('reltype'=>'belongs_to',      'class_name'=>'Theme',          'foreign_key'=>'theme_id'),
+        'alineas'       =>array('reltype'=>'has_many',        'class_name'=>'QuestionAlinea', 'foreign_key'=>'questioncontext_id'),
     );
 
     static $_buffer = array();
+    static $_isFullyLoaded = false;
 
-    public static function getNbAlineasPerQuestion() {
-        // construit un array(question_id=>question_alineas.length)
+    public static function getNbAlineasPerQuestion($theme_id=0) {
+        echo "DEPRECATED !!";
+        // construit un array(questioncontext_id=>question_alineas.length)
         $aNbAlineasPerQuestion = array();
-        $questions = self::findAll(array("isValidated"=>1, "isActive"=>1));
+        $questions = self::findAll(array("is_validated"=>1, "is_active"=>1, "theme_id"=>$theme_id));
         foreach ($questions as $question) {
             $id    = $question->id;
     //        $title = $question->title;
-            $question_alineas = QuestionAlinea::findAll(array("question_id"=>$id));
+            $question_alineas = QuestionAlinea::findAll(array("questioncontext_id"=>$id));
             $count = count($question_alineas);
     //        echo "$id $title: $count<br />";
             if ($count) {
@@ -27,6 +31,11 @@ class Question extends \Gb\Model\Model {
         }
 
         return $aNbAlineasPerQuestion;
+    }
+
+    public function nbAlineas() {
+        $nb = $this->rel("alineas")->count();
+        return $nb;
     }
 
 }

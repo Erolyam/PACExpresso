@@ -1,6 +1,8 @@
 // Copyright 2009-2012 by contributors, MIT License
 // vim: ts=4 sts=4 sw=4 expandtab
 
+//Add semicolon to prevent IIFE from being passed as argument to concated code.
+;
 // Module systems magic dance
 (function (definition) {
     // RequireJS
@@ -27,16 +29,16 @@ var lookupGetter;
 var lookupSetter;
 var supportsAccessors;
 if ((supportsAccessors = owns(prototypeOfObject, "__defineGetter__"))) {
-  defineGetter = call.bind(prototypeOfObject.__defineGetter__);
-  defineSetter = call.bind(prototypeOfObject.__defineSetter__);
-  lookupGetter = call.bind(prototypeOfObject.__lookupGetter__);
-  lookupSetter = call.bind(prototypeOfObject.__lookupSetter__);
+    defineGetter = call.bind(prototypeOfObject.__defineGetter__);
+    defineSetter = call.bind(prototypeOfObject.__defineSetter__);
+    lookupGetter = call.bind(prototypeOfObject.__lookupGetter__);
+    lookupSetter = call.bind(prototypeOfObject.__lookupSetter__);
 }
 
 // ES5 15.2.3.2
 // http://es5.github.com/#x15.2.3.2
 if (!Object.getPrototypeOf) {
-    // https://github.com/kriskowal/es5-shim/issues#issue/2
+    // https://github.com/es-shims/es5-shim/issues#issue/2
     // http://ejohn.org/blog/objectgetprototypeof/
     // recommended by fschaefer on github
     Object.getPrototypeOf = function getPrototypeOf(object) {
@@ -48,15 +50,53 @@ if (!Object.getPrototypeOf) {
     };
 }
 
-// ES5 15.2.3.3
-// http://es5.github.com/#x15.2.3.3
-if (!Object.getOwnPropertyDescriptor) {
+//ES5 15.2.3.3
+//http://es5.github.com/#x15.2.3.3
+
+function doesGetOwnPropertyDescriptorWork(object) {
+    try {
+        object.sentinel = 0;
+        return Object.getOwnPropertyDescriptor(
+                object,
+                "sentinel"
+        ).value === 0;
+    } catch (exception) {
+        // returns falsy
+    }
+}
+
+//check whether getOwnPropertyDescriptor works if it's given. Otherwise,
+//shim partially.
+if (Object.defineProperty) {
+    var getOwnPropertyDescriptorWorksOnObject = 
+        doesGetOwnPropertyDescriptorWork({});
+    var getOwnPropertyDescriptorWorksOnDom = typeof document == "undefined" ||
+    doesGetOwnPropertyDescriptorWork(document.createElement("div"));
+    if (!getOwnPropertyDescriptorWorksOnDom || 
+            !getOwnPropertyDescriptorWorksOnObject
+    ) {
+        var getOwnPropertyDescriptorFallback = Object.getOwnPropertyDescriptor;
+    }
+}
+
+if (!Object.getOwnPropertyDescriptor || getOwnPropertyDescriptorFallback) {
     var ERR_NON_OBJECT = "Object.getOwnPropertyDescriptor called on a non-object: ";
 
     Object.getOwnPropertyDescriptor = function getOwnPropertyDescriptor(object, property) {
         if ((typeof object != "object" && typeof object != "function") || object === null) {
             throw new TypeError(ERR_NON_OBJECT + object);
         }
+
+        // make a valiant attempt to use the real getOwnPropertyDescriptor
+        // for I8's DOM elements.
+        if (getOwnPropertyDescriptorFallback) {
+            try {
+                return getOwnPropertyDescriptorFallback.call(Object, object, property);
+            } catch (exception) {
+                // try the shim if the real one doesn't work
+            }
+        }
+
         // If object does not owns property return undefined immediately.
         if (!owns(object, property)) {
             return;
@@ -99,6 +139,7 @@ if (!Object.getOwnPropertyDescriptor) {
         // If we got this far we know that object has an own property that is
         // not an accessor so we set it as a value and return descriptor.
         descriptor.value = object[property];
+        descriptor.writable = true;
         return descriptor;
     };
 }
@@ -128,7 +169,7 @@ if (!Object.create) {
         // aside from Object.prototype itself. Instead, create a new global
         // object and *steal* its Object.prototype and strip it bare. This is
         // used as the prototype to create nullary objects.
-        createEmpty = (function () {
+        createEmpty = function () {
             var iframe = document.createElement('iframe');
             var parent = document.body || document.documentElement;
             iframe.style.display = 'none';
@@ -148,11 +189,12 @@ if (!Object.create) {
 
             function Empty() {}
             Empty.prototype = empty;
-
-            return function () {
+            // short-circuit future calls
+            createEmpty = function () {
                 return new Empty();
             };
-        })();
+            return new Empty();
+        };
     }
 
     Object.create = function create(prototype, properties) {
@@ -193,7 +235,7 @@ if (!Object.create) {
 
 // Patch for WebKit and IE8 standard mode
 // Designed by hax <hax.github.com>
-// related issue: https://github.com/kriskowal/es5-shim/issues#issue/5
+// related issue: https://github.com/es-shims/es5-shim/issues#issue/5
 // IE8 Reference:
 //     http://msdn.microsoft.com/en-us/library/dd282900.aspx
 //     http://msdn.microsoft.com/en-us/library/dd229916.aspx
@@ -307,7 +349,7 @@ if (!Object.defineProperties || definePropertiesFallback) {
                 // try the shim if the real one doesn't work
             }
         }
-        
+
         for (var property in properties) {
             if (owns(properties, property) && property != "__proto__") {
                 Object.defineProperty(object, property, properties[property]);
