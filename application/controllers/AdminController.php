@@ -178,7 +178,7 @@ class AdminController extends KleinExtController {
         }
 
         if ("html" === $format) {
-            $rs->jsp->urlAlinea = getUrlExt("adshal", true);
+            $rs->jsp->urlAdshal = getUrlExt("adshal", array("examid"=>$examenId), true);
             $rs->render("views/admin/bilan/${type}.phtml");
         } else {
             echo "<pre>";
@@ -188,10 +188,13 @@ class AdminController extends KleinExtController {
     }
 
     public function actionAlineashow() {
-        $id = $this->_rq->param("id");
-        Gb_Log::logInfo("admin#alineashow id=$id");
+        $alineaId = $this->_rq->param("alineaid");
+        $examenId = $this->_rq->param("examid");
+        Gb_Log::logInfo("admin#alineashow examid=$examenId alineaid=$alineaId");
         $rs = $this->_rs;
-        $QuestionAlinea  = QuestionAlinea::getOne($id);
+
+        // cherche la définition de l'alinéa et de son contexte
+        $QuestionAlinea  = QuestionAlinea::getOne($alineaId);
         $QuestionContext = $QuestionAlinea->rel("question");
 
         // totaux des cases cochées:
@@ -199,11 +202,11 @@ class AdminController extends KleinExtController {
         // recherche l'alinéa demandé dans tous les questionnaires validés
         // remplit $aSubmitted avec les reponses données
 
-        $qaireAlineas = QuestionnaireAlinea::findAll(array("questionalinea_id"=>$id));
+        $qaireAlineas = QuestionnaireAlinea::findAll(array("questionalinea_id"=>$alineaId));
         $qaireAlineas->rel("questionnaire"); // eager load
-        $qaireAlineas = $qaireAlineas->filter(function($qaireAlinea) {
+        $qaireAlineas = $qaireAlineas->filter(function($qaireAlinea) use ($examenId) {
             $f = $qaireAlinea->rel("questionnaire");
-            return $f["score"] !== null;
+            return ($f["score"] !== null) && ((int) $f["examen_id"] === (int) $examenId);
         });
 
         $aAnswers = array();
@@ -211,7 +214,7 @@ class AdminController extends KleinExtController {
             $answer = (int) $qaireAlinea->answer;
             $aAnswers[] = $answer;
         }
-        //print_r($aSubmitted);
+        //print_r($qaireAlineas->__toString());
 
         // construit un tableau avec le nombre de fois où la réponse a été cochée par les étudiants:
         // $aChecked[0] = 4  -> la réponse A a été cochée 4 fois

@@ -115,8 +115,8 @@ respondExt("adexre",       "GET /admin/examens/[i:id]/repool",                  
 respondExt("adbilh",       "GET /admin/examens/[i:id]/bilan",                   "admin#bilanhome");
 respondExt("adbilg",       "GET /admin/examens/[i:id]/bilan/[details|stats:type].[csv|txt|html:format]?",
                                                                                 "admin#bilango");
-
-respondExt("adshal",       "GET /admin/alinea[i:id]/[show|popover:type]",       "admin#alineashow");
+respondExt("adshal",       "GET /admin/examens/[i:examid]/alinea[i:alineaid]/[show|popover:type]",
+                                                                                "admin#alineashow");
 
 
 

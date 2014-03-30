@@ -1217,7 +1217,7 @@ return a=window.jsp.aUrls.thistst,$.ajax({url:a,method:"POST",data:{_method:"POS
 }}(this))},a.prototype.solutionsReceived=function(){return this.renderLis(),$(".qtabctn li[data-num=#]").trigger("click")
 },a.prototype.retrieveUserAnswer=function(){var a,b,c,d,e,f;return d=$(".passer .qtabctn li.selected"),b=d.data("num"),e=d.data("qairealineaid"),null==e?null:(a=$(".passer .alineaanswers").find(".letter input.etu[type=checkbox]"),c=1,f=0,_.each(a,function(a){return $(a).prop("checked")&&(f+=c),c<<=1
 }),{num:b,val:f,qaireAlineaId:e})},a}();var AdminStats;AdminStats=function(){function a(){this.poActive=!1
-}return a.prototype.go=function(){var a=this;return $("div.bilan table").dataTable({bPaginate:!1,bFilter:!1,bInfo:!1,iDisplayLength:5}),$("div.bilan table").addClass("table table-striped table-bordered"),$("div.bilan table").on("click","tr",function(b){var c,d,e,f;
-return e=$(b.currentTarget).find("td:nth-child(1)"),c=e.text(),f=window.jsp.urlAlinea,f=f.replace("[:id]",c),f=f.replace("[:type]","popover"),void 0===e.data("poloaded")?(a.poActive!==!1&&a.poActive.popover("hide"),e.data("poloaded","waiting"),a.poActive=e,$.ajax(f,{}).done(function(a){return e.data("poloaded","1"),e.popover({html:!0,content:a,trigger:"manual",container:".bilan"}).popover("show")
+}return a.prototype.go=function(){return $("div.bilan table").dataTable({bPaginate:!1,bFilter:!1,bInfo:!1,iDisplayLength:5}),$("div.bilan table").addClass("table table-striped table-bordered"),$("div.bilan table").on("click","tr",function(a){return function(b){var c,d,e,f;
+return e=$(b.currentTarget).find("td:nth-child(1)"),c=e.text(),f=window.jsp.urlAdshal,f=f.replace("[:alineaid]",c),f=f.replace("[:type]","popover"),void 0===e.data("poloaded")?(a.poActive!==!1&&a.poActive.popover("hide"),e.data("poloaded","waiting"),a.poActive=e,$.ajax(f,{}).done(function(a){return e.data("poloaded","1"),e.popover({html:!0,content:a,trigger:"manual",container:".bilan"}).popover("show")
 })):"1"!==e.data("poloaded")||(d=e.is(a.poActive),a.poActive!==!1&&(a.poActive.popover("hide"),a.poActive=!1),d)?void 0:(e.popover("show"),a.poActive=e)
-})},a}();
+}}(this))},a}();

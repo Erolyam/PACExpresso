@@ -15,8 +15,8 @@ class AdminStats
       # deltarget:table   target:td   curTar:tr
       target = $(e.currentTarget).find "td:nth-child(1)"  # la première colonne
       id = target.text() # récupération de l'id
-      url = window.jsp.urlAlinea
-      url = url.replace("[:id]", id)
+      url = window.jsp.urlAdshal
+      url = url.replace("[:alineaid]", id)
       url = url.replace("[:type]", "popover")
 
 
@@ -44,8 +44,8 @@ class AdminStats
     ###
     $("div.bilan table").on "click", "tr td:nth-child(2)", (e) =>
       id = $(e.target).prev().text()
-      url = window.jsp.urlAlinea
-      url = url.replace("[:id]", id)
+      url = window.jsp.urlAdshal
+      url = url.replace("[:alineaid]", id)
       url = url.replace("[:type]", "show")
 
       win1 = window.open("", "_blank")
