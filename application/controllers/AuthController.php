@@ -49,9 +49,9 @@ class AuthController extends KleinExtController {
                 }
 
                 // met à jour utilisateur avec données de fastannu
-                $user->email      = $userinfo->mail;
-                $user->name_first = $userinfo->pren;
-                $user->name_last  = $userinfo->nom;
+                $user->email      = (is_array($userinfo->mail)) ? ($userinfo->mail[0])            : ($userinfo->mail);
+                $user->name_first = (is_array($userinfo->pren)) ? (implode('/', $userinfo->pren)) : ($userinfo->pren);
+                $user->name_last  = (is_array($userinfo->nom))  ? (implode('/', $userinfo->nom))  : ($userinfo->nom);
                 $user->last_at    = Gb_String::date_iso();
                 $res = $user->save();
 
