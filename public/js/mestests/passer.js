@@ -16,6 +16,7 @@ MestestsPasser = (function() {
     this.aAlineas = window.jsp.aAlineas;
     this.aContexts = window.jsp.aContexts;
     this.aQaireAlineas = window.jsp.aQaireAlineas;
+    this.showSolution = window.jsp.showSolution;
     _.forEach(this.aQaireAlineas, (function(_this) {
       return function(qaireAlinea, index) {
         return qaireAlinea.answer != null ? qaireAlinea.answer : qaireAlinea.answer = 0;
@@ -113,7 +114,10 @@ MestestsPasser = (function() {
       targetAnswers = target.find(".alineaanswers");
       tpl = _.template($('#tplqAlineaAnswer').html().trim());
       total = parseInt(qaireAlinea.answer, 10);
-      solution = qaireAlinea.solution;
+      solution = null;
+      if (this.showSolution) {
+        solution = qaireAlinea.solution;
+      }
       if (solution != null) {
         solution = parseInt(solution, 10);
       }
@@ -143,11 +147,17 @@ MestestsPasser = (function() {
     } else {
       if (this.Qaire.score === null) {
         tpl = _.template($('#tplqRecapConfirm').html().trim());
-        html = tpl(this.Qaire);
+        html = tpl({
+          qaire: this.Qaire,
+          showSolution: this.showSolution
+        });
         return target.append(html);
       } else {
         tpl = _.template($('#tplqResult').html().trim());
-        html = tpl(this.Qaire);
+        html = tpl({
+          qaire: this.Qaire,
+          showSolution: this.showSolution
+        });
         return target.append(html);
       }
     }

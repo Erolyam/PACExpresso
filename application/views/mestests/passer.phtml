@@ -51,7 +51,7 @@
       <p>
         Vous êtes arrivé à la fin du questionnaire. Vous pouvez encore vérifier et modifier vos réponses.
         Quand vous serez satisfait, appuyez sur le bouton de validation pour envoyer vos réponses.
-        Vous aurez alors votre note, et vous pourrez consulter le corrigé.
+        Vous aurez alors voir votre note, et vous pourrez consulter le corrigé.
       </p>
       <p>
         Attention, une fois le questionnaire validé, vous ne pourrez plus modifier vos réponses.
@@ -70,10 +70,14 @@
     <div class='title'><h2>Résultats</h2></div>
     <div class='body'>
       <p>
-        Votre note: <%= score %>
+        Votre note: <%= qaire.score %>
       </p>
       <p>
-        Vous pouvez revenir sur chaque question et consulter la solution.
+        <% if (showSolution) { %>
+          Vous pouvez revenir sur chaque question et consulter la solution.
+        <% } else { %>
+          Vous pouvez revenir sur chaque question.
+        <% } %>
       </p>
     </div>
   </div>

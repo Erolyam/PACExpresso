@@ -13,6 +13,7 @@ class MestestsPasser
     @aAlineas      = window.jsp.aAlineas
     @aContexts     = window.jsp.aContexts
     @aQaireAlineas = window.jsp.aQaireAlineas
+    @showSolution  = window.jsp.showSolution
 
     # initialise les réponses à zéro
     _.forEach @aQaireAlineas, (qaireAlinea, index) =>
@@ -118,7 +119,9 @@ class MestestsPasser
       targetAnswers = target.find(".alineaanswers")
       tpl = _.template $('#tplqAlineaAnswer').html().trim()
       total = parseInt(qaireAlinea.answer, 10)  # la réponse de l'étudiant
-      solution = qaireAlinea.solution           # la solution cachée (si indiquée)
+      solution = null
+      if @showSolution
+        solution = qaireAlinea.solution           # la solution cachée (si indiquée)
       # on utilise la solution fournie. Si on veut la solution réelle: solution = alinea.solution
       if solution?
         solution = parseInt(solution, 10)
@@ -137,12 +140,12 @@ class MestestsPasser
       if @Qaire.score is null
         # affiche le bouton de validation du formulaire
         tpl = _.template $('#tplqRecapConfirm').html().trim()
-        html = tpl(@Qaire)
+        html = tpl({qaire:@Qaire, showSolution:@showSolution})
         target.append(html)
       else
         # Affiche le score
         tpl = _.template $('#tplqResult').html().trim()
-        html = tpl(@Qaire)
+        html = tpl({qaire:@Qaire, showSolution:@showSolution})
         target.append(html)
 
 

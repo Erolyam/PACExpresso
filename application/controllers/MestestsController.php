@@ -23,6 +23,11 @@ class MestestsController extends KleinExtController {
      */
     protected $_qaireAlinea;
 
+    /**
+     * @var Examen
+     */
+    protected $_examen;
+
     public function initialize() {
     }
 
@@ -57,6 +62,7 @@ class MestestsController extends KleinExtController {
             $qaire_id     = $this->_rq->param("id");
             try {
                 $this->_qaire = $this->_aQaires->$qaire_id;
+                $this->_examen = $this->_qaire->rel("examen");
             } catch (Gb_Exception $e) {
                   Gb_Log::logWarning($action . " questionnaire " . $qaire_id . " introuvable");
                 $this->_rs->renderJSON("Questionnaire introuvable");
@@ -191,9 +197,13 @@ class MestestsController extends KleinExtController {
         $aContexts = $aAlineas->rel('question');
         $rs->jsp->aContexts = $aContexts->asArray();
 
+        $rs->jsp->showSolution = false;
         $keepSolution = false;
         if ($this->_qaire['score']) {
             $keepSolution = true;
+            if ($this->_examen->correction === "3") {
+                $rs->jsp->showSolution = true;
+            }
         }
         $this->subactionPass($keepSolution);
     }

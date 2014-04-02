@@ -11,3 +11,6 @@ on doit pouvoir copier vers un nouveau
 REPOOL
 Faire en sorte que le repool ne soit pas nécessaire, mais automatique.
 (génère 10 nouveaux questionnaires tant que le pool est inférieur à 1000 par exemple)
+
+Dans MestestsController::actionOne()
+showSolution/keepSolution
