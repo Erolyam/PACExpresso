@@ -75,22 +75,20 @@ class AdmExamensController extends KleinExtController {
 
     public function actionRepool() {
         $id = $this->_rq->param("id");
+        $Examen = Examen::getOne($id);
+        $nbalineas = $Examen->nbalineas;
 
         $qDetails = $this->getQuestionsDetailsForExamen($id);
 
-        $aQuestionIds = $this->drawQuestions($qDetails, 7);
-        $qairePool = $this->createQairepool($id, $aQuestionIds);
-
-        echo Gb_String::formatTable($qDetails, "html");
-
         $number = 500;
         for ($i=0; $i<$number; $i++) {
-            $aQuestionIds = $this->drawQuestions($qDetails, 7);
+            $aQuestionIds = $this->drawQuestions($qDetails, $nbalineas);
             $qairepool = $this->createQairepool($id, $aQuestionIds);
             $qairepool->save();
         }
 
         echo "Ok. $number questionnaires tirés";
+        Gb_Log::logNotice("Repool for examen $id: $number questionnaires tirés.");
 
         $this->_rs->render("views/empty.phtml");
     }
