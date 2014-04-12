@@ -1,5 +1,7 @@
 <?php
 
+//die("Application en maintenance pendant 5 minutes. Merci de votre compréhension !");
+
 chdir(dirname(__FILE__));
 set_include_path(
     dirname(__FILE__) . PATH_SEPARATOR .

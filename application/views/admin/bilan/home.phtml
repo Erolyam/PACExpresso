@@ -5,7 +5,7 @@
 
 <div class='container'>
 
-<? foreach (array("details", "stats") as $type):?>
+<? foreach (array(/*"details", */"stats") as $type):?>
   <? foreach (array("txt", "html", "csv") as $format):?>
     <? $url = getUrlExt($name, array("id"=>$examenId, "type"=>$type, "format"=>$format))?>
     <a href="<?= $url ?>">Bilan <?= $type ?>, format <?= $format ?></a><br />
