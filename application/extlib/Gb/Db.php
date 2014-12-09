@@ -32,12 +32,13 @@ Class Gb_Db extends Zend_Db
      */
     protected $_adapter;
     protected $connArray;                                     // array utilisé par Zend_Db::factory()
-    protected $driver;                                        // Pdo_Mysql, Pdo_Oci, Pdo_Sqlite
+    protected $driver;                                        // Pdo_Mysql, Pdo_Oci, Pdo_Sqlite, Oracle
     protected $dbname;
     protected $charset;
     protected $fTransaction=false;
     protected $fInitialized=false;
-    protected $instanceNumber=null;
+    protected $instanceNumber=null;                             // starts at 0
+    protected $fLogEnabled=true;
 
     /**
      * @var Gb_Cache
@@ -47,7 +48,8 @@ Class Gb_Db extends Zend_Db
     protected $tables;                                        // cache de la liste des tables
     protected $tablesDesc;                                    // cache descriptif table
 
-    protected static $sqlTime=0;
+    protected static $sqlTime=0;                             // global time spent in Gb_Db
+    protected static $aSqlTime=array();                      // per instance time spent
     protected static $nbInstance_total=0;                    // Nombre de classes gbdb ouvertes au total
     protected static $nbInstance_peak=0;                     // maximum ouvertes simultanément
     protected static $nbInstance_current=0;                  // nom d'instances ouvertes en ce moment
@@ -96,7 +98,7 @@ Class Gb_Db extends Zend_Db
      *
      * type est le driver à utiliser (MYSQL, OCI8)
      *
-     * @param array("type"=>"Pdo_Mysql/Pdo_Oci/Pdo_Sqlite/Pdo_Pgsql", "host"=>"localhost", "user/username"=>"", "pass/password"=>"", "name/dbname"=>"", "port"=>"", "charset"=>"utf8") $aIn
+     * @param array("type"=>"Pdo_Mysql/Pdo_Oci/Pdo_Sqlite/Pdo_Pgsql/Oracle_Oci8", "host"=>"localhost", "user/username"=>"", "pass/password"=>"", "name/dbname"=>"", "port"=>"", "charset"=>"utf8", "log"=>"true|false") $aIn
      * @return GbDb
      */
     function __construct(array $aIn)
@@ -105,6 +107,7 @@ Class Gb_Db extends Zend_Db
         $user=$pass=$name=$port=$charset="";
         $host="";
         $driver="Pdo_Mysql";
+        $log = true;
         if (isset($aIn["type"]))                    $driver=$aIn["type"];
         if (isset($aIn["host"]))                    $host=$aIn["host"];
         if (isset($aIn["user"]))                    $user=$aIn["user"];
@@ -115,6 +118,22 @@ Class Gb_Db extends Zend_Db
         if (isset($aIn["dbname"]))                  $name=$aIn["dbname"];
         if (isset($aIn["port"]))                    $port=$aIn["port"];
         if (isset($aIn["charset"]))                 $charset=$aIn["charset"];
+        if (isset($aIn["log"])
+            && in_array($aIn["log"], array("false", false))) $log=false;
+
+        $array = array("username"=>$user, "password"=>$pass, "dbname"=>$name);
+        if (strlen($host)) {
+            $array["host"]=$host;
+        }
+        if (strlen($port)) {
+            $array["port"]=$port;
+        }
+        if (strlen($charset)) {
+            $array["charset"]=$charset;
+        }
+
+        $this->instanceNumber = self::$nbInstance_total;
+        self::$aSqlTime[$this->instanceNumber] = 0;
 
         switch (strtoupper($driver)) {
             case "MYSQL":
@@ -128,6 +147,27 @@ Class Gb_Db extends Zend_Db
             case "PDO_OCI":
                 $driver="Pdo_Oci"; break;
 
+            case "ORACLE_OCI8":
+                // see http://www.php.net/manual/en/function.oci-connect.php
+                $array["dbname"] = $host .
+                    (($port !== "") ? ":$port" : "") .
+                    "/$name";
+
+                // http://php.net/manual/en/function.oci-connect.php#105284
+                // seem that that name is not always the same as service name, so,
+                // don't use this way of connecting, but the older one:
+                $address = "ADDRESS=(PROTOCOL=TCP)(HOST = $host)";
+                $address .= ($port !== "") ? ("(PORT = $port)") : ("");
+                $cdata = "SID = $name";
+                $array["dbname"] =  "
+(DESCRIPTION=
+  (ADDRESS_LIST=($address))
+  (CONNECT_DATA=($cdata))
+)";
+                unset($array["host"]);
+                unset($array["port"]);
+                $driver="Oracle"; break;
+
             case "SQLITE":
             case "PDO_SQLITE":
                 $driver="Pdo_Sqlite"; break;
@@ -136,34 +176,20 @@ Class Gb_Db extends Zend_Db
             case "POSTGRESQL":
             case "PDO_PGSQL":
                 $driver="Pdo_Pgsql"; break;
-
-        }
-
-        $array=array("username"=>$user, "password"=>$pass, "dbname"=>$name);
-        if (strlen($host)) {
-            $array["host"]=$host;
-        }
-        if (strlen($port)) {
-            $array["port"]=$port;
-        }
-        if (strlen($charset)) {
-            $array["charset"]=$charset;
         }
 
         try
         {
             $this->_adapter=Zend_Db::factory($driver, $array);
         } catch (Exception $e) {
-            self::$sqlTime+=microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
 
-        $this->instanceNumber = self::$nbInstance_total;
-        $this->log("CONNECT TO $host:$name");
+        $this->log("CONNECT TO " . (strlen($host)?("$host:"):("")) . $name);
         self::$nbInstance_total++;
         self::$nbInstance_current++;
         self::$nbInstance_peak=max(self::$nbInstance_peak, self::$nbInstance_current);
-        self::$sqlTime+=microtime(true)-$time;
 
         if (!self::$fPluginRegistred)
         {
@@ -175,6 +201,8 @@ Class Gb_Db extends Zend_Db
         $this->dbname=$name;
         $this->connArray=$array;
         $this->charset=$charset;
+        $this->fLogEnabled=$log;
+        $this->addTime(microtime(true)-$time);
     }
 
     function __destruct()
@@ -182,7 +210,7 @@ Class Gb_Db extends Zend_Db
         $time=microtime(true);
         self::$nbInstance_current--;
         $this->_adapter->closeConnection();
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
     }
 
    /**
@@ -206,14 +234,46 @@ Class Gb_Db extends Zend_Db
     }
 
     /**
+     * get instance number (start at 0)
+     * @return number
+     */
+    public function getInstanceNumber() {
+        return $this->instanceNumber;
+    }
+
+    /**
      * Log the request
      * @param string $str
      */
     public function log($str, $o=null) {
+        if ($this->fLogEnabled === false) {
+            return;
+        }
         $str = trim($str);
         $str = str_replace("\n", " ", $str);
         if ($o !== null) { $str .= " "; }
         self::$sqlLog[$this->instanceNumber][] = $str . Gb_Log::dump($o);
+    }
+
+    /**
+     * Add time spent
+     * @param float $time
+     */
+    protected function addTime($time) {
+        self::$sqlTime += $time;
+        self::$aSqlTime[$this->instanceNumber] += $time;
+    }
+
+    /**
+     * get/set log
+     * @param boolean[optional] $param
+     * @return boolean
+     */
+    public function enableLog($p = null) {
+        if (false === $p || true === $p) {
+            $this->fLogEnabled = $p;
+        }
+        return $this->fLogEnabled;
     }
 
     public function initialize()
@@ -249,12 +309,14 @@ Class Gb_Db extends Zend_Db
         $dbpeak=self::$nbInstance_peak;
         $nbrequest=self::$nbRequest;
         $sqltime=Gb_Util::roundCeil($sqltime);
-        $ret.="Gb_Db:{ ";
+        $ret.="Gb_Db:\n{\n";
         $ret.="totalInstances:$dbtotal peakInstances:$dbpeak nbrequests:$nbrequest time:{$sqltime}s";
-        foreach (self::$sqlLog as $loginstance) {
-            $ret .= "<br />" . implode("\n", $loginstance);
+        $aTimes = array_map(function($a){return Gb_Util::roundCeil($a)."s";}, self::$aSqlTime);
+        $ret.=" per instance: {" . implode(", ", $aTimes) . "}\n";
+        foreach (self::$sqlLog as $instance=>$loginstance) {
+            $ret .= "Gb_Db instance $instance: " . implode("\n", $loginstance) . "\n";
         }
-        $ret.="<br /> }";
+        $ret.="}";
 
         return $ret;
     }
@@ -268,7 +330,7 @@ Class Gb_Db extends Zend_Db
     {
         if ($this->tables==null) {
             switch($this->driver) {
-                case "Pdo_Oci":
+                case "Pdo_Oci": case "Oracle":
                     $sql_getTablesName=<<<EOF
                         SELECT OWNER || '.' || TABLE_NAME AS "FULL_NAME"
                         FROM ALL_TABLES
@@ -324,7 +386,6 @@ EOF;
      */
     public function getTableDesc($table)
     {
-        $sqlTime=self::$sqlTime;
         $time=microtime(true);
 
         // détermine towner et tname
@@ -354,7 +415,8 @@ EOF;
         $sql_getColumns = $sql_getPK = $sql_getFKs = $sql_getOtr = "";
 
         switch($this->driver) {
-            case "Pdo_Oci":
+
+            case "Pdo_Oci": case "Oracle":
                 $sql_getColumns=<<<EOF
 SELECT A.COLUMN_NAME, A.DATA_TYPE AS "TYPE", A.NULLABLE, C.COMMENTS AS "COMMENT", '' AS "EXTRA"
 FROM ALL_TAB_COLUMNS A
@@ -505,7 +567,7 @@ EOF;
         }
 
 
-        self::$sqlTime=$sqlTime+microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $desc;
     }
 
@@ -514,7 +576,7 @@ EOF;
         $time=microtime(true);
         $this->initialize();
         $ret=$this->_adapter->fetchAll($a, $b);
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -523,7 +585,7 @@ EOF;
         $time=microtime(true);
         $this->initialize();
         $ret=$this->_adapter->fetchAssoc($a, $b);
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -532,7 +594,7 @@ EOF;
         $time=microtime(true);
         $this->initialize();
         $ret=$this->_adapter->query($sql, $bindarguments);
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -547,7 +609,7 @@ EOF;
         $time=microtime(true);
         $this->initialize();
         $ret=$this->_adapter->getConnection()->exec($sql);
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -595,11 +657,16 @@ EOF;
         self::$nbRequest++;
         $this->log($sql);
 
-
         if ( (false === $bindargurment) || (null === $bindargurment)) {
             $bindargurment=array();
         } elseif (!is_array($bindargurment)) {
             $bindargurment = array($bindargurment);
+        }
+
+        if (count($bindargurment) && ("Oracle" === $this->driver)) {
+            // oracle does not support positional parameters
+            $sql = $this->quoteIntoMultiple($sql, $bindargurment);
+            $bindargurment = array();
         }
 
         try
@@ -642,9 +709,9 @@ EOF;
                     $ret[$key]=$res;
                 }
             }
-            self::$sqlTime+=microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
         } catch (Exception $e) {
-            self::$sqlTime+=microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
         return $ret;
@@ -667,11 +734,16 @@ EOF;
         self::$nbRequest++;
         $this->log($sql);
 
-
         if ( (false === $bindargurment) || (null === $bindargurment)) {
             $bindargurment=array();
         } elseif (!is_array($bindargurment)) {
             $bindargurment = array($bindargurment);
+        }
+
+        if (count($bindargurment) && ("Oracle" === $this->driver)) {
+            // oracle does not support positional parameters
+            $sql = $this->quoteIntoMultiple($sql, $bindargurment);
+            $bindargurment = array();
         }
 
         try {
@@ -684,7 +756,7 @@ EOF;
                 // on veut juste la valeur
                 $res=$stmt->fetch(Zend_Db::FETCH_ASSOC);
                 if ($res===false) {
-                    self::$sqlTime+=microtime(true)-$time;
+                    $this->addTime(microtime(true)-$time);
                     return false;
                 }
                 $ret=$res[$col];
@@ -692,14 +764,14 @@ EOF;
                 //on veut un array
                 $res=$stmt->fetch(Zend_Db::FETCH_ASSOC);
                 if ($res===false) {
-                    self::$sqlTime+=microtime(true)-$time;
+                    $this->addTime(microtime(true)-$time);
                     return false;
                 }
                 $ret=$res;
             }
-            self::$sqlTime+=microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
         } catch (Exception $e){
-            self::$sqlTime+=microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
         return $ret;
@@ -732,7 +804,7 @@ EOF;
         }
         $this->fTransaction=true;
         $ret=$this->_adapter->beginTransaction();
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -741,7 +813,7 @@ EOF;
         $time=microtime(true);
         $ret=$this->_adapter->rollBack();
         $this->fTransaction=false;
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -751,7 +823,7 @@ EOF;
         $ret=$this->_adapter->commit();
         $this->fTransaction=false;
 
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -775,10 +847,10 @@ EOF;
         try {
             $ret=$this->_adapter->update($table, $data, $where);
         } catch (Exception $e) {
-            self::$sqlTime+=microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -800,10 +872,10 @@ EOF;
         try {
             $ret=$this->_adapter->delete($table, $where);
         } catch (Exception $e) {
-            self::$sqlTime+=microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -826,10 +898,10 @@ EOF;
         try {
             $ret=$this->_adapter->insert($table, $data);
         } catch (Exception $e) {
-            self::$sqlTime+=microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -853,7 +925,6 @@ EOF;
         if (null === $moreDataUpdate) { $moreDataUpdate=array(); }
 
         if (is_string($where)) {$where=array($where);}
-        $sqlTime=self::$sqlTime;
         $time=microtime(true);
         $this->initialize();
         self::$nbRequest++;
@@ -893,13 +964,13 @@ EOF;
                 throw new Gb_Exception("replace impossible: plus d'une ligne correspond !");
             }
         } catch (Gb_Exception $e) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw $e;
         } catch (Exception $e) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
-        self::$sqlTime=$sqlTime+microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -919,7 +990,6 @@ EOF;
     public function insertOrDeleteInsert($table, array $data)
     {
         if (count($data)==0) { return 0; }
-        $sqlTime=self::$sqlTime;
         $time=microtime(true);
         $this->initialize();
         self::$nbRequest++;
@@ -968,20 +1038,19 @@ EOF;
                 throw new Gb_Exception("replace impossible: plus d'une ligne correspond !");
             }
         } catch (Gb_Exception $e) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw $e;
         } catch (Exception $e) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
-        self::$sqlTime=$sqlTime+microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
 
     protected function developpeData($table, $data, &$newdata, &$where)
     {
-        $sqlTime=self::$sqlTime;
         $time=microtime(true);
 
         $tableDesc=$this->getTableDesc($table);
@@ -1000,7 +1069,7 @@ EOF;
             unset($newdata[$key]);
         }
 
-        self::$sqlTime=$sqlTime+microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
     }
 
    /**
@@ -1013,7 +1082,6 @@ EOF;
     public function insertOrUpdateNOTWORKING($table, array $data)
     {
         if (count($data)==0) { return 0; }
-        $sqlTime=self::$sqlTime;
         $time=microtime(true);
         $this->initialize();
         self::$nbRequest++;
@@ -1046,20 +1114,19 @@ EOF;
                 throw new Gb_Exception("replace impossible: plus d'une ligne correspond !");
             }
         } catch (Gb_Exception $e) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw $e;
         } catch (Exception $e) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
-        self::$sqlTime=$sqlTime+microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
     public function insertOrUpdate($table, array $data)
     {
         if (count($data)==0) { return 0; }
-        $sqlTime=self::$sqlTime;
         $time=microtime(true);
         $this->initialize();
         self::$nbRequest++;
@@ -1092,13 +1159,13 @@ EOF;
                 throw new Gb_Exception("replace impossible: plus d'une ligne correspond !");
             }
         } catch (Gb_Exception $e) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw $e;
         } catch (Exception $e) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception($e->getMessage());
         }
-        self::$sqlTime=$sqlTime+microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -1129,7 +1196,7 @@ EOF;
         } else {
             $ret=$this->_adapter->quote($var);
         }
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -1156,7 +1223,7 @@ EOF;
            $text=$this->_adapter->quoteInto($text, $value);
         }
 
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $text;
     }
 
@@ -1170,7 +1237,7 @@ EOF;
     {
         $time=microtime(true);
         $ret=$this->_adapter->quoteIdentifier($ident, false);
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -1186,7 +1253,7 @@ EOF;
         $time=microtime(true);
         $this->initialize();
         $ret=(int) $this->_adapter->lastInsertId($tableName, $primaryKey);
-        self::$sqlTime+=microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $ret;
     }
 
@@ -1207,14 +1274,13 @@ EOF;
     {
         $time=microtime(true);
         $this->initialize();
-        $sqlTime=self::$sqlTime;
 
         $nb=$this->update($tableName, array( $colName=>new Zend_Db_Expr("LAST_INSERT_ID(".$this->_adapter->quoteIdentifier($colName)."+1)") ));
         if ($nb!=1) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception("erreur sequenceNext($tableName.$colName)");
         }
-        self::$sqlTime=$sqlTime+microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return (int) $this->_adapter->lastInsertId();
     }
 
@@ -1227,7 +1293,6 @@ EOF;
      */
     public function sequenceCurrent($tableName, $colName="id")
     {
-        $sqlTime=self::$sqlTime;
         $time=microtime(true);
         $this->initialize();
         self::$nbRequest++;
@@ -1237,11 +1302,11 @@ EOF;
         $stmt=$this->_adapter->query($sql);
         $res=$stmt->fetch(Zend_Db::FETCH_NUM);
         if ($stmt->fetch(Zend_Db::FETCH_NUM)) {
-            self::$sqlTime=$sqlTime+microtime(true)-$time;
+            $this->addTime(microtime(true)-$time);
             throw new Gb_Exception("erreur sequenceCurrent($tableName.$colName)");
         }
         $res=$res[0];
-        self::$sqlTime=$sqlTime+microtime(true)-$time;
+        $this->addTime(microtime(true)-$time);
         return $res;
     }
 
@@ -1249,6 +1314,36 @@ EOF;
     {
         $db=$this->_adapter;
         return $db->setProfiler($param);
+    }
+
+    /**
+     * Quotes a value and places into a piece of text at a placeholder.
+     *
+     * The placeholder is a question-mark; all placeholders will be replaced
+     * with the quoted value.   For example:
+     *
+     * <code>
+     * $text = "WHERE date < ?";
+     * $date = "2005-01-02";
+     * $safe = $sql->quoteInto($text, $date);
+     * // $safe = "WHERE date < '2005-01-02'"
+     * </code>
+     *
+     * @param string  $text  The text with a placeholder.
+     * @param array   $values The value to quote.
+     * @param array   $types  OPTIONAL SQL datatype
+     */
+    public function quoteIntoMultiple($text, $values, $types = null)
+    {
+        $index = 0;
+        foreach ($values as $value) {
+            if (strpos($text, '?') !== false) {
+                $type = isset($types[$index]) ? ($types[$index]) : null;
+                $text = substr_replace($text, $this->quote($value, $type), strpos($text, '?'), 1);
+            }
+            $index++;
+        }
+        return $text;
     }
 
 }

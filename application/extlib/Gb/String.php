@@ -170,6 +170,34 @@ class Gb_String
     }
 
 
+    /**
+     * substitute polish character
+     * @param string $str to translate
+     * @return string
+     */
+    public static function removeLatin2($str)
+    {
+        $from = "óÓąĄćĆęĘłŁńŃśŚźŹżŻ";
+        $to   = "oOaAcCeElLnNsSzZzZ";
+        return self::mb_strtr($str, $from, $to);
+    }
+
+    /**
+     * Multi byte strtr
+     * @param string $str to translate
+     * @param string $from
+     * @param string $to
+     * @return string
+     */
+    public static function mb_strtr($str, $from, $to)
+    {
+        // source: http://stackoverflow.com/questions/2758736/multibyte-strtr-mb-strtr @AlixAxel
+        return str_replace(preg_split('~~u', $from, null, PREG_SPLIT_NO_EMPTY),
+            preg_split('~~u', $to, null, PREG_SPLIT_NO_EMPTY), $str);
+    }
+
+
+
   /**
    * converti, si nécessaire une date au format YYYY-MM-DD en DD/MM/YYYY
    *
@@ -450,7 +478,7 @@ class Gb_String
                 $max["index"]=max($max["index"], mb_strlen($indexname, "UTF-8"));
                 foreach ($firstrowkeys as $number=>$keyname) {
                     $col = self::splat($line[$keyname], $arrayMode);
-                    $max[$number]=max($max[$number], mb_strlen(str_replace(array("\r","\n","\0"), array("\\r", "\\n", "\\0"), $col)), "UTF-8");
+                    $max[$number]=max($max[$number], mb_strlen(str_replace(array("\r","\n","\0"), array("\\r", "\\n", "\\0"), $col), "UTF-8"));
                     if ($maxColLen) {
                         $max[$number] = min($max[$number], $maxColLen);
                     }

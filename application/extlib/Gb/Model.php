@@ -51,7 +51,7 @@ class Model implements \IteratorAggregate, \ArrayAccess {
      * @throws \Gb_Exception
      * @return self
      */
-    public static function getOne($id) {
+    public static function getOne($db__id) {
         $args = func_get_args();
         $id = array_pop($args);
         $db = array_pop($args); if (!$db) {$db = self::$_db; };
@@ -69,7 +69,14 @@ class Model implements \IteratorAggregate, \ArrayAccess {
         return self::_getOne($db, $id);
     }
 
-    public static function _getOne($db, $id, $rel=array()) {
+    /**
+     * Return an already fetched row into a new Model object
+     * @param \Gb_Db $db
+     * @param $id
+     * @param array[optional] $rel
+     * @return \Gb\Model
+     */
+    public static function _getOne(\Gb_Db $db, $id, $rel=array()) {
         $id = (int) $id;
         // send the row from the buffer
         $model = get_called_class();
@@ -84,7 +91,7 @@ class Model implements \IteratorAggregate, \ArrayAccess {
      * @param array $ids
      * @return \Gb\Model\Rows
      */
-    public static function getSome($ids) {
+    public static function getSome($db__ids) {
         $args = func_get_args();
         $ids = array_unique(array_pop($args));
         $db = array_pop($args); if (!$db) {$db = self::$_db; };
@@ -130,7 +137,7 @@ class Model implements \IteratorAggregate, \ArrayAccess {
      * @param mixed $ids single/array/null
      * @throws \Gb_Exception if a row is not found for the asked keys.
      */
-    public static function _fetch($ids) {
+    public static function _fetch($db__ids) {
         $args = func_get_args();
         $ids = array_pop($args);
         $db = array_pop($args); if (!$db) {$db = self::$_db; };
@@ -152,11 +159,7 @@ class Model implements \IteratorAggregate, \ArrayAccess {
         }
 
         $data = $db->retrieve_all($sql, null, static::$_pk, null, true);
-
-        // force id to be integer
-        foreach (array_keys($data) as $key) {
-            $data[$key][static::$_pk] = (int) $data[$key][static::$_pk];
-        }
+        $data = self::castInteger_all($data);
 
         if (null === $ids) {
             static::$_isFullyLoaded = true;
@@ -164,7 +167,9 @@ class Model implements \IteratorAggregate, \ArrayAccess {
             if (1 === count($ids)) {
                 throw new \Gb_Exception("row not found");
             }
-            throw new \Gb_Exception(count($data) . " rows retrieved, " . count($ids) . " rows expected.");
+            $missing = array_diff($ids,array_keys($data));
+            $table = static::$_tablename;
+            throw new \Gb_Exception(count($data) . " rows retrieved, " . count($ids) . " rows expected. Missing ids: (" . implode($missing, ",") . ") from table $table.");
         }
 
         // merge the rows in the buffer. Do not use array_merge!
@@ -195,13 +200,13 @@ class Model implements \IteratorAggregate, \ArrayAccess {
 
     /**
      * Search lines
+     * @param \Gb_Db[optional] $db
      * @param array|string[optional] $cond array("col"=>"value") or array("col"=>array(1,2)) or "col='value'"
      * @param array[optional] $options array("order"=>"cola DESC, colb", "limit"=>10, "offset"=>5)
      * @return \Gb\Model\Rows
      * @todo: if isFullyLoaded, handle the requestion without the database ?
      */
-    public static function findAll($cond=null) {
-
+    public static function findAll($db__cond__options=null) {
         $args = func_get_args();
         $db = self::$_db;
         if (isset($args[0]) && $args[0] instanceof \Gb_Db) {
@@ -211,18 +216,16 @@ class Model implements \IteratorAggregate, \ArrayAccess {
         $options = array_shift($args); if (null===$options){$options=array();}
 
         $sql = static::_find($db, $cond, $options);
+        if (strlen($sql)) {
+            $data = $db->retrieve_all($sql, null, static::$_pk, null, true);
+            $data = self::castInteger_all($data);
 
-        $data = $db->retrieve_all($sql, null, static::$_pk, null, true);
-
-        // force id to be integer
-        foreach (array_keys($data) as $key) {
-            $data[$key][static::$_pk] = (int) $data[$key][static::$_pk];
+            //echo static::$_tablename."\n";print_r(static::$_buffer);
+            // merge the rows in the buffer. Do not use array_merge!
+            static::$_buffer = $data + static::$_buffer;
+        } else {
+            $data = array();
         }
-
-        //echo static::$_tablename."\n";print_r(static::$_buffer);
-        // merge the rows in the buffer. Do not use array_merge!
-        static::$_buffer = $data + static::$_buffer;
-
         $model = get_called_class();
         return new Rows($db, $model, array_keys($data));
     }
@@ -231,23 +234,33 @@ class Model implements \IteratorAggregate, \ArrayAccess {
 
     /**
      * return the first line
+     * @param \Gb_Db[optional] $db
      * @param array|string[optional] $cond array("col"=>"value") or array("col"=>array(1,2)) or "col='value'"
+     * @param array[optional] $options array("order"=>"cola DESC, colb", "limit"=>10, "offset"=>5)
      * @see findFirstOrThrows
      * @return null|\Gb\Model\Model
      */
-    public static function findFirst($cond=null) {
+    public static function findFirst($db__cond__options=null) {
         $args = func_get_args();
-        $cond = array_pop($args);
-        $db = array_pop($args); if (!$db) {$db = self::$_db; };
+        $db = self::$_db;
+        if (isset($args[0]) && $args[0] instanceof \Gb_Db) {
+            $db = array_shift($args);
+        }
+        $cond = array_shift($args);
+        $options = array_shift($args); if (null===$options){$options=array();}
 
-        $sql = static::_find($db, $cond);
+        $sql = static::_find($db, $cond, $options);
         $sql .= " LIMIT 1";
 
         $data = $db->retrieve_one($sql);
+        if ($data === false) {
+            return null;
+        }
+        $data = self::castInteger_one($data);
+
         // merge the row in the buffer.
         $id = $data[static::$_pk];
         if ($id !== null) {
-            $data[static::$_pk] = (int) $id;
             static::$_buffer[$id] = $data;
 
             $model = get_called_class();
@@ -259,13 +272,14 @@ class Model implements \IteratorAggregate, \ArrayAccess {
 
     /**
      * return the first line or throw an exception
+     * @param \Gb_Db[optional] $db
      * @param array|string[optional] $cond array("col"=>"value") or array("col"=>array(1,2)) or "col='value'"
+     * @param array[optional] $options array("order"=>"cola DESC, colb", "limit"=>10, "offset"=>5)
      * @see findFirst
      * @return null|\Gb\Model\Model
      */
-    public static function findFirstOrThrows($cond=null) {
-        $z = "Row not found for Model " . get_called_class();
-        $ret = self::findFirst($cond);
+    public static function findFirstOrThrows($db__cond__options=null) {
+        $ret = call_user_func_array("self::findFirst", func_get_args());
         if (null === $ret) {
             throw new \Gb_Exception("Row not found for Model " . get_called_class());
         }
@@ -282,6 +296,15 @@ class Model implements \IteratorAggregate, \ArrayAccess {
      * @return string
      */
     protected static function _find(\Gb_db $db, $cond, $options=array()) {
+        if (isset($options["IS_SQL"]) && true == $options["IS_SQL"]) {
+            $options2 = $options;
+            unset($options2["IS_SQL"]);
+            if (count($options2)) {
+                $cond = $db->quoteIntoMultiple($cond, $options2);
+            }
+
+            return $cond;
+        }
         $tablename = static::$_tablename;
         $sql  = " SELECT * FROM $tablename";
         if (is_array($cond) && count($cond)) {
@@ -289,7 +312,9 @@ class Model implements \IteratorAggregate, \ArrayAccess {
             foreach ($cond as $k=>$v) {
                 if (is_string($k)) {
                     if (is_array($v)) {
-                        $aWhere[] = $db->quoteIdentifier($k) . ' IN (' . $db->quote($v) . ')';
+                        if (count($v)) {
+                            $aWhere[] = $db->quoteIdentifier($k) . ' IN (' . $db->quote($v) . ')';
+                        }
                     } elseif (null === $v) {
                         $aWhere[] = $db->quoteIdentifier($k) . ' IS NULL';
                     } elseif (is_a($v, "Zend_Db_Expr")) {
@@ -304,6 +329,9 @@ class Model implements \IteratorAggregate, \ArrayAccess {
                 }
             }
             $sql .= " WHERE " . join(" AND ", $aWhere);
+            if (count($aWhere) === 0) {
+                return "";
+            }
         } elseif (is_string($cond) && strlen($cond)) {
             $sql .= " WHERE $cond";
         }
@@ -323,13 +351,15 @@ class Model implements \IteratorAggregate, \ArrayAccess {
 
     /**
      * returns a blank row. created_at is handled by save()
+     * @param \Gb_Db[optional] $db
+     * @param array|stdClass[optional] $data
      * @return self
      */
-    public static function create(/* $db=null, $data=null*/) {
+    public static function create($db__data=null) {
         $args = func_get_args();
         $data = array_pop($args);
         $db = array_pop($args);
-        if (is_array($db)) {
+        if (is_array($db) || is_a($db, "stdClass")) {
             $data = $db;
             $db = null;
         }
@@ -351,10 +381,57 @@ class Model implements \IteratorAggregate, \ArrayAccess {
 
 
 
+    /**
+     * Cast columns to integer
+     * @param array[array] $data
+     * @return array[array]
+     */
+    protected static function castInteger_all($data) {
+        $integerCols = self::_getIntegerCols();
+
+        foreach (array_keys($data) as $rowid) {
+            foreach ($integerCols as $col) {
+                if (isset($data[$rowid][$col])) { // is set, and is not null
+                    $data[$rowid][$col] = (int) $data[$rowid][$col];
+                }
+            }
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * Cast columns to integer
+     * @param array $data
+     * @return array
+     */
+    protected static function castInteger_one($data) {
+        if (is_array($data)) {
+            $data = self::castInteger_all(array(0=>$data));
+            $data = $data[0];
+        }
+        return $data;
+    }
 
 
 
 
+
+    /**
+     * return array of column to be casted to int
+     * @return array
+     */
+    protected static function _getIntegerCols() {
+        if (isset(static::$_integerCols)) {
+            $integerCols = static::$_integerCols;
+        } else {
+            $integerCols = array();
+        }
+        $integerCols[] = static::$_pk; // always push id
+
+        return $integerCols;
+    }
 
 
     /***********************/
@@ -443,7 +520,7 @@ class Model implements \IteratorAggregate, \ArrayAccess {
         }
 
         // reload the row into the buffer
-        $this->_fetch($id);
+        self::_fetch($db, $id);
 
         return $this;
     }
@@ -452,9 +529,9 @@ class Model implements \IteratorAggregate, \ArrayAccess {
     /**
      * Set the properties if the column exists
      * @see set
-     * @param array $data
+     * @param array|stdClass $data
      */
-    public function merge(array $data) {
+    public function merge($data) {
         foreach ($data as $key=>$value) {
             if ($this->__isset($key)) {
                 $this->__set($key, $value);
@@ -464,9 +541,9 @@ class Model implements \IteratorAggregate, \ArrayAccess {
     /**
      * Set properties. Even if the column does not exist.
      * @see merge
-     * @param array $data
+     * @param array|stdClass $data
      */
-    public function set(array $data) {
+    public function set($data) {
         foreach ($data as $key=>$value) {
             $this->__set($key, $value);
         }
@@ -519,7 +596,7 @@ class Model implements \IteratorAggregate, \ArrayAccess {
     }
 
     public function __get($key) {
-        if (isset($this->o[$key])) {
+        if ($this->__isset($key)) {
             return $this->o[$key];
         } else {
             return null;
@@ -556,7 +633,7 @@ class Model implements \IteratorAggregate, \ArrayAccess {
         $this->o[$key] = $value;
     }
     public function __isset($key) {
-        return isset($this->o[$key]);
+        return isset($this->o[$key]) || array_key_exists($key, $this->o); // this handle null as existent
     }
     public function __unset($key) {
         unset($this->o[$key]);
@@ -580,7 +657,16 @@ class Model implements \IteratorAggregate, \ArrayAccess {
         return json_encode($this->o);
     }
 
-    public function rel($relname) {
+    /**
+     * returns rows/model for the relation
+     * @param string $relname
+     * @param array[optional] $params
+     *   fCacheMiss[false] true to force database read
+     * @return self|\Gb\Model\Rows
+     */
+    public function rel($relname, array $params = null) {
+        if (null === $params) { $params = array(); }
+        if (!isset($params["fCacheMiss"])) { $params["fCacheMiss"] = false; }
         $model = get_called_class();
         if (!isset($model::$rels[$relname])) {
             throw new \Gb_Exception("relation $relname does not exist for $model");
@@ -592,24 +678,40 @@ class Model implements \IteratorAggregate, \ArrayAccess {
         }
         $reltype  = $relMeta["reltype"];
         if ('belongs_to' === $reltype) {
-            if (!isset($this->rel[$relname])) {
+            if ($params["fCacheMiss"] || !isset($this->rel[$relname])) {
                 $relfk    = $relMeta["foreign_key"];
-            if (!isset($this->o[$relfk])) { throw new \Gb_Exception("Relation {$model}->rel('{$relname}'): there is no column $relfk"); }
+                if (!isset($this->o[$relfk])) { throw new \Gb_Exception("Relation {$model}->rel('{$relname}'): there is no column $relfk"); }
                 $relfk    = $this->o[$relfk];
                 $relat    = $relclass::getOne($this->db, $relfk);
                 $this->rel[$relname] = $relat->asArray();
             }
             return new $relclass($this->db, $this->rel[$relname][$relclass::$_pk], $this->rel[$relname]);
         } elseif ('has_many' === $reltype) {
-            if (!isset($this->rel[$relname])) {
+            if ($params["fCacheMiss"] || !isset($this->rel[$relname])) {
                 // Find the other rows referenced by our line
                 $relfk    = $relMeta["foreign_key"];
                 $relat    = $relclass::findAll($this->db, array($relfk=>$this->o[$relclass::$_pk]));
                 $this->rel[$relname] = $relat->ids();
             }
             return new Rows($this->db, $relclass, $this->rel[$relname]);
+        } elseif ('has_many_through' === $reltype) {
+            if ($params["fCacheMiss"] || !isset($this->rel[$relname])) {
+                // Find the other rows referenced by our line
+                $relfk    = $relMeta["foreign_key"];
+                $through  = $relMeta["through"];
+                $pivClass = $through[0];
+                $pivCol   = $through[1];
+                $pivfk    = $this->o[$relclass::$_pk];
+                //echo "<br />relfk:$relfk // value:$pivfk // relclass:$relclass // pivClass:$pivClass // pivCol:$pivCol<br />";
+                $pivot = $pivClass::findAll($this->db, array($pivCol=>$pivfk));
+                //echo "<br />pivot: $pivot<br />";
+                $relfks   = $pivot->pluck($relfk);
+                $relfks   = array_unique($relfks);
+                $this->rel[$relname] = $relfks;
+            }
+            return new Rows($this->db, $relclass, $this->rel[$relname]);
         } elseif ('belongs_to_json' === $reltype) {
-            if (!isset($this->rel[$relname])) {
+            if ($params["fCacheMiss"] || !isset($this->rel[$relname])) {
                 $relfk    = $relMeta["foreign_key"];
                 if (!isset($this->o[$relfk])) { throw new \Gb_Exception("Relation {$model}->rel('{$relname}'): there is no column $relfk"); }
                 $relfk    = $this->o[$relfk];
@@ -618,6 +720,8 @@ class Model implements \IteratorAggregate, \ArrayAccess {
                 $this->rel[$relname] = $relfk;
             }
             return new Rows($this->db, $relclass, $this->rel[$relname]);
+        } else {
+            throw new \Gb_Exception("Unsupported relation type $reltype for model $model");
         }
     }
 

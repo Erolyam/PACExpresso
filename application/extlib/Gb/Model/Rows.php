@@ -1,7 +1,6 @@
 <?php
 namespace Gb\Model;
 
-
 class Rows implements \IteratorAggregate, \Countable, \ArrayAccess {
     /**
      * @var Gb_Db
@@ -20,13 +19,22 @@ class Rows implements \IteratorAggregate, \Countable, \ArrayAccess {
      */
     protected $rel;
 
-    public function __construct(\Gb_Db $db, $classname, array $data, $rel=array()) {
+    /**
+     * construct a now Rows object
+     * @param \Gb_Db $db
+     * @param string $classname should be a \Gb\Model inherited
+     * @param array $ids
+     * @param array $rel pre-resolved relations
+     * @return \Gb\Model\Rows
+     */
+    public function __construct(\Gb_Db $db, $classname, array $ids, $rel=array()) {
         // $data should be array of integers
-        $data = array_map(function($val){return (int) $val;}, $data);
+        $ids = array_map(function($val){return (int) $val;}, $ids);
         $this->db   = $db;
         $this->nam  = $classname;
-        $this->o    = $data;
+        $this->o    = $ids;
         $this->rel  = $rel;
+        $classname::_getSome($this->db, $ids);   // fetch rows in model buffer
     }
 
     /**
@@ -70,7 +78,7 @@ class Rows implements \IteratorAggregate, \Countable, \ArrayAccess {
     /**
      * Reduce the number of rows and return new \Gb\Model\Rows
      * @param callable $callback
-     * @return self
+     * @return new self
      */
     public function filter($callback) {
         $rowsIds = array();
@@ -99,6 +107,24 @@ class Rows implements \IteratorAggregate, \Countable, \ArrayAccess {
             }
         }
         return null;
+    }
+
+    /**
+     * Sort rows by a callback
+     * @param callable $callback
+     * @return new self
+     */
+    public function sort($callback) {
+        $rowIds = $this->o;
+        $model = $this->nam;
+        $db = $this->db;
+        usort($rowIds, function ($a, $b) use ($db, $model, $callback) {
+            $a = new $model($db, $a, $model::$_buffer[$a]);
+            $b = new $model($db, $b, $model::$_buffer[$b]);
+            return call_user_func($callback, $a, $b);
+        });
+        $class = __CLASS__;
+        return new $class($this->db, $this->nam, $rowIds);
     }
 
 
@@ -138,6 +164,30 @@ class Rows implements \IteratorAggregate, \Countable, \ArrayAccess {
             throw new \Gb_Exception("Cannot append a " . get_class($rows) . " to rows of " . $this->nam);
         } else { // one object
             array_push($this->o, $rows->id);
+        }
+        return $this;
+    }
+
+
+    /**
+     * Merge model/rows to the current rows
+     * @param \Gb\Model|\Gb\Model\Rows $rows
+     * @return self
+     * @throws \Gb_Exception
+     */
+    public function merge($rows) {
+        if (is_a($rows, '\Gb\Model\Rows')) {
+            foreach ($rows as $row) {
+                if (!in_array($row->id, $this->o)) {
+                    array_push($this->o, $row->id);
+                }
+            }
+        } elseif (!is_a($rows, $this->nam)) {
+            throw new \Gb_Exception("Cannot append a " . get_class($rows) . " to rows of " . $this->nam);
+        } else { // one object
+            if (!in_array($rows->id, $this->o)) {
+                array_push($this->o, $rows->id);
+            }
         }
         return $this;
     }
@@ -188,10 +238,15 @@ class Rows implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
     /**
+     * returns rows for the relation
      * @param string $relname
+     * @param array[optional] $params
+     *   fCacheMiss[false] true to force database read
      * @return self
      */
-    public function rel($relname) {
+    public function rel($relname, array $params = null) {
+        if (null === $params) { $params = array(); }
+        if (!isset($params["fCacheMiss"])) { $params["fCacheMiss"] = false; }
         $model = $this->nam;
         if (!isset($model::$rels[$relname])) {
             throw new \Gb_Exception("relation $relname does not exist for $model");
@@ -200,7 +255,7 @@ class Rows implements \IteratorAggregate, \Countable, \ArrayAccess {
         $relclass = $relMeta["class_name"];
         $reltype  = $relMeta["reltype"];
         if ('belongs_to' === $reltype) {
-            if (!isset($this->rel[$relname])) {
+            if ($params["fCacheMiss"] || !isset($this->rel[$relname])) {
                 $relfk    = $relMeta["foreign_key"];
                 // for each line, get the foreign key
                 $relfks   = array_map(function($id) use ($relfk, $model) {
@@ -217,15 +272,32 @@ class Rows implements \IteratorAggregate, \Countable, \ArrayAccess {
             return new Rows($this->db, $relclass, $this->rel[$relname]);
         } elseif ('has_many' === $reltype) {
             // For all of our lines, find the other rows, referenced by our line
-            if (!isset($this->rel[$relname])) {
+            if ($params["fCacheMiss"] || !isset($this->rel[$relname])) {
                 $relfk    = $relMeta["foreign_key"];
                 $relfks   = $this->o;
                 $relat    = $relclass::findAll($this->db, array($relfk=>$relfks));
                 $this->rel[$relname] = $relat->ids();
             }
             return new Rows($this->db, $relclass, $this->rel[$relname]);
+        } elseif ('has_many_through' === $reltype) {
+            if ($params["fCacheMiss"] || !isset($this->rel[$relname])) {
+                // Find the other rows referenced by our line
+                $relfk    = $relMeta["foreign_key"];
+                $through  = $relMeta["through"];
+                $pivClass = $through[0];
+                $pivCol   = $through[1];
+                $pivfks   = $this->o;
+                //echo "<br />relfk:$relfk // values:" . implode(",", $pivfks) . " // relclass:$relclass // pivClass:$pivClass // pivCol:$pivCol<br />";
+                $pivot    = $pivClass::findAll($this->db, array($pivCol=>$pivfks));
+                //echo "<br />pivot: $pivot<br />";
+                $relfks   = $pivot->pluck($relfk);
+                $relfks   = array_unique($relfks);
+                //print_r($pivot);
+                $this->rel[$relname] = $relfks;
+            }
+            return new Rows($this->db, $relclass, $this->rel[$relname]);
         } elseif ('belongs_to_json' === $reltype) {
-            if (!isset($this->rel[$relname])) {
+            if ($params["fCacheMiss"] || !isset($this->rel[$relname])) {
                 $relfk    = $relMeta["foreign_key"];
                 $relfks   = array_map(function($id)use($relfk, $model){return $model::$_buffer[$id][$relfk]; }, $this->o);
                 $relfks2  = array();
@@ -237,6 +309,8 @@ class Rows implements \IteratorAggregate, \Countable, \ArrayAccess {
                 $this->rel[$relname] = $relfks2;
             }
             return new Rows($this->db, $relclass, $this->rel[$relname]);
+        } else {
+            throw new \Gb_Exception("Unsupported relation type $reltype for model $model rows");
         }
     }
 
