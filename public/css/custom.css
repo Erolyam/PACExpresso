@@ -58,6 +58,7 @@ ul.dropdown-menu li.navbar-text {
 }
 .navbar ul.dropdown-menu a {
   padding: 3px 15px !important;
+/* 3px 20px par défaut */
 }
 /******************/
 /* liste de tests */
@@ -202,26 +203,30 @@ body.bodypasser {
   top: -2px;
   left: 5px;
 }
-@media( max-width:767px) {
-  text-align: center;
-  width: 60px;
-  height: 40px;
-  line-height: 40px;
-  border: 1px solid #000;
-  cursor: pointer;
-  display: table-cell;
+@media (max-width:767px) {
+  .passer .qtabctn ul li {
+    text-align: center;
+    width: 60px;
+    height: 40px;
+    line-height: 40px;
+    border: 1px solid #000;
+    cursor: pointer;
+    display: table-cell;
+  }
   .passer .qtabctn ul li.selected {
     border-width: 4px;
   }
 }
-@media( min-width:768px) {
-  text-align: center;
-  width: 60px;
-  height: 40px;
-  line-height: 40px;
-  border-bottom: 1px solid #000;
-  cursor: pointer;
-  position: relative;
+@media (min-width:768px) {
+  .passer .qtabctn ul li {
+    text-align: center;
+    width: 60px;
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    position: relative;
+  }
   .passer .qtabctn ul li:first-child {
     border-top: 1px solid #000;
   }
@@ -270,9 +275,11 @@ body.bodypasser {
 }
 .passer .qtabctn li.result-right {
   background: #c7ff73;
+/* couleur RIGHT */
 }
 .passer .qtabctn li.result-wrong {
   background: #ff8673;
+/* couleur WRONG */
 }
 .passer .qtabctn li:hover {
   background: #ff9400;
