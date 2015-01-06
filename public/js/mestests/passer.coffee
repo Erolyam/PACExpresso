@@ -191,7 +191,7 @@ class MestestsPasser
       url:url
       method:'POST'
       data:{_method:'PUT', qaireAlineaId:qaireAlineaId, answer:after}
-      timeout:10000
+      timeout:20000
     }).fail (jqXHR, textStatus, errorThrown) =>
       alert "Erreur lors de l'enregistrement"
     .done (data, textStatus, jqXHR) =>
@@ -208,7 +208,7 @@ class MestestsPasser
       url:url
       method:'POST'
       data:{_method:'POST', submit:'true'}
-      timeout:10000
+      timeout:20000
     })
       .fail (jqXHR, textStatus, errorThrown) =>
         alert "Erreur lors de l'enregistrement"

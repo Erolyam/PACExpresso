@@ -209,7 +209,7 @@ MestestsPasser = (function() {
         qaireAlineaId: qaireAlineaId,
         answer: after
       },
-      timeout: 10000
+      timeout: 20000
     }).fail((function(_this) {
       return function(jqXHR, textStatus, errorThrown) {
         return alert("Erreur lors de l'enregistrement");
@@ -235,7 +235,7 @@ MestestsPasser = (function() {
         _method: 'POST',
         submit: 'true'
       },
-      timeout: 10000
+      timeout: 20000
     }).fail((function(_this) {
       return function(jqXHR, textStatus, errorThrown) {
         return alert("Erreur lors de l'enregistrement");
