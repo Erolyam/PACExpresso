@@ -58,20 +58,24 @@ respondExt(function($rq, $rs, $ap) {
     }
     apply_env();
 
+    $rs->onError(function($this, $msg, $type, $err){header("HTTP/1.0 500 Application Error");Gb_Log::logException($err); echo "Erreur: " . $msg;});
+
     /**
      * Traduction de chaine. Cherche dans $GLOBALS["translate"].
      * @param string $in chaine à traduire
      */
-    $rs->tr = function($in) {
+    $rs->tr = function($in, $default=null) {
         $tr = &$GLOBALS["translate"];
         if (isset($tr[$in])) {
             $out = $tr[$in];
-        } else {
+        } elseif ($default === null) {
             $vd = debug_backtrace();
             $file = $vd[1]["file"];
             $line = $vd[1]["line"];
             Gb_Log::logWarning("Texte non traduit : $in ----- $file:$line");
             $out = $in;
+        } else {
+            $out = $default;
         }
         return $out;
     };
