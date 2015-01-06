@@ -18,6 +18,7 @@ class AdmExamensController extends KleinExtController {
     }
 
     public function actionShowMany() {
+        Gb_Log::logInfo(__CLASS__ . "->" . __METHOD__);
         $examens = Examen::getAll();
 
         $exPoolCount = array();
@@ -40,6 +41,7 @@ class AdmExamensController extends KleinExtController {
         require_once("Gb/Form/Backend/GbModel.php");
 
         $id = $this->_rq->param("id");
+        Gb_Log::logInfo(__CLASS__ . "->" . __METHOD__ . "id=$id");
         $examen = Examen::getOne($id);
 
         $form = $examen->getGbForm();
@@ -75,6 +77,7 @@ class AdmExamensController extends KleinExtController {
 
     public function actionRepool() {
         $id = $this->_rq->param("id");
+        Gb_Log::logInfo(__CLASS__ . "->" . __METHOD__ . "id=$id");
         $Examen = Examen::getOne($id);
         $nbalineas = $Examen->nbalineas;
 
@@ -193,3 +196,4 @@ class AdmExamensController extends KleinExtController {
 
 
 }
+
