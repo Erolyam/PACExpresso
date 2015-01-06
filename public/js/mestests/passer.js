@@ -208,7 +208,8 @@ MestestsPasser = (function() {
         _method: 'PUT',
         qaireAlineaId: qaireAlineaId,
         answer: after
-      }
+      },
+      timeout: 10000
     }).fail((function(_this) {
       return function(jqXHR, textStatus, errorThrown) {
         return alert("Erreur lors de l'enregistrement");
@@ -233,7 +234,8 @@ MestestsPasser = (function() {
       data: {
         _method: 'POST',
         submit: 'true'
-      }
+      },
+      timeout: 10000
     }).fail((function(_this) {
       return function(jqXHR, textStatus, errorThrown) {
         return alert("Erreur lors de l'enregistrement");
@@ -242,7 +244,7 @@ MestestsPasser = (function() {
       return function(data, textStatus, jqXHR) {
         var ret;
         if (jqXHR.status !== 200 || !(jqXHR.getResponseHeader('content-type').substr(0, 16) === "application/json")) {
-          alert("Le serveur n'a pas pu enregistrer le questionnaire");
+          alert("Le serveur n'a pas pu enregistrer le questionnaire status=" + jqXHR.status + " response=" + jqXHR.responseText);
           return;
         }
         ret = JSON.parse(jqXHR.responseText);
@@ -296,3 +298,5 @@ MestestsPasser = (function() {
   return MestestsPasser;
 
 })();
+
+//# sourceMappingURL=passer.map

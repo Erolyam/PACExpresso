@@ -191,6 +191,7 @@ class MestestsPasser
       url:url
       method:'POST'
       data:{_method:'PUT', qaireAlineaId:qaireAlineaId, answer:after}
+      timeout:10000
     }).fail (jqXHR, textStatus, errorThrown) =>
       alert "Erreur lors de l'enregistrement"
     .done (data, textStatus, jqXHR) =>
@@ -207,12 +208,13 @@ class MestestsPasser
       url:url
       method:'POST'
       data:{_method:'POST', submit:'true'}
+      timeout:10000
     })
       .fail (jqXHR, textStatus, errorThrown) =>
         alert "Erreur lors de l'enregistrement"
       .done (data, textStatus, jqXHR) =>
         if jqXHR.status isnt 200 or !(jqXHR.getResponseHeader('content-type').substr(0, 16) is "application/json")
-          alert "Le serveur n'a pas pu enregistrer le questionnaire"
+          alert "Le serveur n'a pas pu enregistrer le questionnaire status=#{jqXHR.status} response=#{jqXHR.responseText}"
           return
         ret = JSON.parse(jqXHR.responseText)
         @Qaire = ret.qaire
