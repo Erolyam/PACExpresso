@@ -199,12 +199,13 @@ class MestestsController extends KleinExtController {
 
         $rs->jsp->showSolution = false;
         $keepSolution = false;
-        if ($this->_qaire['score']) {
-            $keepSolution = true;
-            if ($this->_examen->correction === "3") {
-                $rs->jsp->showSolution = true;
+        if ($this->_examen->correction === "3") {
+            $rs->jsp->showSolution = true;
+            if ($this->_qaire['score']) {
+                $keepSolution = true;
             }
         }
+
         $this->subactionPass($keepSolution);
     }
 
