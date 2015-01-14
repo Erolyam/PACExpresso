@@ -58,7 +58,6 @@ ul.dropdown-menu li.navbar-text {
 }
 .navbar ul.dropdown-menu a {
   padding: 3px 15px !important;
-/* 3px 20px par défaut */
 }
 /******************/
 /* liste de tests */
@@ -203,7 +202,7 @@ body.bodypasser {
   top: -2px;
   left: 5px;
 }
-@media (max-width:767px) {
+@media all and (max-width: 767px) {
   .passer .qtabctn ul li {
     text-align: center;
     width: 60px;
@@ -217,7 +216,7 @@ body.bodypasser {
     border-width: 4px;
   }
 }
-@media (min-width:768px) {
+@media all and (min-width: 768px) {
   .passer .qtabctn ul li {
     text-align: center;
     width: 60px;
@@ -275,11 +274,9 @@ body.bodypasser {
 }
 .passer .qtabctn li.result-right {
   background: #c7ff73;
-/* couleur RIGHT */
 }
 .passer .qtabctn li.result-wrong {
   background: #ff8673;
-/* couleur WRONG */
 }
 .passer .qtabctn li:hover {
   background: #ff9400;
