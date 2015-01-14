@@ -10,12 +10,14 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-stylus');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-cssc');
   grunt.loadNpmTasks('grunt-css-url-replace'); // attention customisé !!!
 
   // Default task(s).
   grunt.registerTask('default', [
+      'stylus',
       'css_url_replace:layout_all_css_create',
       'stripBlockComments:layout_all_css',
       'cssc:layout_all_css',
@@ -27,6 +29,17 @@ module.exports = function(grunt) {
   grunt.registerTask('autolint', ['jshint:default', 'watch']);
 
   grunt.initConfig({
+    // compile stylus files to css
+    stylus: {
+      compile: {
+        options: {
+          compress: false,
+        },
+        files: {
+          'public/css/custom.css': 'public/css/custom.styl',
+        }
+      }
+    }, //stylus
 
     // Concat css file, and replaces url() with relative url
     css_url_replace: {
