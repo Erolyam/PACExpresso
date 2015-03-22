@@ -79,6 +79,10 @@
               <? $active = ""; if ($this->layout->current==="examens") {$active = "active"; } ?>
               <li class="<?= $active ?>"><a href="<?= $this->layout->urlExamens?>">Examens</a></li>
             <? endif; ?>
+            <? if ((int) AuthController::getProfile("is_author", 0) === 1) :?>
+              <? $active = ""; if ($this->layout->current==="stats") {$active = "active"; } ?>
+              <li class="<?= $active ?>"><a href="<?= $this->layout->urlStats?>">Stats</a></li>
+            <? endif; ?>
 
             <!--
             <li class="dropdown">

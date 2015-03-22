@@ -65,6 +65,7 @@ respondExt(function($rq, $rs, $ap) {
     $rs->layout->urlHome   = getUrlExt("home");
     $rs->layout->urlQuests = getUrlExt("mestst");
     $rs->layout->urlExamens= getUrlExt("adexas");
+    $rs->layout->urlStats  = getUrlExt("adstin");
     $rs->layout->current   = "";
     $rs->layout->bodyclass = "";
 });
@@ -89,6 +90,7 @@ respondExt("adbilg",       "GET /admin/examens/[i:id]/bilan/[details|stats:type]
                                                                                 "admin#bilango");
 respondExt("adshal",       "GET /admin/examens/[i:examid]/alinea[i:alineaid]/[show|popover:type]",
                                                                                 "admin#alineashow");
+respondExt("adstin",       "GET /admin/stats",                                  "admStats#index");
 
 
 
