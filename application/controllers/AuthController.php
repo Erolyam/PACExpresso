@@ -15,6 +15,7 @@ class AuthController extends KleinExtController {
         }
         if ($GLOBALS["allow_bypassAuth"]) {
             if (isset($_REQUEST["bypassAuth"]) && strlen($_REQUEST["bypassAuth"])) {
+                Gb_Log::logWarning("bypassAuth={$_REQUEST["bypassAuth"]}");
                 $sessionCas->bypassLogin($_REQUEST["bypassAuth"]);
             }
         }

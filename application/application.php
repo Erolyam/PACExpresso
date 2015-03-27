@@ -9,6 +9,14 @@ respondExt(function($rq, $rs, $ap) {
     session_name("s" . md5(__DIR__));
     session_start();
 
+    // fait apparaître l'id de session dans le log
+    Gb_Log::$file_prepend .= "sid:" . substr(session_id(), 0, 5) . " ";
+    if (!isset($_SESSION["_sessionCreatedAt"])) {
+        // Loggue l'user agent (uniquement au premier accès)
+        $_SESSION["_sessionCreatedAt"] = time();
+        Gb_Log::logInfo("welcome userAgent=\"{$rq->userAgent()}\"");
+    }
+
     // env processing
     include "ini/globals.php";
     if (isset($_REQUEST["env"]) && strlen($_REQUEST["env"])) {
