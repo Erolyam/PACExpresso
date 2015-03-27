@@ -19,7 +19,7 @@
     <% if (solution===null) { %>
       <div class='letter'>
         <label>
-          <%= letter %>: <input type='checkbox' class='etu' <%= checked %> />
+          <%= letter %>: <input type='checkbox' <% if (disabled) { %> disabled <% } %> class='etu' <%= checked %> />
         </label>
       </div>
     <% } else { %>

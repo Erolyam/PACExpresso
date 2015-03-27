@@ -217,6 +217,16 @@ class MestestsController extends KleinExtController {
             $questionAlineaId = $qaireAlinea['questionalinea_id'];
             $rs->jsp->aAlineas[$questionAlineaId]['comment'] = null;
 
+            $correction = null;
+            if ($rs->jsp->aQaireAlineas[$qaireAlineaId]['answer'] !== null) {
+                // l'étudiant a indiqué réponse
+                $correction =
+                    ($rs->jsp->aQaireAlineas[$qaireAlineaId]['solution'] == $rs->jsp->aQaireAlineas[$qaireAlineaId]['answer']) ?
+                    ("right") :
+                    ("wrong");
+            }
+            $rs->jsp->aQaireAlineas[$qaireAlineaId]['correction'] = $correction;
+
             if (!$keepSolution) {
                 $rs->jsp->aQaireAlineas[$qaireAlineaId]['solution'] = null;
                 $rs->jsp->aAlineas[$questionAlineaId]['solution'] = null;

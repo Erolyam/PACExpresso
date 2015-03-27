@@ -54,12 +54,13 @@ class MestestsPasser
       index    = parseInt(qaireAlinea.order, 10)
       resultClass = 'result'
       img = ""
-      if qaireAlinea.solution?
+      if @Qaire.score?
         #console.log(@Qaire.solution_json)
         #img = "<img src='public/img/red_64.png' />"
         etu_ans = parseInt(qaireAlinea.answer, 10)
-        solutio = parseInt(qaireAlinea.solution,10)
-        if etu_ans is solutio
+        solutio = parseInt(qaireAlinea.solution, 10)
+        correct = qaireAlinea.correction;
+        if (etu_ans is solutio) or (correct is 'right')
           resultClass = 'result-right'
           img = "<img src='public/img/green_64black.png' />"
         else
@@ -126,14 +127,15 @@ class MestestsPasser
       if solution?
         solution = parseInt(solution, 10)
       curWeight = 1
-      _.forEach JSON.parse(alinea.answers_json), (answer, index) ->
+      _.forEach JSON.parse(alinea.answers_json), (answer, index) =>
         checked    = ""
         checked    = "checked" if (total & curWeight)
         checkedSol = ""
         if solution?
           checkedSol = "checked" if (solution & curWeight)
         curWeight <<= 1
-        html = tpl({body:answer, letter:String.fromCharCode(65+index), checked:checked, solution:solution, checkedSol:checkedSol})
+        disabled = if @Qaire.score != null then true else false
+        html = tpl({body:answer, letter:String.fromCharCode(65+index), disabled:disabled, checked:checked, solution:solution, checkedSol:checkedSol})
         targetAnswers.append(html)
     else
       # clic sur récapitulatif

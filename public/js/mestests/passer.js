@@ -49,15 +49,16 @@ MestestsPasser = (function() {
     target.empty();
     _.forEach(this.aQaireAlineas, (function(_this) {
       return function(qaireAlinea) {
-        var etu_ans, html, img, index, qaireAlineaId, resultClass, solutio;
+        var correct, etu_ans, html, img, index, qaireAlineaId, resultClass, solutio;
         qaireAlineaId = qaireAlinea.id;
         index = parseInt(qaireAlinea.order, 10);
         resultClass = 'result';
         img = "";
-        if (qaireAlinea.solution != null) {
+        if (_this.Qaire.score != null) {
           etu_ans = parseInt(qaireAlinea.answer, 10);
           solutio = parseInt(qaireAlinea.solution, 10);
-          if (etu_ans === solutio) {
+          correct = qaireAlinea.correction;
+          if ((etu_ans === solutio) || (correct === 'right')) {
             resultClass = 'result-right';
             img = "<img src='public/img/green_64black.png' />";
           } else {
@@ -122,28 +123,32 @@ MestestsPasser = (function() {
         solution = parseInt(solution, 10);
       }
       curWeight = 1;
-      return _.forEach(JSON.parse(alinea.answers_json), function(answer, index) {
-        var checked, checkedSol;
-        checked = "";
-        if (total & curWeight) {
-          checked = "checked";
-        }
-        checkedSol = "";
-        if (solution != null) {
-          if (solution & curWeight) {
-            checkedSol = "checked";
+      return _.forEach(JSON.parse(alinea.answers_json), (function(_this) {
+        return function(answer, index) {
+          var checked, checkedSol, disabled;
+          checked = "";
+          if (total & curWeight) {
+            checked = "checked";
           }
-        }
-        curWeight <<= 1;
-        html = tpl({
-          body: answer,
-          letter: String.fromCharCode(65 + index),
-          checked: checked,
-          solution: solution,
-          checkedSol: checkedSol
-        });
-        return targetAnswers.append(html);
-      });
+          checkedSol = "";
+          if (solution != null) {
+            if (solution & curWeight) {
+              checkedSol = "checked";
+            }
+          }
+          curWeight <<= 1;
+          disabled = _this.Qaire.score !== null ? true : false;
+          html = tpl({
+            body: answer,
+            letter: String.fromCharCode(65 + index),
+            disabled: disabled,
+            checked: checked,
+            solution: solution,
+            checkedSol: checkedSol
+          });
+          return targetAnswers.append(html);
+        };
+      })(this));
     } else {
       if (this.Qaire.score === null) {
         tpl = _.template($('#tplqRecapConfirm').html().trim());
