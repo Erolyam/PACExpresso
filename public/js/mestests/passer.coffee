@@ -213,10 +213,13 @@ class MestestsPasser
       .fail (jqXHR, textStatus, errorThrown) =>
         alert "Erreur lors de l'enregistrement"
       .done (data, textStatus, jqXHR) =>
-        if jqXHR.status isnt 200 or !(jqXHR.getResponseHeader('content-type').substr(0, 16) is "application/json")
-          alert "Le serveur n'a pas pu enregistrer le questionnaire status=#{jqXHR.status} response=#{jqXHR.responseText}"
+        status = jqXHR.status
+        type = jqXHR.getResponseHeader('content-type')
+        resp = jqXHR.responseText
+        if status isnt 200 or !(type.substr(0, 16) is "application/json")
+          alert "Le serveur n'a pas pu enregistrer le questionnaire status=#{status} type=#{type} response=#{resp}"
           return
-        ret = JSON.parse(jqXHR.responseText)
+        ret = JSON.parse(resp)
         @Qaire = ret.qaire
         @aQaireAlineas = ret.aQaireAlineas
 
