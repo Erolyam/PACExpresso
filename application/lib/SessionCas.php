@@ -1,39 +1,46 @@
 <?php
-
-/* EXEMPLE D'UTILISATION
-session_name("s" . md5(__DIR__)); // Or custom session php id. Must be application unique
-                                  // warning for load balancer : the session storage must be shared between hosts,
-                                  // and the phpsessid must be the same
-$sessionCas = SessionCas::getSingleton();
-if (isset($_GET["caslogout"])) {
-$sessionCas->logout();
-}
-$isAuth = $sessionCas->isAuthenticated();
-if ($isAuth) {
-$login = $sessionCas->getUser();
-echo "Authentifié en tant que $login. ";
-$url = $sessionCas->getLogoutUrl();
-echo "<a href='$url'>se déconnecter</a>";
-} else {
-$url = $sessionCas->getLoginUrl();
-echo "<a href='$url'>s'authentifier</a>";
-}
-*/
-
-
-// TODO: rajouter un timer pour vérifier l'auth
-// quand on est pas connecté, ne fait pas des requetes vers le cas à chaque fois
-// ajouter un mode verbose
-
 /**
+ * SessionCas
+ * **********
+ * Simplifie l'utilisation de Jasig CAS pour l'Université de Franche Comté
+ *
+ * EXEMPLE D'UTILISATION
+ * // Our custom session php id. Must be application unique.
+ * // Warning for load balancer : the session storage must be shared between hosts,
+ * // and the phpsessid must be the same
+ * session_name("s" . md5(__DIR__));
+ *
+ * $sessionCas = SessionCas::getSingleton();
+ * if (isset($_GET["caslogout"])) {
+ *   $sessionCas->logout();
+ * }
+ * $isAuth = $sessionCas->isAuthenticated();
+ * if ($isAuth) {
+ *   $login = $sessionCas->getUser();
+ *   echo "Authenticated as $login. ";
+ *   $url = $sessionCas->getLogoutUrl();
+ *   echo "<a href='$url'>Log out</a>";
+ * } else {
+ *   $url = $sessionCas->getLoginUrl();
+ *   echo "<a href='$url'>Log in</a>";
+ *}
+ *
  * @author gbouthenot
- * @version 1.4
+ * @version 1.5
+ * changes: 1.4 -> 1.5
+ *   * (BREAKING) include "extlib/phpCAS/CAS.php" instead of "extlib/CAS.php"
+ *   * better comments
  * changes: 1.3 -> 1.4
  *   * 2013-09-28: bypassLogin() replaces casUser if already set
  * changes: 1.2 -> 1.3
  *   * handle $_SERVER["X_SSL"]: make Client->isHttps handle proxyfied ssl
  *   * example update
+ *
+ * @todo TODO: rajouter un timer pour vérifier l'auth
+ * @todo quand on est pas connecté, ne fait pas des requetes vers le cas à chaque fois
+ * @todo ajouter un mode verbose
  */
+
 class SessionCas {
     protected static $_instance = null;     // singleton
 
@@ -102,11 +109,13 @@ class SessionCas {
 
     protected function _initCas() {
         if (true !== $this->_casInitiated) {
+            require_once "extlib/phpCAS/CAS.php";
+
             $cas_host = 'cas.univ-fcomte.fr';
             $cas_context = '/cas';
             $cas_port = 443;
-            require_once("extlib/CAS.php");
-            phpCAS::client(CAS_VERSION_2_0, $cas_host, $cas_port, $cas_context, false); //start_session = false
+
+            phpCAS::client(CAS_VERSION_2_0, $cas_host, $cas_port, $cas_context, /* start_session */ false);
             phpCAS::setNoCasServerValidation();
 
             $this->_casInitiated = true;
