@@ -6,6 +6,7 @@ require_once "lib/kleinExt.php";
 
 // démarrage session, env processing
 respondExt(function($rq, $rs, $ap) {
+    // Démarrage de la session avec un nom dépendant du filename, pour éviter collision avec d'autres applis
     session_name("s" . md5(__DIR__));
     session_start();
 
