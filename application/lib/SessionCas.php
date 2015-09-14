@@ -8,7 +8,7 @@
  * // Our custom session php id. Must be application unique.
  * // Warning for load balancer : the session storage must be shared between hosts,
  * // and the phpsessid must be the same
- * session_name("s" . md5(__DIR__));
+ * session_name("s" . substr(md5(__DIR__), 0, 31));
  *
  * $sessionCas = SessionCas::getSingleton();
  * if (isset($_GET["caslogout"])) {
@@ -26,7 +26,9 @@
  *}
  *
  * @author gbouthenot
- * @version 1.5
+ * @version 1.6
+ * changes: 1.5 -> 1.6
+ *   * code style
  * changes: 1.4 -> 1.5
  *   * (BREAKING) include "extlib/phpCAS/CAS.php" instead of "extlib/CAS.php"
  *   * better comments
@@ -42,16 +44,22 @@
  */
 
 class SessionCas {
+
     protected static $_instance = null;     // singleton
 
     // these vars are always available
     protected $_user         = null;        // string login name (only if authenticated)
+
     protected $_urlLogin     = null;        // url to use to log in (only if not authenticated)
+
     protected $_casInitiated = null;        // true when phpCAS has been instanced
+
     protected $_bypassLogin  = null;        // "login" to use. Don't try to use CAS
+
     protected $_init         = null;
 
-    protected function __construct() { }
+    protected function __construct() {
+    }
 
     protected function _init() {
         if (null === $this->_init) {
@@ -68,7 +76,7 @@ class SessionCas {
 
                     phpCAS::checkAuthentication();
                     $casCheck = phpCAS::isAuthenticated();
-                    if (TRUE === $casCheck) {
+                    if (true === $casCheck) {
                         $casUser = phpCAS::getUser();
                         $_SESSION["casUser"]      = $casUser;
                     } else {
@@ -120,7 +128,6 @@ class SessionCas {
 
             $this->_casInitiated = true;
         }
-        return;
     }
 
 
@@ -140,12 +147,12 @@ class SessionCas {
         return $this->_urlLogin;
     }
 
-    public function getLogoutUrl($redirUrl=null) {
+    public function getLogoutUrl($redirUrl = null) {
         $this->_init();
         return $this->_getThisUrl() . "?caslogout";
     }
 
-    public function logout($redirUrl=null) {
+    public function logout($redirUrl = null) {
         $this->_init();
         $url = "";
         if (null !== $redirUrl && "" !== $redirUrl) {

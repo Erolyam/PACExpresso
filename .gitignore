@@ -3,5 +3,7 @@
 .buildpath
 .htaccess
 application/ini/globals.php
+public/js/**/*.map
+public/js/gb.coffee
 var/db.*
 var/logfile.*
