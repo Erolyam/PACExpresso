@@ -92,6 +92,7 @@ respondExt(                "PUT /vostests/[i:id]",                              
 respondExt(                "POST /vostests/[i:id]",                             "mestests#submit");
 
 respondExt("adexas",       "GET /admin/examens",                                "admExamens#showMany");
+respondExt("adexan",       "GET|POST /admin/examens/new",                       "admExamens#showOne");
 respondExt("adexa1",       "GET|POST /admin/examens/[i:id]",                    "admExamens#showOne");
 respondExt("adexre",       "GET /admin/examens/[i:id]/repool",                  "admExamens#repool");
 respondExt("adbilh",       "GET /admin/examens/[i:id]/bilan",                   "admin#bilanhome");

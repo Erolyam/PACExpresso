@@ -40,10 +40,20 @@ class AdmExamensController extends KleinExtController {
         require_once("Gb/Form2.php");
         require_once("Gb/Form/Backend/GbModel.php");
 
-        $id = $this->_rq->param("id");
-        Gb_Log::logInfo(__CLASS__ . "->" . __METHOD__ . "id=$id");
-        $examen = Examen::getOne($id);
+        if (isset($_POST["GBFORM_id"])) {
+            $id = $_POST["GBFORM_id"];
+        } else {
+            $id = $this->_rq->param("id");
+        }
 
+        if (null === $id) {
+            $id = "new";
+            $examen = Examen::create();
+        } else {
+            $examen = Examen::getOne($id);
+        }
+
+        Gb_Log::logInfo(__CLASS__ . "->" . __METHOD__ . "new");
         $form = $examen->getGbForm();
         $backend = new Gb_Form_Backend_GbModel($examen);
         $form->backend($backend);
@@ -58,9 +68,6 @@ class AdmExamensController extends KleinExtController {
                 $this->_rs->flash($msg, "warn");
             }
         }
-
-
-
 
         // try {
         //     $this->_rq->validate('key', 'The key was invalid')->isLen(32);
