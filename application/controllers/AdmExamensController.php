@@ -46,9 +46,10 @@ class AdmExamensController extends KleinExtController {
             $id = $this->_rq->param("id");
         }
 
-        if (null === $id) {
+        if ((int) $id === 0) {
             $id = "new";
             $examen = Examen::create();
+            $examen->author_id = AuthController::getUser("id");
         } else {
             $examen = Examen::getOne($id);
         }
