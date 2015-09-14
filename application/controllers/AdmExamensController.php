@@ -151,7 +151,7 @@ class AdmExamensController extends KleinExtController {
         $tries      = 0;
 
         while($total < $nombreDemandeMin) {
-            if ($tries++ > 100) {
+            if ($tries++ > 400) {
                 throw new Exception("Cannot create a new Questionnaire");
             }
             $rand = rand(0, $nbQuestions-1);

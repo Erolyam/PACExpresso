@@ -102,8 +102,8 @@ class Examen extends \Gb\Model\Model {
 "is_active"       => array("typ"=>"enum",       "des"=>"L'examen peut être passé"),
 "is_redoable"     => array("typ"=>"enum",       "des"=>"Une fois terminé, peut-on repasser l'examen ?"),
 "is_showsolution" => array("typ"=>"enum",       "des"=>""),
-//"themes_ids"      => array("typ"=>"",           "des"=>""),
-//"questions_ids"   => array("typ"=>"",           "des"=>""),
+"themes_ids"      => array("typ"=>"",           "des"=>"Themes, séparés par des /"),
+"questions_ids"   => array("typ"=>"",           "des"=>"Questions, séparées par des /"),
 "nbalineas"       => array("typ"=>"num",        "des"=>"Nombre de questions total que doit avoir l'examen"),
 "maxminutes"      => array("typ"=>"num",        "des"=>"Limite la durée qu'à l'étudiant pour répondre."),
 "correction"      => array("typ"=>"enum",       "des"=>"0:aucun, pas même le total. 1:indique juste le total. 2:Montre les questions fausses. 3:Révêle la solution."),
@@ -134,6 +134,14 @@ class Examen extends \Gb\Model\Model {
         )));
         $group->append(new Gb_Form_Elem_Textarea("comment",          array("label"=>"Commentaire: ",
             "postInput"=>"Commentaire. Visible par tout le monde.",
+        )));
+        $group->append(new Gb_Form_Elem_Text(    "themes_ids",       array("fMandatory"=>true, "label"=>"Thèmes: ",
+            "postInput"=>"Séparés par des /. Par défaut, mettre '//'",
+            "title"=>"/123/456/", "placeholder"=>"/123/456/", "regexp"=>'/^\/[0-9\/]*\/$/',
+        )));
+        $group->append(new Gb_Form_Elem_Text(    "questions_ids",       array("fMandatory"=>true, "label"=>"Questions: ",
+            "postInput"=>"Séparées par des /. Par défaut, mettre '//'",
+            "title"=>"/123/456/", "placeholder"=>"/123/456/", "regexp"=>'/^\/[0-9\/]*\/$/',
         )));
         $group->append(new Gb_Form_Elem_Text(    "date_start",       array("label"=>"Date début: ",
             "postInput"=>"Si renseigné, date mini",
