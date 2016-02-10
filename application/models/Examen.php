@@ -240,7 +240,7 @@ class Examen extends \Gb\Model\Model {
 
 
     /**
-     * Renvoie le statut d'un examen pour un étudiant
+     * Renvoie le statut de l'examen pour un étudiant
      * @param integer $etudiant_id
      * @return stdClass
      *           canCreate  : boolean
@@ -262,8 +262,12 @@ class Examen extends \Gb\Model\Model {
         $notSubmitted = $qaires->filter(function($qaire) {
             return $qaire->score === null;
         });
-        $nbSubmitted = $nbStarted - $notSubmitted->count();
-        $examen = $notSubmitted->first(false);
+        $nbSubmitted = $nbStarted - ($notSubmitted->count());
+        $lastId = null;
+        if ($notSubmitted->count() > 0) {
+            $examen = $notSubmitted->first(false);
+            $lastId = $examen->id;
+        }
 
         $status = new stdClass();
         $status->canCreate    = false;
@@ -285,22 +289,23 @@ class Examen extends \Gb\Model\Model {
             } elseif ($isRedoable && $nbStarted > $nbSubmitted) {
                 // Continuer le test commencé
                 $status->canResume    = true;
-                $status->lastId       = $examen->id;
+                $status->lastId       = $lastId;
             } elseif (!$isRedoable && $nbSubmitted > 0) {
                 // Résultats de ce test (ne peut plus être refait parce que déjà fait)
-                $status->lastId       = $examen->id;
+                $status->lastId       = $lastId;
                 $status->resultOnly   = true;
             }
         } else {
             if ($nbSubmitted > 0) {
                 // Résultats de cet ancien test (ne peut plus être refait, parce que fermé)
-                $status->lastId       = $examen->id;
+                $status->lastId       = $lastId;
                 $status->resultOnly   = true;
             } else {
                 $status->neverStarted = true;
             }
         }
 
+        Gb_Log::LogDebug("statusForStudent", $status);
         return $status;
     }
 
