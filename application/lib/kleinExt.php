@@ -312,11 +312,7 @@ respondExt(function( _Request $rq, _Response $rs, _App $ap){
 
         if (is_string($out)) {
             $rs->header('Content-type: text/plain; charset=UTF-8');
-            if (strlen($out)) {
-                echo $out;
-            } else {
-                echo $statusText;
-            }
+            echo $out;
         } else {
             if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
                 $json = json_encode($out, JSON_UNESCAPED_SLASHES);
